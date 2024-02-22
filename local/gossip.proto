@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package gossip;
+
+import "google/protobuf/empty.proto";
+
+message GossipMessage {
+  string message = 1;
+}
+
+service GossipService {
+  rpc SendMessage (GossipMessage) returns (google.protobuf.Empty);
+}
