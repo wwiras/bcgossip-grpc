@@ -2,12 +2,16 @@ syntax = "proto3";
 
 package gossip;
 
-import "google/protobuf/empty.proto";
-
 message GossipMessage {
   string message = 1;
+  string sender_id = 2;  // Add this line
+}
+
+message Acknowledgment {
+  string details = 1;
 }
 
 service GossipService {
-  rpc SendMessage (GossipMessage) returns (google.protobuf.Empty);
+  rpc SendMessage (GossipMessage) returns (Acknowledgment);
 }
+

@@ -2,7 +2,6 @@
 import asyncio
 import grpc
 import sys
-from google.protobuf import empty_pb2
 import gossip_pb2
 import gossip_pb2_grpc
 
@@ -15,18 +14,21 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
     async def SendMessage(self, request, context):
         message = request.message
-        print(f"Node {self.node_id} received message: '{message}'")
+        sender_id = request.sender_id
+        print(f"Node {self.node_id} received message: '{message}' from Node {sender_id}")
         if message not in self.received_messages:
             self.received_messages.add(message)
-            await self.gossip_message(message)
-        return empty_pb2.Empty()
+            await self.gossip_message(message, sender_id)
+            return gossip_pb2.Acknowledgment(details=f"Node {self.node_id} received: {message} from Node {sender_id}")
+        else:
+            return gossip_pb2.Acknowledgment(details=f"Node {self.node_id} ignored duplicate: {message} from Node {sender_id}")
 
-    async def gossip_message(self, message):
+    async def gossip_message(self, message, sender_id):
         for peer in self.peers:
             async with grpc.aio.insecure_channel(peer) as channel:
                 try:
                     stub = gossip_pb2_grpc.GossipServiceStub(channel)
-                    await stub.SendMessage(gossip_pb2.GossipMessage(message=message))
+                    await stub.SendMessage(gossip_pb2.GossipMessage(message=message, sender_id=self.node_id))
                     print(f"Node {self.node_id} forwarded message to {peer}")
                 except grpc.aio.AioRpcError as e:
                     print(f"Failed to send message to {peer}: {e}")
@@ -34,7 +36,6 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
     async def start_server(self):
         server = grpc.aio.server()
         gossip_pb2_grpc.add_GossipServiceServicer_to_server(self, server)
-        # server.add_insecure_port(f'127.0.0.1:{self.port}')
         server.add_insecure_port(f'[::]:{self.port}')
         print(f"Node {self.node_id} listening on port {self.port}")
         await server.start()

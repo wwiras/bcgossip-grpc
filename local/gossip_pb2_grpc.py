@@ -2,7 +2,6 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-from google.protobuf import empty_pb2 as google_dot_protobuf_dot_empty__pb2
 import gossip_pb2 as gossip__pb2
 
 
@@ -18,7 +17,7 @@ class GossipServiceStub(object):
         self.SendMessage = channel.unary_unary(
                 '/gossip.GossipService/SendMessage',
                 request_serializer=gossip__pb2.GossipMessage.SerializeToString,
-                response_deserializer=google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+                response_deserializer=gossip__pb2.Acknowledgment.FromString,
                 )
 
 
@@ -37,7 +36,7 @@ def add_GossipServiceServicer_to_server(servicer, server):
             'SendMessage': grpc.unary_unary_rpc_method_handler(
                     servicer.SendMessage,
                     request_deserializer=gossip__pb2.GossipMessage.FromString,
-                    response_serializer=google_dot_protobuf_dot_empty__pb2.Empty.SerializeToString,
+                    response_serializer=gossip__pb2.Acknowledgment.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -62,6 +61,6 @@ class GossipService(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/gossip.GossipService/SendMessage',
             gossip__pb2.GossipMessage.SerializeToString,
-            google_dot_protobuf_dot_empty__pb2.Empty.FromString,
+            gossip__pb2.Acknowledgment.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

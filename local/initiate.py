@@ -4,13 +4,14 @@ import grpc
 import gossip_pb2
 import gossip_pb2_grpc
 
-async def send_message(target_port, message):
+async def send_message(target_port, message, sender_id):
     async with grpc.aio.insecure_channel(f'localhost:{target_port}') as channel:
         stub = gossip_pb2_grpc.GossipServiceStub(channel)
-        await stub.SendMessage(gossip_pb2.GossipMessage(message=message))
-        print(f"Message sent to Node at port {target_port}")
+        response = await stub.SendMessage(gossip_pb2.GossipMessage(message=message, sender_id=sender_id))
+        print(f"Received acknowledgment: {response.details}")
 
 if __name__ == '__main__':
     target_port = input("Enter target node port: ")
     message = input("Enter message to send: ")
-    asyncio.run(send_message(target_port, message))
+    sender_id = input("Enter sender node ID: ")
+    asyncio.run(send_message(target_port, message, sender_id))
