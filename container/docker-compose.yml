@@ -1,0 +1,61 @@
+version: '3.8'
+services:
+  node1:
+    build: .
+    environment:
+      - NODE_ID=node1
+    networks:
+      gossip-net:
+        ipv4_address: 172.28.0.2
+
+  node2:
+    build: .
+    environment:
+      - NODE_ID=node2
+    networks:
+      gossip-net:
+        ipv4_address: 172.28.0.3
+
+  node3:
+    build: .
+    environment:
+      - NODE_ID=node3
+    networks:
+      gossip-net:
+        ipv4_address: 172.28.0.4
+
+networks:
+  gossip-net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+
+#version: '3.8'
+#services:
+#  node1:
+#    build: .
+#    environment:
+#      - NODE_ID=node1
+#    networks:
+#      - gossip-net
+#
+#  node2:
+#    build: .
+#    environment:
+#      - NODE_ID=node2
+#    networks:
+#      - gossip-net
+#
+#  node3:
+#    build: .
+#    environment:
+#      - NODE_ID=node3
+#    networks:
+#      - gossip-net
+#
+#networks:
+#  gossip-net:
+#    driver: bridge
+
