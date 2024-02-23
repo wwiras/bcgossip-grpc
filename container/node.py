@@ -14,7 +14,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
     def SendMessage(self, request, context):
         message = request.message
         sender_id = request.sender_id
-        print(f"{self.node_id} received message: '{message}' from {sender_id}")
+        print(f"{self.node_id} received message: '{message}' from {sender_id}", flush=True)
         self.peers.add(sender_id)
         if message not in self.received_messages:
             self.received_messages.add(message)
@@ -30,15 +30,15 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                     try:
                         stub = gossip_pb2_grpc.GossipServiceStub(channel)
                         stub.SendMessage(gossip_pb2.GossipMessage(message=message, sender_id=self.node_id))
-                        print(f"{self.node_id} forwarded message to {peer_id}")
+                        print(f"{self.node_id} forwarded message to {peer_id}", flush=True)
                     except grpc.RpcError as e:
-                        print(f"Failed to send message to {peer_id}: {e}")
+                        print(f"Failed to send message to {peer_id}: {e}", flush=True)
 
     def start_server(self):
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         gossip_pb2_grpc.add_GossipServiceServicer_to_server(self, server)
         server.add_insecure_port(f'[::]:{self.port}')
-        print(f"{self.node_id} listening on port {self.port}")
+        print(f"{self.node_id} listening on port {self.port}", flush=True)
         server.start()
         server.wait_for_termination()
 
