@@ -1,19 +1,22 @@
-version: '3'
+version: '3.8'
 services:
-  nodeA:
+  node1:
+    container_name: node1
     build: .
     environment:
-      NODE_NAME: nodeA
-      NEIGHBORS: nodeB,nodeC
+      NODE_NAME: node1
+      NEIGHBORS: node2,node3
 
-  nodeB:
+  node2:
+    container_name: node2
     build: .
     environment:
-      NODE_NAME: nodeB
-      NEIGHBORS: nodeA,nodeC
+      NODE_NAME: node2
+      NEIGHBORS: node1,node3
 
-  nodeC:
+  node3:
+    container_name: node3
     build: .
     environment:
-      NODE_NAME: nodeC
-      NEIGHBORS: nodeA,nodeB
+      NODE_NAME: node3
+      NEIGHBORS: node1,node2
