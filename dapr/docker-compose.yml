@@ -1,0 +1,19 @@
+version: '3'
+services:
+  nodeA:
+    build: .
+    environment:
+      NODE_NAME: nodeA
+      NEIGHBORS: nodeB,nodeC
+
+  nodeB:
+    build: .
+    environment:
+      NODE_NAME: nodeB
+      NEIGHBORS: nodeA,nodeC
+
+  nodeC:
+    build: .
+    environment:
+      NODE_NAME: nodeC
+      NEIGHBORS: nodeA,nodeB

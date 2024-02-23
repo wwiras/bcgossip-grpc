@@ -1,0 +1,2 @@
+dapr-ext-grpc>=1.0.0rc2
+dapr>=1.0.0rc2
