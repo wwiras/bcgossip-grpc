@@ -35,10 +35,14 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         message = request.message
         sender_ip = request.sender_id
         # print(f"{self.host} received message: '{message}' from {sender_ip}", flush=True)
-        if sender_ip is not self.host:
-            print(f"{self.host} received message: '{message}' from {sender_ip}", flush=True)
-        else:
+        print(f"sender_ip : {sender_ip}")
+        print(f"self.host : {self.host}")
+
+        if sender_ip == self.host:
             print(f"{self.host} Initiating gossip message: '{message}' from {sender_ip}", flush=True)
+        else:
+            print(f"{self.host} received message: '{message}' from {sender_ip}", flush=True)
+
         if message not in self.received_messages:
             self.received_messages.add(message)
             self.gossip_message(message, sender_ip)
