@@ -11,6 +11,7 @@ def send_message_to_self(message):
 
     with grpc.insecure_channel(target) as channel:
         stub = gossip_pb2_grpc.GossipServiceStub(channel)
+        print(f"Initiating gossip from {host_ip}", flush=True)
         response = stub.SendMessage(gossip_pb2.GossipMessage(message=message, sender_id=host_ip))
         print(f"Received acknowledgment: {response.details}", flush=True)
 
