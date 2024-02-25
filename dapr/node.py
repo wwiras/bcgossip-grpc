@@ -43,4 +43,3 @@ def send_message(target_service, message):
 if __name__ == "__main__":
     print(f"Node {current_node} listening on port 50051", flush=True)
     app.run(50051)
-
