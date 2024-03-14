@@ -35,6 +35,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         message = str(request.message).strip()  # Ensure message is a plain, trimmed string
         sender_ip = request.sender_id
         if sender_ip == self.host:
+            self.received_message = message
             print(f"Message initiated by {self.host}...", flush=True)
         else:
             # Check whether message already receive ot nor
