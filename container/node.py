@@ -15,8 +15,10 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         message = request.message
         sender_id = request.sender_id
         print(f"{self.node_id} received message: '{message}' from {sender_id}", flush=True)
+        print(f"received message before sending: {self.received_messages}",flush=True)
         if message not in self.received_messages:
             self.received_messages.add(message)
+            print(f"received message after sending: {self.received_messages}", flush=True)
             self.gossip_message(message, sender_id)
             return gossip_pb2.Acknowledgment(details=f"{self.node_id} received: '{message}'")
         else:
