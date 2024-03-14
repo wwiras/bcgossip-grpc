@@ -14,7 +14,6 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # List to keep track of IPs of neighboring nodes
         self.susceptible_nodes = []
         # Set to keep track of messages that have been received to prevent loops
-        self.received_messages = set()
         self.received_message = ""
 
     def get_neighbours(self):
@@ -33,31 +32,21 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                             self.susceptible_nodes.append(i.status.pod_ip)
 
     def SendMessage(self, request, context):
-        # message = request.message
         message = str(request.message).strip()  # Ensure message is a plain, trimmed string
         sender_ip = request.sender_id
         if sender_ip == self.host:
-            print(f"Message initiatied by {self.host}...", flush=True)
+            print(f"Message initiated by {self.host}...", flush=True)
         else:
-            print(f"{self.host} received message: '{message}' from {sender_ip}", flush=True)
-        print(f"received message before sending: {self.received_messages}", flush=True)
-        print(f" current message  == self.received_message : {self.received_message==message}", flush=True)
-
-        # Test single message
-        if self.received_message == message:
-            print(f"{self.host} ignored duplicate: '{message}' from {sender_ip}", flush=True)
-        else:
-            self.received_message = message
-            print(f"{self.host} received: '{message}' from {sender_ip}", flush=True)
-
-        if message not in self.received_messages:
-            self.received_messages.add(message)
-            print(f"received message after sending: {self.received_messages}", flush=True)
-            print(f" message after == self.received_messages : {self.received_message == message}", flush=True)
-            self.gossip_message(message, sender_ip)
-            return gossip_pb2.Acknowledgment(details=f"{self.host} received: '{message}'")
-        else:
-            return gossip_pb2.Acknowledgment(details=f"{self.host} ignored duplicate: '{message}'")
+            # Check whether message already receive ot nor
+            # Notify whether accept it or ignore it
+            if self.received_message == message:
+                print(f"{self.host} ignored duplicate: '{message}' from {sender_ip}", flush=True)
+                return gossip_pb2.Acknowledgment(details=f"{self.host} ignored duplicate: '{message}'")
+            else:
+                self.received_message = message
+                print(f"{self.host} received: '{message}' from {sender_ip}", flush=True)
+                self.gossip_message(message, sender_ip)
+                return gossip_pb2.Acknowledgment(details=f"{self.host} received: '{message}'")
 
     def gossip_message(self, message, sender_ip):
         # Refresh list of neighbors before gossiping to capture any changes
