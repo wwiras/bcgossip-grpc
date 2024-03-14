@@ -34,20 +34,21 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
     def SendMessage(self, request, context):
         message = str(request.message).strip()  # Ensure message is a plain, trimmed string
         sender_ip = request.sender_id
+
+        # For initiating acknowledgment only
         if sender_ip == self.host:
-            self.received_message = message
             print(f"Message initiated by {self.host}...", flush=True)
+
+        # Check whether the message is already received ot not
+        # Notify whether accept it or ignore it
+        if self.received_message == message:
+            print(f"{self.host} ignored duplicate: '{message}' from {sender_ip}", flush=True)
+            return gossip_pb2.Acknowledgment(details=f"{self.host} ignored duplicate: '{message}'")
         else:
-            # Check whether message already receive ot nor
-            # Notify whether accept it or ignore it
-            if self.received_message == message:
-                print(f"{self.host} ignored duplicate: '{message}' from {sender_ip}", flush=True)
-                return gossip_pb2.Acknowledgment(details=f"{self.host} ignored duplicate: '{message}'")
-            else:
-                self.received_message = message
-                print(f"{self.host} received: '{message}' from {sender_ip}", flush=True)
-                self.gossip_message(message, sender_ip)
-                return gossip_pb2.Acknowledgment(details=f"{self.host} received: '{message}'")
+            self.received_message = message
+            print(f"{self.host} received: '{message}' from {sender_ip}", flush=True)
+            self.gossip_message(message, sender_ip)
+            return gossip_pb2.Acknowledgment(details=f"{self.host} received: '{message}'")
 
     def gossip_message(self, message, sender_ip):
         # Refresh list of neighbors before gossiping to capture any changes
