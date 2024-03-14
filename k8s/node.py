@@ -32,7 +32,8 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                             self.susceptible_nodes.append(i.status.pod_ip)
 
     def SendMessage(self, request, context):
-        message = request.message
+        # message = request.message
+        message = str(request.message).strip()  # Ensure message is a plain, trimmed string
         sender_ip = request.sender_id
         if sender_ip == self.host:
             print(f"Message initiatied by {self.host}...", flush=True)
