@@ -15,6 +15,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.susceptible_nodes = []
         # Set to keep track of messages that have been received to prevent loops
         self.received_messages = set()
+        self.received_message = ""
 
     def get_neighbours(self):
         # Clear the existing list to refresh it
@@ -40,9 +41,19 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         else:
             print(f"{self.host} received message: '{message}' from {sender_ip}", flush=True)
         print(f"received message before sending: {self.received_messages}", flush=True)
+        print(f" current message  == self.received_message : {self.received_message==message}", flush=True)
+
+        # Test single message
+        if self.received_message == message:
+            print(f"{self.host} ignored duplicate: '{message}' from {sender_ip}", flush=True)
+        else:
+            self.received_message = message
+            print(f"{self.host} received: '{message}' from {sender_ip}", flush=True)
+
         if message not in self.received_messages:
             self.received_messages.add(message)
             print(f"received message after sending: {self.received_messages}", flush=True)
+            print(f" message after == self.received_messages : {self.received_message == message}", flush=True)
             self.gossip_message(message, sender_ip)
             return gossip_pb2.Acknowledgment(details=f"{self.host} received: '{message}'")
         else:
