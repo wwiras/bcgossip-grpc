@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bcgossip50nodes
+  name: bcgossip200nodes
 spec:
   selector:
     matchLabels:
       run: bcgossip
-  replicas: 50
+  replicas: 200
   template:
     metadata:
       labels:
