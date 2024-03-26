@@ -17,8 +17,3 @@ spec:
         image: wwiras/bcgossip-grpc:v14  # Replace with your actual Docker image
         ports:
         - containerPort: 5050
-        resources:
-          requests:
-            memory: 100Mi
-          limits:
-            memory: 100Mi
