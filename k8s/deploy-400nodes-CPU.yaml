@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bcgossip400nodes
+spec:
+  selector:
+    matchLabels:
+      run: bcgossip
+  replicas: 400
+  template:
+    metadata:
+      labels:
+        run: bcgossip
+    spec:
+      containers:
+      - name: bcgossip-cont
+        image: wwiras/bcgossip-grpc:v14  # Replace with your actual Docker image
+        ports:
+        - containerPort: 5050
+        resources:
+          requests:
+            cpu: "60m"  # 0.06 CPU per pod for 400 pods scenario
+          limits:
+            cpu: "120m"  # 0.12 CPU limit per pod
