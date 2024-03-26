@@ -19,6 +19,6 @@ spec:
         - containerPort: 5050
         resources:
           requests:
-            cpu: "60m"  # 0.06 CPU per pod for 400 pods scenario
+            cpu: "50m"  # 0.05 CPU per pod for 400 pods scenario
           limits:
-            cpu: "120m"  # 0.12 CPU limit per pod
+            cpu: "100m"  # 0.1 CPU limit per pod
