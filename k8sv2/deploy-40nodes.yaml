@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bcgossip40nodes
+spec:
+  selector:
+    matchLabels:
+      run: bcgossip
+  replicas: 40
+  template:
+    metadata:
+      labels:
+        run: bcgossip
+    spec:
+      containers:
+      - name: bcgossip-cont
+        image: wwiras/bcgossip-grpc:v14  # Replace with your actual Docker image
+        ports:
+        - containerPort: 5050

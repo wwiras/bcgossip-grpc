@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bcgossip30nodes
+spec:
+  selector:
+    matchLabels:
+      run: bcgossip
+  replicas: 30
+  template:
+    metadata:
+      labels:
+        run: bcgossip
+      annotations:
+        kubernetes.io/ingress-bandwidth: 10M    # Limit the inbound bandwidth of the pod.
+        kubernetes.io/egress-bandwidth: 10M     # Limit the outbound bandwidth of the pod.
+    spec:
+      containers:
+      - name: bcgossip-cont
+        image: wwiras/bcgossip-grpc:v14  # Replace with your actual Docker image
+        ports:
+        - containerPort: 5050
