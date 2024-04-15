@@ -12,7 +12,7 @@ print(f"output for system= {output}", flush=True)
 
 # STORING THE COMMAND OUTPUT TO A VARIABLE
 import subprocess
-x = subprocess.run(['ls', '-la'])
+x = subprocess.run(['ls', '-la'], capture_output=True)
 print(x)
 print(x.args)
 print(x.returncode)
