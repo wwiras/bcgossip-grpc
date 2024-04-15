@@ -7,7 +7,7 @@ os.system('ls -la')
 # sample using system()
 stream = os.popen('ls -la')
 output = stream.readlines()
-print(output)
+print(f"output for system= {output}", flush=True)
 
 
 # STORING THE COMMAND OUTPUT TO A VARIABLE
