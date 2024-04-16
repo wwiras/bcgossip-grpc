@@ -51,7 +51,9 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             # therefore, only one iteration is required
             if (sender_ip == self.host):
                 self.gossip_message(message, sender_ip)
-            return gossip_pb2.Acknowledgment(details=f"{self.host} received: '{message}'")
+                return gossip_pb2.Acknowledgment(details=f"Done propagate! {self.host} received: '{message}'")
+            else:
+                return gossip_pb2.Acknowledgment(details=f"{self.host} received: '{message}'")
 
     def gossip_message(self, message, sender_ip):
         # Refresh list of neighbors before gossiping to capture any changes
