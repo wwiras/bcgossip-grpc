@@ -19,11 +19,11 @@
 # 5.b. Enter the pod (from execute terminal command)
 # 5.c, Once inside, run python initiate.py --message <message>
 # 5.d. Once output done
+
 import subprocess
 import sys
 import traceback
 import random
-
 
 def run_command(command, shell=False):
     """
@@ -115,17 +115,16 @@ def access_pod_and_initiate_gossip(pod_name):
         out, err = session.communicate('python initiate.py --message cubaan10\n')
         if 'Done propagate!' in out:
             print("Gossip propagation complete.")
+            return True
         else:
             print("Gossip did not complete as expected.")
             print(err)
-
-        # Exiting the shell session
-        session.stdin.write('exit\n')
-        session.stdin.flush()
+            return False
 
     except Exception as e:
         print(f"Error accessing pod {pod_name}: {e}")
         traceback.print_exc()
+        return False
 
 
 def main():
@@ -143,12 +142,12 @@ def main():
     if get_running_pods_count() == 10:
         pod_name = select_random_pod()
         print(f"Selected pod: {pod_name}")
-        access_pod_and_initiate_gossip(pod_name)
+        if access_pod_and_initiate_gossip(pod_name):
+            # Only delete the deployment if gossip was successfully initiated
+            delete_deployment(f"{base_dir}k8sv2/deploy-10nodes.yaml")
     else:
         print("The number of running pods is not equal to 10.")
-
-    # Delete the 10-node deployment after the operations
-    delete_deployment(f"{base_dir}k8sv2/deploy-10nodes.yaml")
+        delete_deployment(f"{base_dir}k8sv2/deploy-10nodes.yaml")
 
 
 if __name__ == '__main__':
