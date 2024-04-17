@@ -8,7 +8,7 @@ import os
 
 
 # 1. Set the service
-os.system('kubectl apply -f ../k8sv2/svc-bcgossip.yaml')
+os.system('kubectl apply -f /home/puluncode/bcgossip-grpc/k8sv2/svc-bcgossip.yaml')
 
 # 2. Set the role python
 # For instance name of the deployment and how many round for the test
