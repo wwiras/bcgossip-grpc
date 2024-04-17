@@ -70,18 +70,47 @@ def apply_kubernetes_config(base_dir, file_path):
         traceback.print_exc()
         sys.exit(1)
 
-def delete_deployment(file_path):
+# def delete_deployment(file_path):
+#     """
+#     Delete a deployment using kubectl without waiting for complete clearance of resources.
+#     """
+#     command = ['kubectl', 'delete', '-f', file_path]
+#     try:
+#         # Initiating the deletion of the deployment
+#         result = subprocess.run(command, check=True, text=True, capture_output=True)
+#         print(f"Deployment deletion initiated and processing for {file_path}.", flush=True)
+#         print(f"Deletion output: {result.stdout}", flush=True)
+#         if result.stderr:
+#             print(f"Deletion error output: {result.stderr}", flush=True)
+#     except subprocess.CalledProcessError as e:
+#         print(f"Failed to delete deployment from {file_path}. Error: {e.stderr}", flush=True)
+#         traceback.print_exc()
+#         sys.exit(1)
+
+def delete_deployment(file_path, timeout=300):
     """
-    Delete a deployment using kubectl without waiting for complete clearance of resources.
+    Delete a deployment using kubectl and wait until no resources are found in the specified namespace.
     """
     command = ['kubectl', 'delete', '-f', file_path]
     try:
         # Initiating the deletion of the deployment
-        result = subprocess.run(command, check=True, text=True, capture_output=True)
-        print(f"Deployment deletion initiated and processing for {file_path}.", flush=True)
-        print(f"Deletion output: {result.stdout}", flush=True)
-        if result.stderr:
-            print(f"Deletion error output: {result.stderr}", flush=True)
+        subprocess.run(command, check=True, text=True, capture_output=True)
+        print(f"Deployment deletion initiated from {file_path}.", flush=True)
+
+        # Monitor for "No resources found" message
+        end_time = time.time() + timeout
+        check_command = ['kubectl', 'get', 'pod']
+        while time.time() < end_time:
+            result = subprocess.run(check_command, text=True, capture_output=True)
+            if "No resources" in result.stdout:
+                print("No resources found in the namespace, deletion confirmed.", flush=True)
+                return True
+            print("Waiting for resources to clear...", flush=True)  # Continuous feedback
+            time.sleep(3)  # wait for 3 seconds before checking again
+
+        print("Timeout waiting for the resources to clear from the namespace.", flush=True)
+        return False
+
     except subprocess.CalledProcessError as e:
         print(f"Failed to delete deployment from {file_path}. Error: {e.stderr}", flush=True)
         traceback.print_exc()
