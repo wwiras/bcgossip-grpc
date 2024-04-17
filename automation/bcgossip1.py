@@ -8,8 +8,14 @@ import os
 
 
 # 1. Set the service
-os.system('kubectl apply -f /home/puluncode/bcgossip-grpc/k8sv2/svc-bcgossip.yaml')
+# os.system('kubectl apply -f /home/puluncode/bcgossip-grpc/k8sv2/svc-bcgossip.yaml')
+command = 'kubectl apply -f /home/puluncode/bcgossip-grpc/k8sv2/svc-bcgossip.yaml'
 
+# Capture the output of the command using subprocess
+result = os.popen(command).read()
+
+# Print the result
+print("Output from command:", result)
 # 2. Set the role python
 # For instance name of the deployment and how many round for the test
 # The propagation test are
