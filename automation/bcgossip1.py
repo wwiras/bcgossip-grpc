@@ -43,35 +43,47 @@ import sys
 import traceback
 
 
-def deploy_application():
-    command = ['kubectl', 'apply', '-f', '/home/puluncode/bcgossip-grpc/k8sv2/svc-bcgossip.yaml']
-
+def apply_kubernetes_config(base_dir, file_path):
+    """
+    Apply a Kubernetes configuration file using kubectl.
+    """
+    full_path = f"{base_dir}{file_path}"
+    command = ['kubectl', 'apply', '-f', full_path]
     try:
         # Run the command and capture stdout and stderr
         result = subprocess.run(command, check=True, text=True, capture_output=True)
 
-        # Check if the deployment was successful
+        # Check if the command was successful
         if 'unchanged' in result.stdout or 'created' in result.stdout:
-            print("bcgossip is ready!")
+            print(f"{full_path} applied successfully!")
         else:
-            print("Deployment updated or other changes applied.")
+            print(f"Changes applied to {full_path}:")
             print(result.stdout)
 
     except subprocess.CalledProcessError as e:
         # Handle errors that result in a non-zero exit code
-        print("An error occurred while applying the deployment.")
+        print(f"An error occurred while applying {full_path}.")
         print(f"Error message: {e.stderr}")
         traceback.print_exc()
         sys.exit(1)
     except Exception as e:
         # Handle other exceptions
-        print("An unexpected error occurred.")
+        print(f"An unexpected error occurred while applying {full_path}.")
         traceback.print_exc()
         sys.exit(1)
 
 
+def main():
+    base_dir = "/home/puluncode/bcgossip-grpc/"
+    # Apply the role for the Python script
+    apply_kubernetes_config(base_dir, 'k8sv2/python-role.yaml')
+
+    # Deploy the main application
+    apply_kubernetes_config(base_dir, 'k8sv2/svc-bcgossip.yaml')
+
+
 if __name__ == '__main__':
-    deploy_application()
+    main()
 
 #!/usr/bin/env python3
 #
