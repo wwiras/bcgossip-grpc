@@ -117,7 +117,6 @@ def delete_deployment(file_path, timeout=300):
         sys.exit(1)
 
 
-
 def select_random_pod():
     """
     Select a random pod from the list of running pods
