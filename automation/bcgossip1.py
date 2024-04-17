@@ -70,37 +70,23 @@ def apply_kubernetes_config(base_dir, file_path):
         traceback.print_exc()
         sys.exit(1)
 
-def delete_deployment(file_path, namespace='default', timeout=300):
+def delete_deployment(file_path):
     """
-    Delete a deployment using kubectl and wait until no resources are found in the specified namespace.
+    Delete a deployment using kubectl without waiting for complete clearance of resources.
     """
     command = ['kubectl', 'delete', '-f', file_path]
     try:
         # Initiating the deletion of the deployment
-        subprocess.run(command, check=True, text=True, capture_output=True)
-        print(f"Deployment deletion initiated from {file_path}.", flush=True)
-
-        # Monitor for "No resources found" message
-        end_time = time.time() + timeout
-        while time.time() < end_time:
-            check_command = ['kubectl', 'get', 'pods', '-n', namespace]
-            result = subprocess.run(check_command, text=True, capture_output=True)
-            print(f"Checking pods: {result.stdout}", flush=True)  # Debug output
-            if "No resources found" in result.stdout:
-                print("No resources found in the namespace, deletion confirmed.", flush=True)
-                return True
-            elif "Error" in result.stderr:
-                print(f"Error checking pods: {result.stderr}", flush=True)  # Error handling
-                break
-            time.sleep(5)  # wait for 5 seconds before checking again
-
-        print("Timeout waiting for the resources to clear from the namespace.", flush=True)
-        return False
-
+        result = subprocess.run(command, check=True, text=True, capture_output=True)
+        print(f"Deployment deletion initiated and processing for {file_path}.", flush=True)
+        print(f"Deletion output: {result.stdout}", flush=True)
+        if result.stderr:
+            print(f"Deletion error output: {result.stderr}", flush=True)
     except subprocess.CalledProcessError as e:
         print(f"Failed to delete deployment from {file_path}. Error: {e.stderr}", flush=True)
         traceback.print_exc()
         sys.exit(1)
+
 
 def select_random_pod():
     """
@@ -154,7 +140,6 @@ def access_pod_and_initiate_gossip(pod_name):
         traceback.print_exc()
         return False
 
-
 def main():
     base_dir = "/home/puluncode/bcgossip-grpc/"
     # Apply the role for the Python script
@@ -172,6 +157,8 @@ def main():
     if access_pod_and_initiate_gossip(pod_name):
         # Only delete the deployment if gossip was successfully initiated
         delete_deployment(f"{base_dir}k8sv2/deploy-10nodes.yaml")
+    else:
+        print("Gossip initiation failed.", flush=True)
 
 
 if __name__ == '__main__':
