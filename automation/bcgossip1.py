@@ -25,6 +25,7 @@ import sys
 import traceback
 import random
 
+
 def run_command(command, shell=False):
     """
     Run a shell command and return the output
@@ -33,7 +34,7 @@ def run_command(command, shell=False):
         result = subprocess.run(command, check=True, text=True, capture_output=True, shell=shell)
         return result.stdout.strip()
     except subprocess.CalledProcessError as e:
-        print(f"An error occurred: {e.stderr}")
+        print(f"An error occurred: {e.stderr}", flush=True)
         traceback.print_exc()
         sys.exit(1)
 
@@ -50,20 +51,20 @@ def apply_kubernetes_config(base_dir, file_path):
 
         # Check if the command was successful
         if 'unchanged' in result.stdout or 'created' in result.stdout:
-            print(f"{full_path} applied successfully!")
+            print(f"{full_path} applied successfully!", flush=True)
         else:
-            print(f"Changes applied to {full_path}:")
-            print(result.stdout)
+            print(f"Changes applied to {full_path}:", flush=True)
+            print(result.stdout, flush=True)
 
     except subprocess.CalledProcessError as e:
         # Handle errors that result in a non-zero exit code
-        print(f"An error occurred while applying {full_path}.")
-        print(f"Error message: {e.stderr}")
+        print(f"An error occurred while applying {full_path}.", flush=True)
+        print(f"Error message: {e.stderr}", flush=True)
         traceback.print_exc()
         sys.exit(1)
     except Exception as e:
         # Handle other exceptions
-        print(f"An unexpected error occurred while applying {full_path}.")
+        print(f"An unexpected error occurred while applying {full_path}.", flush=True)
         traceback.print_exc()
         sys.exit(1)
 
@@ -75,9 +76,9 @@ def delete_deployment(file_path):
     command = ['kubectl', 'delete', '-f', file_path]
     try:
         result = subprocess.run(command, check=True, text=True, capture_output=True)
-        print(f"Deployment successfully deleted from {file_path}.")
+        print(f"Deployment successfully deleted from {file_path}.", flush=True)
     except subprocess.CalledProcessError as e:
-        print(f"Failed to delete deployment from {file_path}. Error: {e.stderr}")
+        print(f"Failed to delete deployment from {file_path}. Error: {e.stderr}", flush=True)
         traceback.print_exc()
         sys.exit(1)
 
@@ -114,15 +115,15 @@ def access_pod_and_initiate_gossip(pod_name):
         # Sending the command to initiate gossip
         out, err = session.communicate('python initiate.py --message cubaan10\n')
         if 'Done propagate!' in out:
-            print("Gossip propagation complete.")
+            print("Gossip propagation complete.", flush=True)
             return True
         else:
-            print("Gossip did not complete as expected.")
-            print(err)
+            print("Gossip did not complete as expected.", flush=True)
+            print(err, flush=True)
             return False
 
     except Exception as e:
-        print(f"Error accessing pod {pod_name}: {e}")
+        print(f"Error accessing pod {pod_name}: {e}", flush=True)
         traceback.print_exc()
         return False
 
@@ -141,13 +142,12 @@ def main():
     # Ensure all pods are running
     if get_running_pods_count() == 10:
         pod_name = select_random_pod()
-        print(f"Selected pod: {pod_name}")
+        print(f"Selected pod: {pod_name}", flush=True)
         if access_pod_and_initiate_gossip(pod_name):
             # Only delete the deployment if gossip was successfully initiated
             delete_deployment(f"{base_dir}k8sv2/deploy-10nodes.yaml")
     else:
-        print("The number of running pods is not equal to 10.")
-        delete_deployment(f"{base_dir}k8sv2/deploy-10nodes.yaml")
+        print("The number of running pods is not equal to 10.", flush=True)
 
 
 if __name__ == '__main__':
