@@ -24,7 +24,8 @@ import subprocess
 import sys
 import traceback
 import random
-
+import time
+import select
 
 def run_command(command, shell=False):
     """
@@ -102,7 +103,6 @@ def select_random_pod():
         raise Exception("No running pods found.")
     return random.choice(pod_list)
 
-
 def access_pod_and_initiate_gossip(pod_name):
     """
     Access the pod's shell, initiate gossip, and handle the response
@@ -112,15 +112,32 @@ def access_pod_and_initiate_gossip(pod_name):
         session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--', 'sh'], stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
-        # Sending the command to initiate gossip
-        out, err = session.communicate('python initiate.py --message cubaan10\n')
-        if 'Done propagate!' in out:
-            print("Gossip propagation complete.", flush=True)
-            return True
+        # Start the gossip process
+        session.stdin.write('python initiate.py --message cubaan10\n')
+        session.stdin.flush()
+
+        # Monitor the output until 'Done propagate!' is found or timeout
+        end_time = time.time() + 300  # 5 minutes timeout
+        while time.time() < end_time:
+            reads = [session.stdout.fileno()]
+            ready = select.select(reads, [], [], 5)[0]  # Check every 5 seconds
+            if ready:
+                output = session.stdout.readline()
+                print(output, flush=True)
+                if 'Done propagate!' in output:
+                    print("Gossip propagation complete.", flush=True)
+                    break
+            if session.poll() is not None:  # Check if process has exited
+                print("Session ended before completion.", flush=True)
+                break
         else:
-            print("Gossip did not complete as expected.", flush=True)
-            print(err, flush=True)
+            print("Timeout waiting for gossip to complete.", flush=True)
             return False
+
+        # Exiting the shell session
+        session.stdin.write('exit\n')
+        session.stdin.flush()
+        return True
 
     except Exception as e:
         print(f"Error accessing pod {pod_name}: {e}", flush=True)
