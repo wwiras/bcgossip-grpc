@@ -102,6 +102,7 @@ def delete_deployment(file_path, timeout=300):
         check_command = ['kubectl', 'get', 'pod']
         while time.time() < end_time:
             result = subprocess.run(check_command, text=True, capture_output=True)
+            print(f"result.stdout={result.stdout}", flush=True)
             if "No resources" in result.stdout:
                 print("No resources found in the namespace, deletion confirmed.", flush=True)
                 return True
