@@ -27,6 +27,7 @@ import random
 import time
 import select
 
+
 def run_command(command, shell=False):
     """
     Run a shell command and return the output
@@ -88,20 +89,39 @@ def get_running_pods_count():
     """
     Get the count of pods that are in the Running state
     """
-    command = "kubectl get pod | grep Running | wc -l"
+    command = "kubectl get pods --no-headers | grep Running | wc -l"
     count = run_command(command, shell=True)
     return int(count)
+
+
+def wait_for_pods_to_run(expected_count, timeout=300, interval=5):
+    """
+    Wait for all pods to be in the Running state.
+    """
+    start_time = time.time()
+    while True:
+        if time.time() - start_time > timeout:
+            print("Timeout waiting for pods to run.", flush=True)
+            return False
+        count = get_running_pods_count()
+        if count == expected_count:
+            print("All pods are running.", flush=True)
+            return True
+        else:
+            print(f"Waiting for all pods to be running. Current count: {count}/{expected_count}", flush=True)
+            time.sleep(interval)
 
 
 def select_random_pod():
     """
     Select a random pod from the list of running pods
     """
-    command = "kubectl get pod --no-headers | grep Running | awk '{print $1}'"
+    command = "kubectl get pods --no-headers | grep Running | awk '{print $1}'"
     pod_list = run_command(command, shell=True).split()
     if not pod_list:
         raise Exception("No running pods found.")
     return random.choice(pod_list)
+
 
 def access_pod_and_initiate_gossip(pod_name):
     """
@@ -156,15 +176,15 @@ def main():
     # Deploy the 10-node gossip protocol environment
     apply_kubernetes_config(base_dir, 'k8sv2/deploy-10nodes.yaml')
 
-    # Ensure all pods are running
-    if get_running_pods_count() == 10:
+    # Wait until all pods are running
+    if wait_for_pods_to_run(10):
         pod_name = select_random_pod()
         print(f"Selected pod: {pod_name}", flush=True)
         if access_pod_and_initiate_gossip(pod_name):
             # Only delete the deployment if gossip was successfully initiated
             delete_deployment(f"{base_dir}k8sv2/deploy-10nodes.yaml")
     else:
-        print("The number of running pods is not equal to 10.", flush=True)
+        print("Pods did not reach the running state as expected.", flush=True)
 
 
 if __name__ == '__main__':
