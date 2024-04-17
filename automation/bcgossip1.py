@@ -1,3 +1,5 @@
+import os
+
 # Before running this script in the terminal, make sure
 # a. Cluster instance is running (based on the specifications of the test)
 # b. Enter the terminal through web google cloud terminal
@@ -5,8 +7,9 @@
 # d. you are ready to run this script
 
 
-
 # 1. Set the service
+os.system('kubectl apply -f /k8sv2/svc-bcgossip.yaml')
+
 # 2. Set the role python
 # For instance name of the deployment and how many round for the test
 # The propagation test are
