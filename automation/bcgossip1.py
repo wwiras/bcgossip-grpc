@@ -71,45 +71,33 @@ def apply_kubernetes_config(base_dir, file_path):
         sys.exit(1)
 
 
-def delete_deployment(file_path):
+def delete_deployment(file_path, namespace='default', timeout=300):
     """
-    Delete a deployment using kubectl.
+    Delete a deployment using kubectl and wait until no resources are found in the specified namespace.
     """
     command = ['kubectl', 'delete', '-f', file_path]
     try:
-        result = subprocess.run(command, check=True, text=True, capture_output=True)
-        print(f"Deployment successfully deleted from {file_path}.", flush=True)
+        # Initiating the deletion of the deployment
+        subprocess.run(command, check=True, text=True, capture_output=True)
+        print(f"Deployment deletion initiated from {file_path}.", flush=True)
+
+        # Monitor for "No resources found" message
+        end_time = time.time() + timeout
+        while time.time() < end_time:
+            check_command = ['kubectl', 'get', 'pods', '-n', namespace]
+            result = subprocess.run(check_command, text=True, capture_output=True)
+            if "No resources found" in result.stdout:
+                print("No resources found in the namespace, deletion confirmed.", flush=True)
+                return True
+            time.sleep(5)  # wait for 5 seconds before checking again
+
+        print("Timeout waiting for the resources to clear from the namespace.", flush=True)
+        return False
+
     except subprocess.CalledProcessError as e:
         print(f"Failed to delete deployment from {file_path}. Error: {e.stderr}", flush=True)
         traceback.print_exc()
         sys.exit(1)
-
-
-def get_running_pods_count():
-    """
-    Get the count of pods that are in the Running state
-    """
-    command = "kubectl get pods --no-headers | grep Running | wc -l"
-    count = run_command(command, shell=True)
-    return int(count)
-
-
-def wait_for_pods_to_run(expected_count, timeout=300, interval=5):
-    """
-    Wait for all pods to be in the Running state.
-    """
-    start_time = time.time()
-    while True:
-        if time.time() - start_time > timeout:
-            print("Timeout waiting for pods to run.", flush=True)
-            return False
-        count = get_running_pods_count()
-        if count == expected_count:
-            print("All pods are running.", flush=True)
-            return True
-        else:
-            print(f"Waiting for all pods to be running. Current count: {count}/{expected_count}", flush=True)
-            time.sleep(interval)
 
 
 def select_random_pod():
@@ -176,15 +164,12 @@ def main():
     # Deploy the 10-node gossip protocol environment
     apply_kubernetes_config(base_dir, 'k8sv2/deploy-10nodes.yaml')
 
-    # Wait until all pods are running
-    if wait_for_pods_to_run(10):
-        pod_name = select_random_pod()
-        print(f"Selected pod: {pod_name}", flush=True)
-        if access_pod_and_initiate_gossip(pod_name):
-            # Only delete the deployment if gossip was successfully initiated
-            delete_deployment(f"{base_dir}k8sv2/deploy-10nodes.yaml")
-    else:
-        print("Pods did not reach the running state as expected.", flush=True)
+    # Select and access pod to initiate gossip
+    pod_name = select_random_pod()
+    print(f"Selected pod: {pod_name}", flush=True)
+    if access_pod_and_initiate_gossip(pod_name):
+        # Only delete the deployment if gossip was successfully initiated
+        delete_deployment(f"{base_dir}k8sv2/deploy-10nodes.yaml")
 
 
 if __name__ == '__main__':
