@@ -70,7 +70,6 @@ def apply_kubernetes_config(base_dir, file_path):
         traceback.print_exc()
         sys.exit(1)
 
-
 def delete_deployment(file_path, namespace='default', timeout=300):
     """
     Delete a deployment using kubectl and wait until no resources are found in the specified namespace.
@@ -86,9 +85,13 @@ def delete_deployment(file_path, namespace='default', timeout=300):
         while time.time() < end_time:
             check_command = ['kubectl', 'get', 'pods', '-n', namespace]
             result = subprocess.run(check_command, text=True, capture_output=True)
+            print(f"Checking pods: {result.stdout}", flush=True)  # Debug output
             if "No resources found" in result.stdout:
                 print("No resources found in the namespace, deletion confirmed.", flush=True)
                 return True
+            elif "Error" in result.stderr:
+                print(f"Error checking pods: {result.stderr}", flush=True)  # Error handling
+                break
             time.sleep(5)  # wait for 5 seconds before checking again
 
         print("Timeout waiting for the resources to clear from the namespace.", flush=True)
@@ -98,7 +101,6 @@ def delete_deployment(file_path, namespace='default', timeout=300):
         print(f"Failed to delete deployment from {file_path}. Error: {e.stderr}", flush=True)
         traceback.print_exc()
         sys.exit(1)
-
 
 def select_random_pod():
     """
