@@ -89,7 +89,7 @@ def apply_kubernetes_config(base_dir, file_path):
 
 def delete_deployment(file_path, timeout=300):
     """
-    Delete a deployment using kubectl and wait until no resources are found in the specified namespace.
+    Delete a deployment using kubectl and wait until there are no running pods left in the specified namespace.
     """
     command = ['kubectl', 'delete', '-f', file_path]
     try:
@@ -97,25 +97,25 @@ def delete_deployment(file_path, timeout=300):
         subprocess.run(command, check=True, text=True, capture_output=True)
         print(f"Deployment deletion initiated from {file_path}.", flush=True)
 
-        # Monitor for "No resources found" message
+        # Monitor the number of running pods
         end_time = time.time() + timeout
-        check_command = ['kubectl', 'get', 'pod']
+        check_command = "kubectl get pod | grep Running | wc -l"
         while time.time() < end_time:
-            result = subprocess.run(check_command, text=True, capture_output=True)
-            print(f"result.stdout={result.stdout}", flush=True)
-            if "No resources" in result.stdout:
-                print("No resources found in the namespace, deletion confirmed.", flush=True)
+            result = subprocess.run(check_command, shell=True, text=True, capture_output=True)
+            if result.stdout.strip() == "0":
+                print("All pods are terminated, deletion confirmed.", flush=True)
                 return True
-            print("Waiting for resources to clear...", flush=True)  # Continuous feedback
+            print(f"Waiting for all pods to terminate... Remaining: {result.stdout.strip()}", flush=True)
             time.sleep(3)  # wait for 3 seconds before checking again
 
-        print("Timeout waiting for the resources to clear from the namespace.", flush=True)
+        print("Timeout waiting for all pods to terminate.", flush=True)
         return False
 
     except subprocess.CalledProcessError as e:
         print(f"Failed to delete deployment from {file_path}. Error: {e.stderr}", flush=True)
         traceback.print_exc()
         sys.exit(1)
+
 
 
 def select_random_pod():
