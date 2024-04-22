@@ -26,7 +26,34 @@ import traceback
 import random
 import time
 import select
+import yaml
 
+def get_replica_count_from_deployment(base_dir,file_path):
+    """
+    Read the number of replicas specified in a Kubernetes deployment YAML file.
+
+    Args:
+    file_path (str): The path to the Kubernetes deployment YAML file.
+
+    Returns:
+    int: The number of replicas specified in the deployment file.
+    """
+    full_path = f"{base_dir}{file_path}"
+
+    try:
+        with open(full_path, 'r') as file:
+            deployment = yaml.safe_load(full_path)
+            replicas = deployment['spec']['replicas']
+            return replicas
+    except KeyError as e:
+        print(f"Key error while reading the deployment file: {e}")
+        return None
+    except FileNotFoundError:
+        print("The file was not found.")
+        return None
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None
 
 def run_command(command, shell=False):
     """
@@ -40,6 +67,46 @@ def run_command(command, shell=False):
         traceback.print_exc()
         sys.exit(1)
 
+def apply_kubernetes_config_and_wait(base_dir,file_path, expected_count, namespace='default', timeout=600):
+    """
+    Apply a Kubernetes configuration and wait until all specified pods are running.
+
+    Args:
+    file_path (str): The path to the Kubernetes YAML file.
+    expected_count (int): The expected number of pods to be running.
+    namespace (str): The Kubernetes namespace in which the pods will be running.
+    timeout (int): The maximum time to wait for the pods to be running, in seconds.
+    """
+
+    full_path = f"{base_dir}{file_path}"
+
+    try:
+        # Apply the Kubernetes configuration
+        apply_cmd = ['kubectl', 'apply', '-f', file_path]
+        subprocess.run(apply_cmd, check=True, text=True, capture_output=True)
+        print(f"Applied configuration from {file_path}")
+
+        # Wait for all pods to be in the 'Running' state
+        start_time = time.time()
+        while True:
+            if time.time() - start_time > timeout:
+                print("Timeout waiting for all pods to run.")
+                return False
+
+            get_pods_cmd = f"kubectl get pods -n {namespace} --no-headers | grep Running | wc -l"
+            result = subprocess.run(get_pods_cmd, shell=True, text=True, capture_output=True)
+            running_count = int(result.stdout.strip())
+
+            if running_count == expected_count:
+                print(f"All {expected_count} pods are running.")
+                return True
+            else:
+                print(f"Currently {running_count}/{expected_count} pods are running. Waiting...")
+                time.sleep(10)  # Check every 10 seconds
+
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred while applying configuration or checking pods: {e.stderr}")
+        return False
 
 def apply_kubernetes_config(base_dir, file_path):
     """
@@ -178,7 +245,15 @@ def main():
     apply_kubernetes_config(base_dir, 'k8sv2/svc-bcgossip.yaml')
 
     # Deploy the 10-node gossip protocol environment
-    apply_kubernetes_config(base_dir, 'k8sv2/deploy-10nodes.yaml')
+    # apply_kubernetes_config(base_dir, 'k8sv2/deploy-10nodes.yaml')
+
+    # Read the number of replicas specified in a Kubernetes deployment YAML file.
+    replica_count = get_replica_count_from_deployment(base_dir, 'k8sv2/deploy-10nodes.yaml')
+    print(f"Number of replicas specified in the deployment: {replica_count}")
+
+    # Deploy the 10-node gossip protocol environment
+    apply_kubernetes_config_and_wait(base_dir, 'k8sv2/deploy-10nodes.yaml')
+
 
     # Select and access pod to initiate gossip
     pod_name = select_random_pod()
