@@ -252,7 +252,7 @@ def main():
     print(f"Number of replicas specified in the deployment: {replica_count}")
 
     # Deploy the 10-node gossip protocol environment
-    apply_kubernetes_config_and_wait(base_dir, 'k8sv2/deploy-10nodes.yaml')
+    apply_kubernetes_config_and_wait(base_dir, 'k8sv2/deploy-10nodes.yaml',replica_count)
 
 
     # Select and access pod to initiate gossip
