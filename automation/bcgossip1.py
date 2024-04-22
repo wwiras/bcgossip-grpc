@@ -106,7 +106,7 @@ def delete_deployment(file_path, timeout=300):
                 print("All pods are terminated, deletion confirmed.", flush=True)
                 return True
             print(f"Waiting for all pods to terminate... Remaining: {result.stdout.strip()}", flush=True)
-            time.sleep(3)  # wait for 3 seconds before checking again
+            time.sleep(0.5)  # wait for 3 seconds before checking again
 
         print("Timeout waiting for all pods to terminate.", flush=True)
         return False
