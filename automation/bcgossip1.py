@@ -43,7 +43,7 @@ def apply_kubernetes_config(base_dir, file_path):
 
 def delete_deployment(file_path, namespace='default', timeout=300):
     """
-    Delete a deployment using kubectl and monitor until "No resources found" message is detected in the namespace.
+    Delete a deployment using kubectl and monitor until no pods are left in the namespace by checking the length of the output from `kubectl get pods`.
     """
     command = ['kubectl', 'delete', '-f', file_path, '-n', namespace]
     try:
@@ -51,18 +51,16 @@ def delete_deployment(file_path, namespace='default', timeout=300):
         print(f"Deployment deletion initiated for {file_path}.", flush=True)
 
         start_time = time.time()
-        # get_pods_cmd = f"kubectl get pods -n {namespace} --no-headers"
-        get_pods_cmd = f"kubectl get pods"
+        get_pods_cmd = f"kubectl get pods -n {namespace} --no-headers"
 
         while time.time() - start_time < timeout:
             result = subprocess.run(get_pods_cmd, shell=True, text=True, capture_output=True, check=True)
-            print(f"len(result.stdout)={len(result.stdout)}", flush=True)
-            if "No resources found" in result.stdout:
-                print("No resources found in the namespace, deletion confirmed.", flush=True)
+            if len(result.stdout.strip()) == 0:
+                print("No pods found in the namespace, deletion confirmed.", flush=True)
                 return True
 
             print("Waiting for all pods to terminate...", flush=True)
-            time.sleep(0.5)  # Update status every 2 seconds
+            time.sleep(2)  # Update status every 2 seconds
 
         print("Timeout waiting for the resources to clear from the namespace.", flush=True)
         return False
@@ -71,7 +69,6 @@ def delete_deployment(file_path, namespace='default', timeout=300):
         print(f"Failed to delete deployment from {file_path}. Error: {e.stderr}", flush=True)
         traceback.print_exc()
         sys.exit(1)
-
 
 def select_random_pod():
     """
