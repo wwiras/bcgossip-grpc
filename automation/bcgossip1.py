@@ -119,30 +119,28 @@ def get_replica_count_from_yaml(file_path):
         except KeyError:
             return 1  # Default to 1 if no replica count is specified
 
-def wait_for_pods_to_be_ready(namespace='default', deployment_name='my-deployment', timeout=300):
+def wait_for_pods_to_be_ready(namespace='default', expected_pods=0, timeout=300):
     """
-    Wait for all pods in a deployment to reach the 'Running' state.
+    Wait for a specific number of pods to reach the 'Running' state in a given namespace.
     """
     start_time = time.time()
+    get_pods_cmd = f"kubectl get pods -n {namespace} --no-headers | grep Running | wc -l"
+
     while time.time() - start_time < timeout:
         try:
-            command = ['kubectl', 'get', 'deployment', deployment_name, '-n', namespace, '-o', 'jsonpath={.status.readyReplicas}']
-            result = subprocess.run(command, text=True, capture_output=True, check=True)
-            ready_replicas = int(result.stdout.strip())
+            result = subprocess.run(get_pods_cmd, shell=True, text=True, capture_output=True, check=True)
+            running_pods = int(result.stdout.strip())
 
-            command_total = ['kubectl', 'get', 'deployment', deployment_name, '-n', namespace, '-o', 'jsonpath={.spec.replicas}']
-            result_total = subprocess.run(command_total, text=True, capture_output=True, check=True)
-            total_replicas = int(result_total.stdout.strip())
-
-            if ready_replicas == total_replicas:
-                print(f"All {total_replicas} pods are ready in deployment {deployment_name}.", flush=True)
+            if running_pods >= expected_pods:
+                print(f"All {expected_pods} pods are running in namespace {namespace}.", flush=True)
                 return True
         except subprocess.CalledProcessError as e:
-            print(f"Failed to get pod status for deployment {deployment_name}. Error: {e.stderr}", flush=True)
+            print(f"Failed to get pod status for namespace {namespace}. Error: {e.stderr}", flush=True)
         time.sleep(10)  # Check every 10 seconds
 
-    print(f"Timeout waiting for all pods in deployment {deployment_name} to be ready.", flush=True)
+    print(f"Timeout waiting for all {expected_pods} pods to be running in namespace {namespace}.", flush=True)
     return False
+
 
 def main():
     base_dir = "/home/puluncode/bcgossip-grpc/"
@@ -158,11 +156,14 @@ def main():
     apply_kubernetes_config(base_dir, 'k8sv2/deploy-10nodes.yaml')
 
     # Ensure pods are ready before proceeding
-    if wait_for_pods_to_be_ready(namespace='default', deployment_name='deploy-10nodes', timeout=300):
+    if wait_for_pods_to_be_ready(namespace='default', expected_pods=replicas, timeout=300):
         pod_name = select_random_pod()
         print(f"Selected pod: {pod_name}", flush=True)
         if access_pod_and_initiate_gossip(pod_name):
             delete_deployment(deployment_yaml_path)
+
+if __name__ == '__main__':
+    main()
 
 if __name__ == '__main__':
     main()
