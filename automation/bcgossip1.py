@@ -136,7 +136,7 @@ def wait_for_pods_to_be_ready(namespace='default', expected_pods=0, timeout=300)
                 return True
         except subprocess.CalledProcessError as e:
             print(f"Failed to get pod status for namespace {namespace}. Error: {e.stderr}", flush=True)
-        time.sleep(10)  # Check every 10 seconds
+        time.sleep(1)  # Check every 10 seconds
 
     print(f"Timeout waiting for all {expected_pods} pods to be running in namespace {namespace}.", flush=True)
     return False
