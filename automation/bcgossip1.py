@@ -55,6 +55,7 @@ def delete_deployment(file_path, namespace='default', timeout=300):
 
         while time.time() - start_time < timeout:
             result = subprocess.run(get_pods_cmd, shell=True, text=True, capture_output=True, check=True)
+            print(result.stdout, flush=True)
             if "No resources found" in result.stdout:
                 print("No resources found in the namespace, deletion confirmed.", flush=True)
                 return True
