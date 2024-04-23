@@ -60,7 +60,7 @@ def delete_deployment(file_path, namespace='default', timeout=300):
                 return True
 
             print("Waiting for all pods to terminate...", flush=True)
-            time.sleep(2)  # Update status every 2 seconds
+            time.sleep(5)  # Update status every 5 seconds
 
         print("Timeout waiting for the resources to clear from the namespace.", flush=True)
         return False
