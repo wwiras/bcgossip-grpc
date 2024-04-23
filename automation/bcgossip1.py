@@ -51,7 +51,8 @@ def delete_deployment(file_path, namespace='default', timeout=300):
         print(f"Deployment deletion initiated for {file_path}.", flush=True)
 
         start_time = time.time()
-        get_pods_cmd = f"kubectl get pods -n {namespace} --no-headers"
+        # get_pods_cmd = f"kubectl get pods -n {namespace} --no-headers"
+        get_pods_cmd = f"kubectl get pods"
 
         while time.time() - start_time < timeout:
             result = subprocess.run(get_pods_cmd, shell=True, text=True, capture_output=True, check=True)
