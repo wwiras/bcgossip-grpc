@@ -150,7 +150,7 @@ def wait_for_pods_to_be_ready(namespace='default', expected_pods=0, timeout=300)
 
 def main():
     base_dir = "/home/puluncode/bcgossip-grpc/"
-    deployment_yaml_path = base_dir + 'k8sv2/deploy-10nodes.yaml'
+    deployment_yaml_path = base_dir + 'k8sv2/deploy-30nodes.yaml'
 
     # Get the replica count from the YAML file
     replicas = get_replica_count_from_yaml(deployment_yaml_path)
@@ -159,7 +159,7 @@ def main():
     # Apply configurations
     apply_kubernetes_config(base_dir, 'k8sv2/python-role.yaml')
     apply_kubernetes_config(base_dir, 'k8sv2/svc-bcgossip.yaml')
-    apply_kubernetes_config(base_dir, 'k8sv2/deploy-10nodes.yaml')
+    apply_kubernetes_config(base_dir, 'k8sv2/deploy-30nodes.yaml')
 
     # Ensure pods are ready before proceeding
     if wait_for_pods_to_be_ready(namespace='default', expected_pods=replicas, timeout=300):
