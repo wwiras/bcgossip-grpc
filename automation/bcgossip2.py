@@ -60,7 +60,7 @@ def delete_deployment(file_path, namespace='default', timeout=300):
                 return True
 
             print("Waiting for all pods to terminate...", flush=True)
-            time.sleep(2)  # Update status every 2 seconds
+            time.sleep(10)  # Update status every 5 seconds
 
         print("Timeout waiting for the resources to clear from the namespace.", flush=True)
         return False
@@ -80,14 +80,14 @@ def select_random_pod():
         raise Exception("No running pods found.")
     return random.choice(pod_list)
 
-def access_pod_and_initiate_gossip(pod_name):
+def access_pod_and_initiate_gossip(pod_name,replicas):
     """
     Access the pod's shell, initiate gossip, and handle the response.
     """
     try:
         session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--', 'sh'], stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        session.stdin.write('python initiate.py --message cubaan10\n')
+        session.stdin.write(f'python initiate.py --message cubaan{replicas}\n')
         session.stdin.flush()
         end_time = time.time() + 300
         while time.time() < end_time:
@@ -165,7 +165,7 @@ def main():
     if wait_for_pods_to_be_ready(namespace='default', expected_pods=replicas, timeout=300):
         pod_name = select_random_pod()
         print(f"Selected pod: {pod_name}", flush=True)
-        if access_pod_and_initiate_gossip(pod_name):
+        if access_pod_and_initiate_gossip(pod_name,replicas):
             delete_deployment(deployment_yaml_path)
 
 if __name__ == '__main__':
