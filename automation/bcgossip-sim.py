@@ -81,14 +81,14 @@ def select_random_pod():
         raise Exception("No running pods found.")
     return random.choice(pod_list)
 
-def access_pod_and_initiate_gossip(pod_name, replicas, unique_id):
+def access_pod_and_initiate_gossip(pod_name, replicas, unique_id, iteration):
     """
     Access the pod's shell, initiate gossip, and handle the response.
     """
     try:
         session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--', 'sh'], stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        message = f'{unique_id}-cubaan{replicas}'
+        message = f'{unique_id}-cubaan{replicas}-{iteration}'
         session.stdin.write(f'python initiate.py --message {message}\n')
         session.stdin.flush()
         end_time = time.time() + 300
@@ -168,7 +168,7 @@ def main(num_tests, deployment_yaml):
         for i in range(1, num_tests + 1):
             pod_name = select_random_pod()
             print(f"Selected pod: {pod_name}", flush=True)
-            if access_pod_and_initiate_gossip(pod_name, replicas, unique_id):
+            if access_pod_and_initiate_gossip(pod_name, replicas, unique_id, i):
                 print(f"Test {i} complete.", flush=True)
             else:
                 print(f"Test {i} failed.", flush=True)
