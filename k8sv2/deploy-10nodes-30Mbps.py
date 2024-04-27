@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bcgossip10nodes10Mbps
+  name: bcgossip10nodes30Mbps
 spec:
   selector:
     matchLabels:
@@ -12,8 +12,8 @@ spec:
       labels:
         run: bcgossip
       annotations:
-        kubernetes.io/ingress-bandwidth: 10M    # Limit the inbound bandwidth of the pod.
-        kubernetes.io/egress-bandwidth: 10M     # Limit the outbound bandwidth of the pod.
+        kubernetes.io/ingress-bandwidth: 30M    # Limit the inbound bandwidth of the pod.
+        kubernetes.io/egress-bandwidth: 30M     # Limit the outbound bandwidth of the pod.
     spec:
       containers:
       - name: bcgossip-cont
