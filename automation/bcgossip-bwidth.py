@@ -129,33 +129,38 @@ def wait_for_pods_to_be_ready(namespace='default', expected_pods=0, timeout=300)
     print(f"Timeout waiting for all {expected_pods} pods to be running in namespace {namespace}.", flush=True)
     return False
 
+
 def main(num_tests, deployment_folder):
     base_dir = "/home/puluncode/bcgossip-grpc/"
     deployment_files = os.listdir(base_dir + deployment_folder)
 
     for deployment_file in deployment_files:
-        deployment_yaml_path = base_dir + deployment_folder + '/' + deployment_file
+        deployment_yaml_path = os.path.join(base_dir, deployment_folder, deployment_file)
 
-        # Get the replica count from the YAML file
-        replicas = get_replica_count_from_yaml(deployment_yaml_path)
-        print(f"Total replicas defined in YAML: {replicas}")
+        # Check if the path is indeed a file before proceeding
+        if os.path.isfile(deployment_yaml_path):
+            replicas = get_replica_count_from_yaml(deployment_yaml_path)
+            print(f"Total replicas defined in YAML: {replicas}")
 
-        # Apply configurations
-        apply_kubernetes_config(base_dir, 'k8sv2/python-role.yaml')
-        apply_kubernetes_config(base_dir, 'k8sv2/svc-bcgossip.yaml')
-        apply_kubernetes_config(base_dir, deployment_folder + '/' + deployment_file)
+            # Apply configurations
+            apply_kubernetes_config(base_dir, 'k8sv2/python-role.yaml')
+            apply_kubernetes_config(base_dir, 'k8sv2/svc-bcgossip.yaml')
+            apply_kubernetes_config(deployment_yaml_path)
 
-        # Ensure pods are ready before proceeding
-        if wait_for_pods_to_be_ready(namespace='default', expected_pods=replicas, timeout=300):
-            unique_id = str(uuid.uuid4())[:5]  # Generate a unique ID for the entire test
-            for i in range(1, num_tests + 1):
-                pod_name = select_random_pod()
-                print(f"Selected pod: {pod_name}", flush=True)
-                if access_pod_and_initiate_gossip(pod_name, replicas, unique_id, i):
-                    print(f"Test {i} complete.", flush=True)
-                else:
-                    print(f"Test {i} failed.", flush=True)
-            delete_deployment(deployment_yaml_path)
+            # Ensure pods are ready before proceeding
+            if wait_for_pods_to_be_ready(namespace='default', expected_pods=replicas, timeout=300):
+                unique_id = str(uuid.uuid4())[:5]  # Generate a unique ID for the entire test
+                for i in range(1, num_tests + 1):
+                    pod_name = select_random_pod()
+                    print(f"Selected pod: {pod_name}", flush=True)
+                    if access_pod_and_initiate_gossip(pod_name, replicas, unique_id, i):
+                        print(f"Test {i} complete.", flush=True)
+                    else:
+                        print(f"Test {i} failed.", flush=True)
+                delete_deployment(deployment_yaml_path)
+        else:
+            print(f"Skipped {deployment_yaml_path}, not a file.")
+
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
