@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bcgossip10nodes30Mbps
+  name: bcgossip10nodes30mbps
 spec:
   selector:
     matchLabels:
