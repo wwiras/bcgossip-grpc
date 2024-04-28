@@ -129,9 +129,6 @@ def wait_for_pods_to_be_ready(namespace='default', expected_pods=0, timeout=300)
     print(f"Timeout waiting for all {expected_pods} pods to be running in namespace {namespace}.", flush=True)
     return False
 
-import os
-import sys
-
 def main(num_tests, deployment_folder):
     base_dir = "/home/puluncode/bcgossip-grpc/"
     full_directory_path = os.path.join(base_dir, deployment_folder)
@@ -144,18 +141,37 @@ def main(num_tests, deployment_folder):
     # List all files in the directory and filter out subdirectories
     deployment_files = [f for f in os.listdir(full_directory_path) if os.path.isfile(os.path.join(full_directory_path, f))]
 
+    if not deployment_files:
+        print("No deployment files found in the directory.")
+        return
+
     for deployment_file in deployment_files:
         deployment_yaml_path = os.path.join(full_directory_path, deployment_file)
-
-        # Continue with existing logic
         replicas = get_replica_count_from_yaml(deployment_yaml_path)
-        print(f"Total replicas defined in YAML: {replicas}")
+        print(f"Processing {deployment_file}: Total replicas defined in YAML: {replicas}")
 
-        # Apply configurations, manage tests, etc.
+        # Apply configurations
+        apply_kubernetes_config(base_dir, 'k8sv2/python-role.yaml')
+        apply_kubernetes_config(base_dir, 'k8sv2/svc-bcgossip.yaml')
+        apply_kubernetes_config(base_dir, deployment_folder + '/' + deployment_file)
+
+        # Ensure pods are ready before proceeding
+        if wait_for_pods_to_be_ready(namespace='default', expected_pods=replicas, timeout=300):
+            unique_id = str(uuid.uuid4())[:5]  # Generate a unique ID for the entire test
+            for i in range(1, num_tests + 1):
+                pod_name = select_random_pod()
+                print(f"Selected pod for test {i}: {pod_name}", flush=True)
+                if access_pod_and_initiate_gossip(pod_name, replicas, unique_id, i):
+                    print(f"Test {i} complete for {deployment_file}.", flush=True)
+                else:
+                    print(f"Test {i} failed for {deployment_file}.", flush=True)
+            delete_deployment(deployment_yaml_path)
+        else:
+            print(f"Failed to prepare pods for {deployment_file}.", flush=True)
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
-        print("Usage: python bcgossip-sim.py <number_of_tests> <deployment_folder>")
+        print("Usage: python bcgossip-bwidth.py <number_of_tests> <deployment_folder>")
         sys.exit(1)
     num_tests = int(sys.argv[1])
     deployment_folder = sys.argv[2]
