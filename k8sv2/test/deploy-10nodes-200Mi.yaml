@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bcgossip10nodes10mi
+  name: bcgossip10nodes200mi
 spec:
   selector:
     matchLabels:
@@ -19,6 +19,6 @@ spec:
         - containerPort: 5050
         resources:
           requests:
-            memory: 10Mi
+            memory: 200Mi
           limits:
-            memory: 10Mi
+            memory: 200Mi
