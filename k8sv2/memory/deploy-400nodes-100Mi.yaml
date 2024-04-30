@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bcgossip10nodes100mi
+  name: bcgossip400nodes100mi
 spec:
   selector:
     matchLabels:
       run: bcgossip
-  replicas: 10
+  replicas: 400
   template:
     metadata:
       labels:
@@ -14,11 +14,11 @@ spec:
     spec:
       containers:
       - name: bcgossip-cont
-        image: wwiras/bcgossip-grpc:v14  # Replace with your actual Docker image
+        image: wwiras/bcgossip-grpc:v15  # Replace with your actual Docker image
         ports:
         - containerPort: 5050
         resources:
           requests:
-            memory: 100Mi
+            memory: 80Mi
           limits:
             memory: 100Mi
