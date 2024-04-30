@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bcgossip30nodes
+  name: bcgossip150nodes100mi
 spec:
   selector:
     matchLabels:
       run: bcgossip
-  replicas: 30
+  replicas: 150
   template:
     metadata:
       labels:
@@ -19,6 +19,7 @@ spec:
         - containerPort: 5050
         resources:
           requests:
-            cpu: "50m"  # 0.05 CPU per pod for 400 pods scenario
+            memory: 80Mi
           limits:
-            cpu: "100m"  # 0.1 CPU limit per pod
+            memory: 100Mi
+
