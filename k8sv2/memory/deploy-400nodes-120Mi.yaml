@@ -22,4 +22,4 @@ spec:
           requests:
             memory: "120Mi"
           limits:
-            memory: "150Mi"
+            memory: "120Mi"
