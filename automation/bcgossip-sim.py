@@ -176,7 +176,7 @@ def main(num_tests, deployment_yaml):
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
-        print("Usage: python bcgossip1.py <number_of_tests> <deployment_yaml>")
+        print("Usage: python bcgossip-sim.py <number_of_tests> <deployment_folder/xxxx.yaml>")
         sys.exit(1)
     num_tests = int(sys.argv[1])
     deployment_yaml = sys.argv[2]
