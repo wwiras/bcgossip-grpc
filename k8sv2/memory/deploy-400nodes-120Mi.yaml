@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: bcgossip400nodes150mi
+  name: bcgossip400nodes120mi
 spec:
   selector:
     matchLabels:
