@@ -1,3 +1,4 @@
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -19,6 +20,6 @@ spec:
         - containerPort: 5050
         resources:
           requests:
-            memory: 280Mi
+            memory: "280Mi"
           limits:
-            memory: 300Mi
+            memory: "300Mi"
