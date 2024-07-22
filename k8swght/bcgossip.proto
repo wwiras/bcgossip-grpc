@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package gossip;
+
+service Gossip {
+    rpc Gossip (GossipRequest) returns (GossipResponse) {}
+}
+
+message GossipRequest {
+    string sender = 1;
+    double timestamp = 2;
+    string payload = 3;
+}
+
+message GossipResponse {
+    string sender = 1;
+    double timestamp = 2;
+    string payload = 3;
+}
