@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gossip-statefulset
+spec:
+  serviceName: "bcgossip-svc"
+  replicas: 6 # Adjust to match the number of nodes in your topology
+  selector:
+    matchLabels:
+      app: gossip-node
+  template:
+    metadata:
+      labels:
+        app: gossip-node
+        run: bcgossip
+    spec:
+      serviceAccountName: default
+      containers:
+        - name: gossip-node
+          image: wwiras/gpbc:latest
+          env:
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: topology-config
