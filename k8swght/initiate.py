@@ -8,9 +8,8 @@ from bcgossip_pb2_grpc import GossipStub
 
 def send_message_to_self(message):
     """Initiates the gossip protocol by sending a message to self."""
-
     host_ip = socket.gethostbyname(socket.gethostname())
-    target = f"{host_ip}:50051"  # Using port 50051 as per your gRPC server
+    target = f"{host_ip}:50051"
 
     with grpc.insecure_channel(target) as channel:
         stub = GossipStub(channel)
