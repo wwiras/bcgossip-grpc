@@ -8,6 +8,7 @@ from concurrent import futures
 from bcgossip_pb2 import *
 from bcgossip_pb2_grpc import *
 
+
 class GossipServer(GossipServicer):
     def __init__(self):
         self.node_id = os.environ['NODE_NAME']
@@ -15,7 +16,7 @@ class GossipServer(GossipServicer):
             self.topology = json.load(f)
         self.neighbors = self._find_neighbors(self.node_id)
         self.seen_messages = set()
-        self.blockchain = []  # Initialize an empty blockchain
+        self.blockchain = []
 
     def _find_neighbors(self, node_id):
         """Identifies the neighbors of the given node based on the topology."""
@@ -29,12 +30,10 @@ class GossipServer(GossipServicer):
 
     def validate_message(self, message):
         """Simulates basic message validation (replace with your actual logic)."""
-        # Example: Check if the message contains valid data or signature
-        return True  # For now, assume all messages are valid
+        return True
 
     def add_message_to_blockchain(self, message):
         """Simulates adding the message to the blockchain (replace with your actual logic)."""
-        # Example: Append the message to a local data structure representing the blockchain
         self.blockchain.append(message)
         print(f"Node {self.node_id} added message '{message.payload}' to blockchain", flush=True)
 
