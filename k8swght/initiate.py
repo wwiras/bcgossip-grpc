@@ -22,5 +22,4 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Initiate gossip protocol by sending a message to self.")
     parser.add_argument('--message', required=True, help="Message to send to self")
     args = parser.parse_args()
-
     send_message_to_self(args.message)
