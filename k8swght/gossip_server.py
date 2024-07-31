@@ -1,9 +1,9 @@
+
 import grpc
 import json
 import random
 import time
 import os
-
 from concurrent import futures
 from bcgossip_pb2 import *
 from bcgossip_pb2_grpc import *
@@ -11,35 +11,33 @@ from bcgossip_pb2_grpc import *
 
 class GossipServer(GossipServicer):
     def __init__(self):
-        self.node_id = os.environ['NODE_NAME']
-        print(f"node_id={self.node_id}", flush = True)
+        self.pod_name = os.environ['NODE_NAME']  # Get the pod's name
+
         with open('/app/config/network_topology.json', 'r') as f:
             self.topology = json.load(f)
-        print(f"({self.topology})", flush=True)
-        self.neighbors = self._find_neighbors(self.node_id)
-        print(f"neighbors={self.neighbors}", flush=True)
+        self.neighbors = self._find_neighbors(self.pod_name)
+        print(f"Neighbors={self.neighbors}", flush=True)
         self.seen_messages = set()
-        self.blockchain = []
+        self.blockchain = []  # A simple list to represent the blockchain
 
     def _find_neighbors(self, node_id):
         """Identifies the neighbors of the given node based on the topology."""
         neighbors = []
         for link in self.topology['links']:
-            # print(f"link={link}", flush=True)
             if link['source'] == node_id:
-                # print(f"link['source']={link['source']}", flush=True)
                 neighbors.append(link['target'])
             elif link['target'] == node_id:
-                # print(f"link['target']={link['target']}", flush=True)
                 neighbors.append(link['source'])
         return neighbors
 
     def validate_message(self, message):
         """Simulates basic message validation (replace with your actual logic)."""
+        # In a real blockchain, this would involve complex validation of the message signature, content, etc.
         return True
 
     def add_message_to_blockchain(self, message):
         """Simulates adding the message to the blockchain (replace with your actual logic)."""
+        # In a real blockchain, this would involve updating the blockchain's data structure and potentially broadcasting the new block.
         self.blockchain.append(message)
         print(f"Node {self.node_id} added message '{message.payload}' to blockchain", flush=True)
 
@@ -65,10 +63,11 @@ class GossipServer(GossipServicer):
         self.seen_messages.add(message_key)
 
         # Randomly select a neighbor for forwarding (without weights)
-        neighbor = random.choice(self.neighbors)
+        neighbors_to_forward = [n for n in self.neighbors if n != request.sender]
+        if neighbors_to_forward:
+            neighbor = random.choice(neighbors_to_forward)
 
-        # Forward message (ensure not to send back to sender)
-        if neighbor != request.sender:
+            # Forward message
             with grpc.insecure_channel(f'{neighbor}:50051') as channel:
                 stub = GossipStub(channel)
                 response = stub.Gossip(request)

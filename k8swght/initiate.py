@@ -5,16 +5,15 @@ import socket
 from bcgossip_pb2 import GossipRequest
 from bcgossip_pb2_grpc import GossipStub
 
-
 def send_message_to_self(message):
     """Initiates the gossip protocol by sending a message to self."""
-    host_ip = socket.gethostbyname(socket.gethostname())
-    target = f"{host_ip}:50051"
+    node_id = socket.gethostname()  # Use the pod's DNS name directly
+    target = f"{node_id}.bcgossip-svc:50051"  # Using the headless service name
 
     with grpc.insecure_channel(target) as channel:
         stub = GossipStub(channel)
-        print(f"Initiating gossip from {host_ip} with message: '{message}'", flush=True)
-        response = stub.Gossip(GossipRequest(sender=host_ip, timestamp=time.time_ns(), payload=message))
+        print(f"Initiating gossip from {node_id} with message: '{message}'", flush=True)
+        response = stub.Gossip(GossipRequest(sender=node_id, timestamp=time.time_ns(), payload=message))
         print(f"Received acknowledgment: Node {response.sender} at {response.timestamp}", flush=True)
 
 
