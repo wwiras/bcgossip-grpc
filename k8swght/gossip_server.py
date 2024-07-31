@@ -25,9 +25,12 @@ class GossipServer(GossipServicer):
         """Identifies the neighbors of the given node based on the topology."""
         neighbors = []
         for link in self.topology['links']:
+            print(f"link={link}", flush=True)
             if link['source'] == node_id:
+                print(f"link['source']={link['source']}", flush=True)
                 neighbors.append(link['target'])
             elif link['target'] == node_id:
+                print(f"link['target']={link['target']}", flush=True)
                 neighbors.append(link['source'])
         return neighbors
 
