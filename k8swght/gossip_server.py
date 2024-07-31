@@ -17,7 +17,7 @@ class GossipServer(GossipServicer):
             self.topology = json.load(f)
         print(f"({self.topology})", flush=True)
         self.neighbors = self._find_neighbors(self.node_id)
-        print(f"({self.topology})", flush=True)
+        print(f"({self.neighbors})", flush=True)
         self.seen_messages = set()
         self.blockchain = []
 
@@ -25,12 +25,12 @@ class GossipServer(GossipServicer):
         """Identifies the neighbors of the given node based on the topology."""
         neighbors = []
         for link in self.topology['links']:
-            print(f"link={link}", flush=True)
+            # print(f"link={link}", flush=True)
             if link['source'] == node_id:
-                print(f"link['source']={link['source']}", flush=True)
+                # print(f"link['source']={link['source']}", flush=True)
                 neighbors.append(link['target'])
             elif link['target'] == node_id:
-                print(f"link['target']={link['target']}", flush=True)
+                # print(f"link['target']={link['target']}", flush=True)
                 neighbors.append(link['source'])
         return neighbors
 
