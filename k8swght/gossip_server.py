@@ -17,7 +17,7 @@ class GossipServer(GossipServicer):
             self.topology = json.load(f)
         print(f"({self.topology})", flush=True)
         self.neighbors = self._find_neighbors(self.node_id)
-        print(f"({self.neighbors})", flush=True)
+        print(f"(self.neighbors={self.neighbors})", flush=True)
         self.seen_messages = set()
         self.blockchain = []
 
