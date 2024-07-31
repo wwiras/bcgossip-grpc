@@ -12,12 +12,12 @@ from bcgossip_pb2_grpc import *
 class GossipServer(GossipServicer):
     def __init__(self):
         self.node_id = os.environ['NODE_NAME']
-        print(f"self.node_id={self.node_id}", flush = True)
+        print(f"node_id={self.node_id}", flush = True)
         with open('/app/config/network_topology.json', 'r') as f:
             self.topology = json.load(f)
         print(f"({self.topology})", flush=True)
         self.neighbors = self._find_neighbors(self.node_id)
-        print(f"self.neighbors={self.neighbors}", flush=True)
+        print(f"neighbors={self.neighbors}", flush=True)
         self.seen_messages = set()
         self.blockchain = []
 
