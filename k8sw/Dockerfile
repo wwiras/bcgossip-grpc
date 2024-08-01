@@ -1,14 +1,17 @@
-FROM python:3.9
+# Start with python slim image
+FROM python:3.11-slim
 
+# Set the working directory in the container
+# Copy the application source code to the container
 WORKDIR /app
+COPY . /app
 
-RUN pip install --no-cache-dir grpcio grpcio-tools
+# Install Python and necessary packages
+RUN pip install --no-cache-dir grpcio grpcio-tools protobuf kubernetes
 
-COPY . .
-
+# Expose the port the app runs on
 EXPOSE 50051
 
-# Set the NODE_NAME to a default value. This will be overridden by the StatefulSet
-#ENV NODE_NAME=node-0
-
+# Command to run the application
 CMD ["python", "gossip_server.py"]
+
