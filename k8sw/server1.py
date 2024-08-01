@@ -13,9 +13,9 @@ class GossipServer(GossipServicer):
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     add_GossipServicer_to_server(GossipServer(), server)
-    server.add_insecure_port('[::]:50000')
+    server.add_insecure_port('[::]:50051')
     server.start()
-    print("Server started, listening on 50000", flush=True)
+    print("Server started, listening on 50051", flush=True)
     server.wait_for_termination()
 
 if __name__ == '__main__':
