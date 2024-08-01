@@ -1,49 +1,23 @@
 import grpc
 import argparse
-import time
+import gossip_pb2
+import gossip_pb2_grpc
 import socket
-from bcgossip_pb2 import GossipRequest
-from bcgossip_pb2_grpc import GossipStub
 
-def send_message(message, target_node):
-    """Sends a gossip message to the specified target node."""
-
-    target = f"{target_node}.bcgossip-svc:50051"
+def send_message_to_self(message):
+    # Obtain the host's own IP to use as both the sender and the target
+    host_ip = socket.gethostbyname(socket.gethostname())
+    target = f"{host_ip}:5050"
 
     with grpc.insecure_channel(target) as channel:
-        stub = GossipStub(channel)
-        print(f"Sending gossip message to {target_node}: '{message}'", flush=True)
-
-        try:
-            response = stub.Gossip(
-                GossipRequest(sender=socket.gethostname(), timestamp=time.time_ns(), payload=message))
-            print(f"Received acknowledgment: Node {response.sender} at {response.timestamp}", flush=True)
-        except grpc.RpcError as e:
-            print(f"Error sending message to {target_node}: {e}", flush=True)
-
-
-def initiate_gossip(message):
-    """Initiates the gossip protocol by sending a message to self and then to neighbors."""
-
-    my_node_id = socket.gethostname()
-
-    # 1. Send to self
-    send_message(message, my_node_id)
-
-    # 2. Load topology and send to neighbors
-    with open('/app/config/network_topology.json', 'r') as f:
-        topology = json.load(f)
-
-    neighbors = [link['target'] for link in topology['links'] if link['source'] == my_node_id] + \
-                [link['source'] for link in topology['links'] if link['target'] == my_node_id]
-
-    for neighbor in neighbors:
-        send_message(message, neighbor)
+        stub = gossip_pb2_grpc.GossipServiceStub(channel)
+        print(f"Initiating gossip from {host_ip}", flush=True)
+        response = stub.SendMessage(gossip_pb2.GossipMessage(message=message, sender_id=host_ip))
+        print(f"Received acknowledgment: {response.details}", flush=True)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Initiate gossip protocol.")
-    parser.add_argument('--message', required=True, help="Message to send")
+    parser = argparse.ArgumentParser(description="Initiate gossip protocol by sending a message to self.")
+    parser.add_argument('--message', required=True, help="Message to send to self")
     args = parser.parse_args()
-
-    initiate_gossip(args.message)
+    send_message_to_self(args.message)
