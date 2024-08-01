@@ -1,6 +1,7 @@
 import grpc
 from concurrent import futures
-import time, socket
+import time
+import socket
 from bcgossip_pb2 import *
 from bcgossip_pb2_grpc import *
 
