@@ -2,9 +2,8 @@ import grpc
 import argparse
 import time
 import socket
-from your_service_pb2 import GossipRequest
-from your_service_pb2_grpc import GossipStub
-
+from bcgossip_pb2 import GossipRequest
+from bcgossip_pb2_grpc import GossipStub
 
 def send_message(message, target_node):
     """Sends a gossip message to the specified target node."""
