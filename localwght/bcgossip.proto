@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package gossip; // Define the package name (important for code generation)
+
+service Gossip {  // Define the gRPC service
+  rpc Gossip(GossipRequest) returns (GossipResponse) {}  // The RPC method
+}
+
+message GossipRequest {  // The request message
+  string sender = 1;
+  int64 timestamp = 2;  // Nanosecond precision
+  string payload = 3;  // The actual gossip message
+}
+
+message GossipResponse {  // The response message
+  string sender = 1;
+  int64 timestamp = 2;  // Nanosecond precision
+  string payload = 3;  // Optional: Echo the original message
+}

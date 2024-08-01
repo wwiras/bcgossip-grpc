@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gossip-statefulset
+spec:
+  serviceName: "bcgossip-svc"
+  replicas: 2  # Start with 2 replicas for testing
+  selector:
+    matchLabels:
+      app: gossip-node
+  template:
+    metadata:
+      labels:
+        app: gossip-node
+    spec:
+      containers:
+        - name: gossip-node
+          image: your-image-name  # Replace with your Docker image name
+          ports:
+            - containerPort: 50051
