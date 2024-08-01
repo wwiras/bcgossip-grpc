@@ -10,7 +10,7 @@ COPY . /app
 RUN pip install --no-cache-dir grpcio grpcio-tools kubernetes
 
 # Expose the port the app runs on
-EXPOSE 50051
+EXPOSE 5050
 
 # Command to run the application
-CMD ["python", "gossip_server.py"]
+CMD ["python", "node.py"]
