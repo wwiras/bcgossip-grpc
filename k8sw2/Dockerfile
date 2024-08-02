@@ -13,4 +13,4 @@ RUN pip install --no-cache-dir grpcio grpcio-tools kubernetes
 EXPOSE 5050
 
 # Command to run the application
-CMD ["python", "node.py"]
+CMD ["python", "node2.py"]

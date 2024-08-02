@@ -5,6 +5,7 @@ metadata:
   labels:
     run: bcgossip
 spec:
+  clusterIP: None  # Headless Service
   ports:
   - port: 5050
     protocol: TCP
