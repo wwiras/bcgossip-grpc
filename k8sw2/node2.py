@@ -17,6 +17,8 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.neighbor_pod_names = [n for n in all_pod_names if n != socket.gethostname()]
 
     def SendMessage(self, request, context):
+        print(f"request.sender_id={request.sender_id}", flush=True)
+        print(f"self.host={self.host}", flush=True)
         if request.sender_id == self.host:
             print(f"{self.host} initiated message: '{request.message}'", flush=True)
         else:
