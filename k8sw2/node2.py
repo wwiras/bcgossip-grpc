@@ -10,17 +10,19 @@ from kubernetes import client, config
 class Node(gossip_pb2_grpc.GossipServiceServicer):
     def __init__(self):
         self.podname = socket.gethostname()
+        print(f"self.podname={self.podname}", flush=True)
         self.host = socket.gethostbyname(self.podname)  # Get own pod IP
         self.port = '5050'
         # Get all pod names in the StatefulSet
         all_pod_names = [f"gossip-statefulset-{i}" for i in range(6)]  # Assuming 6 replicas
         # Remove the current pod's name from the neighbors
         self.neighbor_pod_names = [n for n in all_pod_names if n != socket.gethostname()]
+        print(f"self.neighbor_pod_names={self.neighbor_pod_names}", flush=True)
 
     def SendMessage(self, request, context):
         # print(f"request.sender_id={request.sender_id}", flush=True)
         # print(f"self.host={self.host}", flush=True)
-        # print(f"self.podname={self.podname}", flush=True)
+
 
         # Gossip starts here
         if request.sender_id == self.podname:
