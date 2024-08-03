@@ -46,7 +46,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                     try:
                         stub = gossip_pb2_grpc.GossipServiceStub(channel)
                         stub.SendMessage(gossip_pb2.GossipMessage(message=message, sender_id=sender_id))
-                        print(f"{self.host} forwarded message to {neighbor_pod_name} ({neighbor_ip})", flush=True)
+                        print(f"{self.podname} forwarded message to {neighbor_pod_name} ({neighbor_ip})", flush=True)
                     except grpc.RpcError as e:
                         print(f"Failed to send message to {neighbor_pod_name}: {e}", flush=True)
 
@@ -54,7 +54,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         gossip_pb2_grpc.add_GossipServiceServicer_to_server(self, server)
         server.add_insecure_port(f'[::]:{self.port}')
-        print(f"{self.host} listening on port {self.port}", flush=True)
+        print(f"{self.podname} ({self.host}) listening on port {self.port}", flush=True)
         server.start()
         server.wait_for_termination()
 
