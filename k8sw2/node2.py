@@ -13,17 +13,21 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.host = socket.gethostbyname(self.podname)  # Get own pod IP
         self.port = '5050'
         # Get all pod names in the StatefulSet
-        all_pod_names = [f"gossip-statefulset-{i}" for i in range(2)]  # Assuming 2 replicas
+        all_pod_names = [f"gossip-statefulset-{i}" for i in range(5)]  # Assuming 2 replicas
         # Remove the current pod's name from the neighbors
         self.neighbor_pod_names = [n for n in all_pod_names if n != socket.gethostname()]
 
     def SendMessage(self, request, context):
-        print(f"request.sender_id={request.sender_id}", flush=True)
-        print(f"self.host={self.host}", flush=True)
-        print(f"self.podname={self.podname}", flush=True)
+        # print(f"request.sender_id={request.sender_id}", flush=True)
+        # print(f"self.host={self.host}", flush=True)
+        # print(f"self.podname={self.podname}", flush=True)
+
+        # Gossip starts here
         if request.sender_id == self.podname:
+            # initiating gossip
             print(f"{self.podname} initiated message: '{request.message}'", flush=True)
         else:
+            # forward gossip
             print(f"{self.podname} received: '{request.message}' from {request.sender_id}", flush=True)
 
         self.gossip_message(request.message, request.sender_id)  # Trigger gossip to neighbors
