@@ -3,18 +3,13 @@ FROM busybox:latest
 WORKDIR /app
 
 # Install required packages for Python (musl is for compatibility with Alpine's libraries)
-RUN apk add --no-cache --virtual .build-deps \
-    bash \             # Bash for better scripting
-    wget \
-    musl-dev \
-    gcc
+RUN apk add --no-cache --virtual .build-deps bash wget musl-dev gcc
 
 # Download and install Python
 RUN wget https://www.python.org/ftp/python/3.11.5/Python-3.11.5.tgz 
 RUN tar -xf Python-3.11.5.tgz
 WORKDIR /app/Python-3.11.5
-RUN ./configure --enable-optimizations && \
-    make altinstall  
+RUN ./configure --enable-optimizations && make altinstall
 
 # Install network utils
 RUN apk add --no-cache iputils dnsutils
@@ -29,7 +24,7 @@ RUN pip install --no-cache-dir grpcio grpcio-tools kubernetes
 COPY . /app
 
 # Expose the port the app runs on (if applicable)
-# EXPOSE 5050
+EXPOSE 5050
 
 # Command to run the application
 CMD ["python3", "node2.py"]
