@@ -10,3 +10,8 @@ spec:
     protocol: TCP
   selector:
     run: bcgossip
+
+# ping gossip-statefulset-0
+#PING gossip-statefulset-0.bcgossip-svc.default.svc.cluster.local (10.76.2.9) 56(84) bytes of data.
+#64 bytes from gossip-statefulset-0.bcgossip-svc.default.svc.cluster.local (10.76.2.9): icmp_seq=1 ttl=64 time=0.030 ms
+#64 bytes from gossip-statefulset-0.bcgossip-svc.default.svc.cluster.local (10.76.2.9): icmp_seq=2 ttl=64 time=0.047 ms
