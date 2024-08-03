@@ -9,7 +9,8 @@ from kubernetes import client, config
 
 class Node(gossip_pb2_grpc.GossipServiceServicer):
     def __init__(self):
-        self.host = socket.gethostbyname(socket.gethostname())  # Get own pod IP
+        self.podname = socket.gethostname()
+        self.host = socket.gethostbyname(self.podname)  # Get own pod IP
         self.port = '5050'
         # Get all pod names in the StatefulSet
         all_pod_names = [f"gossip-statefulset-{i}" for i in range(2)]  # Assuming 2 replicas
@@ -19,10 +20,11 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
     def SendMessage(self, request, context):
         print(f"request.sender_id={request.sender_id}", flush=True)
         print(f"self.host={self.host}", flush=True)
-        if request.sender_id == self.host:
-            print(f"{self.host} initiated message: '{request.message}'", flush=True)
+        print(f"self.podname={self.podname}", flush=True)
+        if request.sender_id == self.podname:
+            print(f"{self.podname} initiated message: '{request.message}'", flush=True)
         else:
-            print(f"{self.host} received: '{request.message}' from {request.sender_id}", flush=True)
+            print(f"{self.podname} received: '{request.message}' from {request.sender_id}", flush=True)
 
         self.gossip_message(request.message, request.sender_id)  # Trigger gossip to neighbors
         return gossip_pb2.Acknowledgment(details="Message received successfully")
