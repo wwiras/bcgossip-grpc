@@ -4,11 +4,13 @@ import socket
 from concurrent import futures
 import gossip_pb2
 import gossip_pb2_grpc
+from kubernetes import client, config
+
 
 class Node(gossip_pb2_grpc.GossipServiceServicer):
     def __init__(self):
-        self.host = socket.gethostbyname(socket.gethostname())
-        self.port = '5050'
+        self.host = socket.gethostbyname(socket.gethostname())  # Get own pod IP
+        self.port = '5050'  # Corrected port number
 
     def SendMessage(self, request, context):
         print(f"{self.host} received: '{request.message}' from {request.sender_id}", flush=True)

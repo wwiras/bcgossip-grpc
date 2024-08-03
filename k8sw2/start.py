@@ -4,15 +4,26 @@ import time
 import socket
 import gossip_pb2
 import gossip_pb2_grpc
+from kubernetes import client, config
+
+
+def get_pod_ip(pod_name, namespace="default"):
+    """Fetches the IP address of a pod in the specified namespace."""
+    config.load_incluster_config()
+    v1 = client.CoreV1Api()
+    pod = v1.read_namespaced_pod(name=pod_name, namespace=namespace)
+    return pod.status.pod_ip
+
 
 def send_message_to_self(message):
-    """Sends a message to the server (pod) itself."""
+    """Sends a message to the current pod (itself)."""
     pod_name = socket.gethostname()
-    target = f"{pod_name}.bcgossip-svc:5050"
+    pod_ip = get_pod_ip(pod_name)
+    target = f"{pod_ip}:5050"
 
     with grpc.insecure_channel(target) as channel:
         stub = gossip_pb2_grpc.GossipServiceStub(channel)
-        print(f"Sending message to self ({pod_name}): '{message}'", flush=True)
+        print(f"Sending message to self ({pod_name}, {pod_ip}): '{message}'", flush=True)
         response = stub.SendMessage(gossip_pb2.GossipMessage(message=message, sender_id=pod_name))
         print(f"Received acknowledgment: {response.details}", flush=True)
 
