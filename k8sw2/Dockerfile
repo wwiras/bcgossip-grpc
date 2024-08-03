@@ -1,24 +1,15 @@
-FROM busybox:latest
+FROM ubuntu:22.04
 
 WORKDIR /app
 
-# Install required packages for Python (musl is for compatibility with Alpine's libraries)
-RUN apk add --no-cache --virtual .build-deps bash wget musl-dev gcc
-
-# Download and install Python
-RUN wget https://www.python.org/ftp/python/3.11.5/Python-3.11.5.tgz 
-RUN tar -xf Python-3.11.5.tgz
-WORKDIR /app/Python-3.11.5
-RUN ./configure --enable-optimizations && make altinstall
+# Install required packages for Python
+RUN apt-get update && apt-get install -y python3 python3-pip build-essential wget
 
 # Install network utils
-RUN apk add --no-cache iputils dnsutils
-
-# Create a symbolic link for 'python3'
-RUN ln -s /usr/local/bin/python3.11 /usr/bin/python3
+RUN apt-get install -y iputils-ping dnsutils
 
 # Install Python and necessary packages
-RUN pip install --no-cache-dir grpcio grpcio-tools kubernetes
+RUN pip3 install --no-cache-dir grpcio grpcio-tools kubernetes
 
 # Copy your application source code
 COPY . /app
