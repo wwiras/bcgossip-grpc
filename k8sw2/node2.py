@@ -13,7 +13,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.host = socket.gethostbyname(self.podname)  # Get own pod IP
         self.port = '5050'
         # Get all pod names in the StatefulSet
-        all_pod_names = [f"gossip-statefulset-{i}" for i in range(5)]  # Assuming 2 replicas
+        all_pod_names = [f"gossip-statefulset-{i}" for i in range(6)]  # Assuming 6 replicas
         # Remove the current pod's name from the neighbors
         self.neighbor_pod_names = [n for n in all_pod_names if n != socket.gethostname()]
 
