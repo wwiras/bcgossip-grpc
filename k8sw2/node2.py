@@ -41,7 +41,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             print(f"{self.podname}({self.host}) received: '{message}' from {sender_id}", flush=True)
 
         # Gossip to neighbors (only if the message is new)
-        self.gossip_message(message, sender_id)
+        self.gossip_message(message, self.podname)
         return gossip_pb2.Acknowledgment(details=f"{self.podname}({self.host}) processed message: '{message}'")
 
     def gossip_message(self, message, sender_id):
