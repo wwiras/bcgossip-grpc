@@ -1,58 +1,60 @@
+from kubernetes import client, config
 import grpc
 import os
 import socket
 from concurrent import futures
 import gossip_pb2
 import gossip_pb2_grpc
-from kubernetes import client, config
-
 
 class Node(gossip_pb2_grpc.GossipServiceServicer):
-    def __init__(self):
+    def __init__(self, service_name):
         self.podname = socket.gethostname()
-        print(f"self.podname={self.podname}", flush=True)
         self.host = socket.gethostbyname(self.podname)  # Get own pod IP
         self.port = '5050'
-        # Get all pod names in the StatefulSet
-        all_pod_names = [f"gossip-statefulset-{i}" for i in range(6)]  # Assuming 6 replicas
-        # Remove the current pod's name from the neighbors
-        self.neighbor_pod_names = [n for n in all_pod_names if n != socket.gethostname()]
-        print(f"self.neighbor_pod_names={self.neighbor_pod_names}", flush=True)
-
-    def SendMessage(self, request, context):
-        # print(f"request.sender_id={request.sender_id}", flush=True)
-        # print(f"self.host={self.host}", flush=True)
-
-
-        # Gossip starts here
-        if request.sender_id == self.podname:
-            # initiating gossip
-            print(f"{self.podname} initiated message: '{request.message}'", flush=True)
-        else:
-            # forward gossip
-            print(f"{self.podname} received: '{request.message}' from {request.sender_id}", flush=True)
-
-        self.gossip_message(request.message, request.sender_id)  # Trigger gossip to neighbors
-        return gossip_pb2.Acknowledgment(details="Message received successfully")
+        self.service_name = service_name
+        # Hardcoded neighbor pod names (excluding self)
+        all_pod_names = [f"gossip-statefulset-{i}" for i in range(2)]  # Assuming 2 replicas
+        self.neighbor_pod_names = [n for n in all_pod_names if n != self.podname]
+        self.received_messages = set()  # Use a set to track received messages
 
     def get_pod_ip(self, pod_name, namespace="default"):
-        """Fetches the IP address of a pod in the specified namespace."""
         config.load_incluster_config()
         v1 = client.CoreV1Api()
         pod = v1.read_namespaced_pod(name=pod_name, namespace=namespace)
         return pod.status.pod_ip
 
+    def SendMessage(self, request, context):
+        message = request.message
+        sender_id = request.sender_id
+
+        # Check for message initiation (using pod name for comparison)
+        if sender_id == self.podname:
+            print(f"Message '{message}' initiated by {self.podname}({self.host})", flush=True)
+        else:
+            print(f"{self.podname}({self.host}) received: '{message}' from {sender_id}", flush=True)
+
+        # Check for duplicate messages
+        if message in self.received_messages:
+            print(f"{self.podname}({self.host}) ignoring duplicate message: '{message}'", flush=True)
+            return gossip_pb2.Acknowledgment(details=f"Duplicate message ignored by {self.podname}({self.host})")
+        else:
+            self.received_messages.add(message)
+            print(f"{self.podname}({self.host}) received: '{message}' from {sender_id}", flush=True)
+
+            # Gossip to neighbors (only if the message is new)
+            self.gossip_message(message, sender_id)
+            return gossip_pb2.Acknowledgment(details=f"{self.podname}({self.host}) processed message: '{message}'")
+
     def gossip_message(self, message, sender_id):
-        """Sends the message to all neighbors except the sender."""
         for neighbor_pod_name in self.neighbor_pod_names:
-            if neighbor_pod_name != sender_id:  # Filter out the original sender
+            if neighbor_pod_name != sender_id:
                 neighbor_ip = self.get_pod_ip(neighbor_pod_name)
                 target = f"{neighbor_ip}:5050"
                 with grpc.insecure_channel(target) as channel:
                     try:
                         stub = gossip_pb2_grpc.GossipServiceStub(channel)
                         stub.SendMessage(gossip_pb2.GossipMessage(message=message, sender_id=sender_id))
-                        print(f"{self.podname} forwarded message to {neighbor_pod_name} ({neighbor_ip})", flush=True)
+                        print(f"{self.podname}({self.host}) forwarded message to {neighbor_pod_name} ({neighbor_ip})", flush=True)
                     except grpc.RpcError as e:
                         print(f"Failed to send message to {neighbor_pod_name}: {e}", flush=True)
 
@@ -60,15 +62,14 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         gossip_pb2_grpc.add_GossipServiceServicer_to_server(self, server)
         server.add_insecure_port(f'[::]:{self.port}')
-        print(f"{self.podname} ({self.host}) listening on port {self.port}", flush=True)
+        print(f"{self.podname}({self.host}) listening on port {self.port}", flush=True)  # Changed here
         server.start()
         server.wait_for_termination()
 
-
 def run_server():
-    node = Node()
+    service_name = os.getenv('SERVICE_NAME', 'bcgossip')  # Make sure this matches your Kubernetes service labels
+    node = Node(service_name)
     node.start_server()
-
 
 if __name__ == '__main__':
     run_server()
