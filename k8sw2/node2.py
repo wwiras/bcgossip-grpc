@@ -34,7 +34,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         # Check for duplicate messages
         elif message in self.received_messages:
-            print(f"{self.podname}({self.host}) ignoring duplicate message: '{message}'", flush=True)
+            print(f"{self.podname}({self.host}) ignoring duplicate message: '{message}' from {sender_id}", flush=True)
             return gossip_pb2.Acknowledgment(details=f"Duplicate message ignored by {self.podname}({self.host})")
         else:
             self.received_messages.add(message)
