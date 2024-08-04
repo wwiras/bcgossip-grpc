@@ -13,7 +13,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.port = '5050'
         self.service_name = service_name
         # Hardcoded neighbor pod names (excluding self)
-        all_pod_names = [f"gossip-statefulset-{i}" for i in range(2)]  # Assuming 2 replicas
+        all_pod_names = [f"gossip-statefulset-{i}" for i in range(4)]  # Assuming 2 replicas
         self.neighbor_pod_names = [n for n in all_pod_names if n != self.podname]
         self.received_messages = set()  # Use a set to track received messages
 

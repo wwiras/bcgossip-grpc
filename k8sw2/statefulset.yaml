@@ -4,7 +4,7 @@ metadata:
   name: gossip-statefulset
 spec:
   serviceName: "bcgossip-svc"
-  replicas: 6  # Start with 2 replicas for testing
+  replicas: 4  # Start with 2 replicas for testing
   selector:
     matchLabels:
       app: bcgossip
