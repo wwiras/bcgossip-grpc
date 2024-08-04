@@ -30,20 +30,19 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # Check for message initiation (using pod name for comparison)
         if sender_id == self.podname:
             print(f"Message '{message}' initiated by {self.podname}({self.host})", flush=True)
-        else:
-            print(f"{self.podname}({self.host}) received: '{message}' from {sender_id}", flush=True)
+            self.received_messages.add(message)  # Add the message to received_messages
 
         # Check for duplicate messages
-        if message in self.received_messages:
+        elif message in self.received_messages:
             print(f"{self.podname}({self.host}) ignoring duplicate message: '{message}'", flush=True)
             return gossip_pb2.Acknowledgment(details=f"Duplicate message ignored by {self.podname}({self.host})")
         else:
             self.received_messages.add(message)
             print(f"{self.podname}({self.host}) received: '{message}' from {sender_id}", flush=True)
 
-            # Gossip to neighbors (only if the message is new)
-            self.gossip_message(message, sender_id)
-            return gossip_pb2.Acknowledgment(details=f"{self.podname}({self.host}) processed message: '{message}'")
+        # Gossip to neighbors (only if the message is new)
+        self.gossip_message(message, sender_id)
+        return gossip_pb2.Acknowledgment(details=f"{self.podname}({self.host}) processed message: '{message}'")
 
     def gossip_message(self, message, sender_id):
         for neighbor_pod_name in self.neighbor_pod_names:
