@@ -37,20 +37,20 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         # Check for message initiation (using pod name for comparison)
         if sender_id == self.pod_name:
-            print(f"Message '{message}' initiated by {self.pod_name}({self.host})", flush=True)
+            print(f"Message:'{message}' initiated by {self.pod_name}({self.host})", flush=True)
             self.received_messages.add(message)  # Add the message to received_messages
 
         # Check for duplicate messages
         elif message in self.received_messages:
-            print(f"{self.pod_name}({self.host}) ignoring duplicate message: '{message}' from {sender_id}", flush=True)
-            return gossip_pb2.Acknowledgment(details=f"Duplicate message ignored by {self.pod_name}({self.host})")
+            print(f"{self.pod_name}({self.host}) ignoring duplicate message:'{message}' from {sender_id}", flush=True)
+            return gossip_pb2.Acknowledgment(details=f"Duplicate message:'{message}' ignored by {self.pod_name}({self.host})")
         else:
             self.received_messages.add(message)
-            print(f"{self.pod_name}({self.host}) received: '{message}' from {sender_id}", flush=True)
+            print(f"{self.pod_name}({self.host}) received message:'{message}' from {sender_id}", flush=True)
 
         # Gossip to neighbors (only if the message is new)
         self.gossip_message(message, sender_id)
-        return gossip_pb2.Acknowledgment(details=f"{self.pod_name}({self.host}) processed message: '{message}'")
+        return gossip_pb2.Acknowledgment(details=f"{self.pod_name}({self.host}) processed message:'{message}'")
 
     def gossip_message(self, message, sender_id):
         for neighbor_pod_name in self.neighbor_pod_names:
@@ -61,9 +61,9 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                     try:
                         stub = gossip_pb2_grpc.GossipServiceStub(channel)
                         stub.SendMessage(gossip_pb2.GossipMessage(message=message, sender_id=self.pod_name))
-                        print(f"{self.pod_name}({self.host}) forwarded message to {neighbor_pod_name} ({neighbor_ip})",flush=True)
+                        print(f"{self.pod_name}({self.host}) forwarded message:'{message}' to {neighbor_pod_name} ({neighbor_ip})",flush=True)
                     except grpc.RpcError as e:
-                        print(f"Failed to send message to {neighbor_pod_name}: {e}", flush=True)
+                        print(f"Failed to send message:'{message}' to {neighbor_pod_name}: {e}", flush=True)
 
     def _find_neighbors(self, node_id):
         """Identifies the neighbors of the given node based on the topology."""
