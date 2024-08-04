@@ -41,7 +41,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             print(f"{self.podname}({self.host}) received: '{message}' from {sender_id}", flush=True)
 
         # Gossip to neighbors (only if the message is new)
-        self.gossip_message(message, self.podname)
+        self.gossip_message(message, sender_id)
         return gossip_pb2.Acknowledgment(details=f"{self.podname}({self.host}) processed message: '{message}'")
 
     def gossip_message(self, message, sender_id):
@@ -52,7 +52,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 with grpc.insecure_channel(target) as channel:
                     try:
                         stub = gossip_pb2_grpc.GossipServiceStub(channel)
-                        stub.SendMessage(gossip_pb2.GossipMessage(message=message, sender_id=sender_id))
+                        stub.SendMessage(gossip_pb2.GossipMessage(message=message, sender_id=self.podname))
                         print(f"{self.podname}({self.host}) forwarded message to {neighbor_pod_name} ({neighbor_ip})", flush=True)
                     except grpc.RpcError as e:
                         print(f"Failed to send message to {neighbor_pod_name}: {e}", flush=True)
