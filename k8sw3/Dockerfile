@@ -7,10 +7,14 @@ WORKDIR /app
 COPY . /app
 
 # Install Python and necessary packages
-RUN pip install --no-cache-dir grpcio grpcio-tools kubernetes
+#RUN pip install --no-cache-dir grpcio grpcio-tools kubernetes
+RUN pip install --no-cache-dir grpcio grpcio-tools kubernetes google-cloud-bigquery
+
 
 # Expose the port the app runs on
 EXPOSE 5050
 
 # Command to run the application
 CMD ["python", "node.py"]
+
+#python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. gossip.proto

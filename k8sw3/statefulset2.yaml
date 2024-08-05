@@ -4,7 +4,7 @@ metadata:
   name: gossip-statefulset
 spec:
   serviceName: "bcgossip-svc"
-  replicas: 6  # Adjust the number of replicas as needed
+  replicas: 6  # Start with 2 replicas for testing
   selector:
     matchLabels:
       app: bcgossip
@@ -21,15 +21,7 @@ spec:
           volumeMounts:
             - name: config-volume
               mountPath: /app/config
-            - name: secrets-volume
-              mountPath: /app/secrets
-          env:
-            - name: GOOGLE_APPLICATION_CREDENTIALS
-              value: "/app/secrets/key.json"
       volumes:
         - name: config-volume
           configMap:
             name: topology-config
-        - name: secrets-volume
-          secret:
-            secretName: gossip-simulator-key

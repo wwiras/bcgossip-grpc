@@ -5,6 +5,7 @@ package gossip;
 message GossipMessage {
   string message = 1;
   string sender_id = 2;
+  int64 timestamp = 3;
 }
 
 message Acknowledgment {
