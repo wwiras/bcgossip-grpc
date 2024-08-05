@@ -4,7 +4,7 @@ metadata:
   name: gossip-statefulset
 spec:
   serviceName: "bcgossip-svc"
-  replicas: 4  # Start with 2 replicas for testing
+  replicas: 6  # Start with 2 replicas for testing
   selector:
     matchLabels:
       app: bcgossip
@@ -18,3 +18,10 @@ spec:
           image: wwiras/gpbc:v1  # Replace with your Docker image name
           ports:
             - containerPort: 5050
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: topology-config
