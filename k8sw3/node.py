@@ -47,7 +47,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # Check for message initiation and set the initial timestamp
         if sender_id == self.pod_name and not self.gossip_initiated:
             self.gossip_initiated = True
-            self.initial_gossip_timestamp = received_timestamp
+            self.initial_gossip_timestamp = received_timestamp // 1000  # Convert to microseconds
             print(f"Gossip initiated by {self.pod_name}({self.host}) at {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(received_timestamp / 1e9))}", flush=True)
 
             # Write initiate message event to BigQuery
@@ -55,7 +55,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 'message': message,
                 'sender_id': sender_id,
                 'receiver_id': self.pod_name,
-                'received_timestamp': received_timestamp,
+                'received_timestamp': self.initial_gossip_timestamp,
                 'propagation_time': None,  # No propagation time for initiated messages
                 'event_type': 'initiate'
             }
@@ -72,7 +72,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 'message': message,
                 'sender_id': sender_id,
                 'receiver_id': self.pod_name,
-                'received_timestamp': received_timestamp,
+                'received_timestamp': received_timestamp // 1000,  # Convert to microseconds
                 'propagation_time': None,
                 'event_type': 'duplicate'
             }
@@ -89,12 +89,15 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             propagation_time = (received_timestamp - request.timestamp) / 1e6
             print(f"{self.pod_name}({self.host}) received: '{message}' from {sender_id} in {propagation_time:.2f} ms", flush=True)
 
+            # Convert nanosecond timestamp to microseconds for BigQuery
+            received_timestamp_microseconds = received_timestamp // 1000
+
             # Write received message event to BigQuery
             row_to_insert = {
                 'message': message,
                 'sender_id': sender_id,
                 'receiver_id': self.pod_name,
-                'received_timestamp': received_timestamp,
+                'received_timestamp': received_timestamp_microseconds,  # Use microsecond timestamp
                 'propagation_time': propagation_time,
                 'event_type': 'received'
             }
