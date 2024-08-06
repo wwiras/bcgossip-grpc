@@ -27,7 +27,7 @@ for col in df.columns:
         df[col] = pd.to_datetime(df[col])
 
 # Specify the table you want to upload to
-table_id = "gossip_simulation.gossip_events_new"  # Use the same table you created earlier
+table_id = "gossip_simulation.gossip_events"  # Use the same table you created earlier
 
 try:
     # Upload the DataFrame to BigQuery, appending to existing table

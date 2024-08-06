@@ -2,11 +2,11 @@ from google.cloud import bigquery
 
 # Set your project ID
 project_id = 'bcgossip-proj'
-table_id = 'gossip_events_new'
+table_id = 'gossip_events'
 
 # Construct the delete query
 delete_query = """
-DELETE FROM `bcgossip-proj.gossip_simulation.gossip_events_new` 
+DELETE FROM `bcgossip-proj.gossip_simulation.gossip_events` 
 WHERE event_type = 'SEND'
 """
 

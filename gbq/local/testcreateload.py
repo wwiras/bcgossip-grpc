@@ -18,7 +18,7 @@ data = {
 df = pd.DataFrame(data)
 
 # Specify a new table ID (replace with your desired table name)
-table_id = "gossip_simulation.gossip_events_new"
+table_id = "gossip_simulation.gossip_events"
 
 # Define schema manually
 schema = [
