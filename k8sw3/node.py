@@ -73,7 +73,8 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                         stub = gossip_pb2_grpc.GossipServiceStub(channel)
                         stub.SendMessage(gossip_pb2.GossipMessage(
                             message=message,
-                            sender_id=sender_id,
+                            # sender_id=sender_id,
+                            sender_id=self.pod_name,
                             timestamp=received_timestamp
                         ))
                         print(f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip})", flush=True)
