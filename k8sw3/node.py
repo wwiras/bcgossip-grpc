@@ -101,10 +101,15 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             'propagation_time': propagation_time,
             'event_type': event_type
         }
-        logging.info(json.dumps(event_data))
-        print(log_message, flush=True)
 
-    def start_server(self):
+        # Log the JSON data using the logging module (for potential future use)
+        logging.info(json.dumps(event_data))
+
+        # Print both the log message and the JSON data to the console
+        print(log_message, flush=True)
+        print(json.dumps(event_data), flush=True)
+
+def start_server(self):
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         gossip_pb2_grpc.add_GossipServiceServicer_to_server(self, server)
         server.add_insecure_port(f'[::]:{self.port}')
