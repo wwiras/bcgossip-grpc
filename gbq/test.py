@@ -1,6 +1,9 @@
 import pandas as pd
+import os
 from google.cloud import bigquery
 
+
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '/home/wwiras/mygcp/bcgossip.json'
 # Establish BigQuery client
 client = bigquery.Client()
 
