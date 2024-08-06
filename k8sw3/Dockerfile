@@ -8,7 +8,7 @@ COPY . /app
 
 # Install Python and necessary packages
 #RUN pip install --no-cache-dir grpcio grpcio-tools kubernetes
-RUN pip install --no-cache-dir grpcio grpcio-tools kubernetes google-cloud-bigquery
+RUN pip install --no-cache-dir grpcio grpcio-tools kubernetes google-cloud-bigquery pandas-gbq
 
 
 # Expose the port the app runs on

@@ -8,10 +8,12 @@ import gossip_pb2_grpc
 import json
 import time
 from google.cloud import bigquery
+import pandas as pd
+import pandas_gbq
 
 class Node(gossip_pb2_grpc.GossipServiceServicer):
     def __init__(self, service_name):
-        self.pod_name = socket.gethostname()  # Get the pod's name from the environment variable
+        self.pod_name = socket.gethostname()
         self.host = socket.gethostbyname(self.pod_name)
         self.port = '5050'
         self.service_name = service_name
@@ -125,13 +127,23 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         return neighbors
 
     def _insert_into_bigquery(self, row):
-        """Inserts a row into BigQuery with basic error handling and retry."""
-        table = self.bigquery_client.get_table(self.table_id)
-        errors = self.bigquery_client.insert_rows_json(table, [row])
-        if errors == []:
-            print("New rows have been added.", flush=True)
-        else:
-            print(f"Encountered errors while inserting rows: {errors}", flush=True)
+        """Inserts a row into BigQuery using pandas-gbq for convenience."""
+
+        # Convert the 'received_timestamp' (nanoseconds) to a BigQuery-compatible timestamp string
+        row['received_timestamp'] = time.strftime('%Y-%m-%d %H:%M:%S.%f', time.localtime(row['received_timestamp'] / 1e9))
+
+        # Create a DataFrame with the row data
+        df = pd.DataFrame([row])
+
+        # Load the DataFrame into BigQuery using pandas-gbq
+        try:
+            pandas_gbq.to_gbq(df, self.table_id, project_id='bcgossip-proj', if_exists='append')
+            print(f"Loaded 1 row into {self.table_id}", flush=True)
+        except pandas_gbq.gbq.GenericGBQException as e:
+            print(f"Error inserting into BigQuery: {e}", flush=True)
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}", flush=True)
+
 
     def start_server(self):
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
