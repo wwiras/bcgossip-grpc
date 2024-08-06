@@ -8,7 +8,7 @@ COPY . /app
 
 # Install Python and necessary packages
 #RUN pip install --no-cache-dir grpcio grpcio-tools kubernetes
-RUN pip install --no-cache-dir grpcio grpcio-tools kubernetes pandas-gbq
+RUN pip install --no-cache-dir grpcio grpcio-tools kubernetes pandas-gbq asyncio
 
 
 # Expose the port the app runs on

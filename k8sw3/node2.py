@@ -9,7 +9,6 @@ import json
 import time
 import pandas as pd
 import pandas_gbq
-import asyncio
 
 class Node(gossip_pb2_grpc.GossipServiceServicer):
     def __init__(self, service_name):
@@ -40,7 +39,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         pod = v1.read_namespaced_pod(name=pod_name, namespace=namespace)
         return pod.status.pod_ip
 
-    async def SendMessage(self, request, context):
+    def SendMessage(self, request, context):
         message = request.message
         sender_id = request.sender_id
         received_timestamp = time.time_ns()
@@ -51,7 +50,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             self.initial_gossip_timestamp = pd.Timestamp.utcnow()
             print(f"Gossip initiated by {self.pod_name}({self.host}) at {self.initial_gossip_timestamp.strftime('%Y-%m-%d %H:%M:%S')}", flush=True)
 
-            # Write initiate message event to BigQuery (asynchronously)
+            # Write initiate message event to BigQuery
             row_to_insert = {
                 'message': message,
                 'sender_id': sender_id,
@@ -60,11 +59,11 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 'propagation_time': None,
                 'event_type': 'initiate'
             }
-            asyncio.create_task(self._insert_into_bigquery_async(row_to_insert))
+            self._insert_into_bigquery(row_to_insert)
 
         # Check for duplicate messages
         elif message in self.received_messages:
-            # Write duplicate message event to BigQuery (asynchronously)
+            # Write duplicate message event to BigQuery
             row_to_insert = {
                 'message': message,
                 'sender_id': sender_id,
@@ -73,7 +72,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 'propagation_time': None,
                 'event_type': 'duplicate'
             }
-            asyncio.create_task(self._insert_into_bigquery_async(row_to_insert))
+            self._insert_into_bigquery(row_to_insert)
 
             print(f"{self.pod_name}({self.host}) ignoring duplicate message: '{message}' from {sender_id}", flush=True)
             return gossip_pb2.Acknowledgment(details=f"Duplicate message ignored by {self.pod_name}({self.host})")
@@ -83,7 +82,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             propagation_time = (received_timestamp - request.timestamp) / 1e6
             print(f"{self.pod_name}({self.host}) received: '{message}' from {sender_id} in {propagation_time:.2f} ms", flush=True)
 
-            # Write received message event to BigQuery (asynchronously)
+            # Write received message event to BigQuery
             row_to_insert = {
                 'message': message,
                 'sender_id': sender_id,
@@ -92,7 +91,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 'propagation_time': propagation_time,
                 'event_type': 'received'
             }
-            asyncio.create_task(self._insert_into_bigquery_async(row_to_insert))
+            self._insert_into_bigquery(row_to_insert)
 
         # Gossip to neighbors (only if the message is new)
         self.gossip_message(message, sender_id, received_timestamp)
@@ -106,12 +105,10 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 with grpc.insecure_channel(target) as channel:
                     try:
                         stub = gossip_pb2_grpc.GossipServiceStub(channel)
-                        # Include the current pod's name in the request
                         stub.SendMessage(gossip_pb2.GossipMessage(
                             message=message,
                             sender_id=sender_id,
-                            timestamp=received_timestamp,
-                            receiver_id=self.pod_name
+                            timestamp=received_timestamp
                         ))
                         print(f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip})", flush=True)
                     except grpc.RpcError as e:
@@ -127,15 +124,18 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 neighbors.append(link['source'])
         return neighbors
 
-    async def _insert_into_bigquery_async(self, row):
-        """Inserts a row into BigQuery using pandas-gbq asynchronously."""
+    def _insert_into_bigquery(self, row):
+        """Inserts a row into BigQuery using pandas-gbq for convenience."""
 
         # Create a DataFrame with the row data
         df = pd.DataFrame([row])
 
-        # Load the DataFrame into BigQuery using pandas-gbq asynchronously
+        # Load the DataFrame into BigQuery using pandas-gbq
         try:
-            await asyncio.to_thread(pandas_gbq.to_gbq, df, self.table_id, project_id='your-project-id', if_exists='append')
+            pandas_gbq.to_gbq(df, self.table_id,
+                              project_id='bcgossip-proj',
+                              progress_bar=False,
+                              if_exists='append')  # Replace 'your-project-id' with your actual project ID
             print(f"Loaded 1 row into {self.table_id}", flush=True)
         except pandas_gbq.gbq.GenericGBQException as e:
             print(f"Error inserting into BigQuery: {e}", flush=True)
@@ -144,23 +144,19 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
 
     def start_server(self):
-        # Modify to use asyncio server
-        server = grpc.aio.server(futures.ThreadPoolExecutor(max_workers=10))
+        server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         gossip_pb2_grpc.add_GossipServiceServicer_to_server(self, server)
         server.add_insecure_port(f'[::]:{self.port}')
         print(f"{self.pod_name}({self.host}) listening on port {self.port}", flush=True)
-
-        # Start the server asynchronously
-        asyncio.run(server.start())
-
-        # Keep the server running
-        try:
-            asyncio.get_event_loop().run_forever()
-        except KeyboardInterrupt:
-            # Graceful shutdown on Ctrl+C
-            server.stop(0)
+        server.start()
+        server.wait_for_termination()
 
 
 def run_server():
     service_name = os.getenv('SERVICE_NAME', 'bcgossip')
-    node = Node
+    node = Node(service_name)
+    node.start_server()
+
+
+if __name__ == '__main__':
+    run_server()
