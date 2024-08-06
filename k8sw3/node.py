@@ -28,7 +28,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         # Set up BigQuery client
         self.bigquery_client = bigquery.Client()
-        self.table_id = 'bcgossip-proj.gossip_simulation.gossip_events'  # Replace with your actual table ID
+        self.table_id = 'your-project-id.gossip_simulation.gossip_events'  # Replace with your actual table ID
 
         self.gossip_initiated = False
         self.initial_gossip_timestamp = None
@@ -47,7 +47,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # Check for message initiation and set the initial timestamp
         if sender_id == self.pod_name and not self.gossip_initiated:
             self.gossip_initiated = True
-            self.initial_gossip_timestamp = received_timestamp // 1000  # Convert to microseconds
+            self.initial_gossip_timestamp = received_timestamp
             print(f"Gossip initiated by {self.pod_name}({self.host}) at {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(received_timestamp / 1e9))}", flush=True)
 
             # Write initiate message event to BigQuery
@@ -59,11 +59,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 'propagation_time': None,  # No propagation time for initiated messages
                 'event_type': 'initiate'
             }
-            errors = self.bigquery_client.insert_rows_json(self.table_id, [row_to_insert])
-            if errors == []:
-                print("New rows have been added.")
-            else:
-                print("Encountered errors while inserting rows: {}".format(errors))
+            self._insert_into_bigquery(row_to_insert)
 
         # Check for duplicate messages
         elif message in self.received_messages:
@@ -72,40 +68,30 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 'message': message,
                 'sender_id': sender_id,
                 'receiver_id': self.pod_name,
-                'received_timestamp': received_timestamp // 1000,  # Convert to microseconds
+                'received_timestamp': received_timestamp,
                 'propagation_time': None,
                 'event_type': 'duplicate'
             }
-            errors = self.bigquery_client.insert_rows_json(self.table_id, [row_to_insert])
-            if errors == []:
-                print("New rows have been added.")
-            else:
-                print("Encountered errors while inserting rows: {}".format(errors))
+            self._insert_into_bigquery(row_to_insert)
 
             print(f"{self.pod_name}({self.host}) ignoring duplicate message: '{message}' from {sender_id}", flush=True)
             return gossip_pb2.Acknowledgment(details=f"Duplicate message ignored by {self.pod_name}({self.host})")
+
         else:
             self.received_messages.add(message)
             propagation_time = (received_timestamp - request.timestamp) / 1e6
             print(f"{self.pod_name}({self.host}) received: '{message}' from {sender_id} in {propagation_time:.2f} ms", flush=True)
-
-            # Convert nanosecond timestamp to microseconds for BigQuery
-            received_timestamp_microseconds = received_timestamp // 1000
 
             # Write received message event to BigQuery
             row_to_insert = {
                 'message': message,
                 'sender_id': sender_id,
                 'receiver_id': self.pod_name,
-                'received_timestamp': received_timestamp_microseconds,  # Use microsecond timestamp
+                'received_timestamp': received_timestamp,
                 'propagation_time': propagation_time,
                 'event_type': 'received'
             }
-            errors = self.bigquery_client.insert_rows_json(self.table_id, [row_to_insert])
-            if errors == []:
-                print("New rows have been added.")
-            else:
-                print("Encountered errors while inserting rows: {}".format(errors))
+            self._insert_into_bigquery(row_to_insert)
 
         # Gossip to neighbors (only if the message is new)
         self.gossip_message(message, sender_id, received_timestamp)
@@ -138,11 +124,20 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 neighbors.append(link['source'])
         return neighbors
 
+    def _insert_into_bigquery(self, row):
+        """Inserts a row into BigQuery with basic error handling and retry."""
+        table = self.bigquery_client.get_table(self.table_id)
+        errors = self.bigquery_client.insert_rows_json(table, [row])
+        if errors == []:
+            print("New rows have been added.", flush=True)
+        else:
+            print(f"Encountered errors while inserting rows: {errors}", flush=True)
+
     def start_server(self):
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         gossip_pb2_grpc.add_GossipServiceServicer_to_server(self, server)
         server.add_insecure_port(f'[::]:{self.port}')
-        print(f"{self.pod_name}({self.host}) listening on port {self.port}", flush=True)  # Changed here
+        print(f"{self.pod_name}({self.host}) listening on port {self.port}", flush=True)
         server.start()
         server.wait_for_termination()
 
