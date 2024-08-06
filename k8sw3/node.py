@@ -7,7 +7,6 @@ import gossip_pb2
 import gossip_pb2_grpc
 import json
 import time
-from google.cloud import bigquery
 import pandas as pd
 import pandas_gbq
 
@@ -28,9 +27,8 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         self.received_messages = set()
 
-        # Set up BigQuery client
-        self.bigquery_client = bigquery.Client()
-        self.table_id = 'bcgossip-proj.gossip_simulation.gossip_events'  # Replace with your actual table ID
+        # Set up BigQuery table ID (replace with your actual project ID)
+        self.table_id = 'bcgossip-proj.gossip_simulation.gossip_events'
 
         self.gossip_initiated = False
         self.initial_gossip_timestamp = None
@@ -49,8 +47,8 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # Check for message initiation and set the initial timestamp
         if sender_id == self.pod_name and not self.gossip_initiated:
             self.gossip_initiated = True
-            self.initial_gossip_timestamp = received_timestamp
-            print(f"Gossip initiated by {self.pod_name}({self.host}) at {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(received_timestamp / 1e9))}", flush=True)
+            self.initial_gossip_timestamp = pd.Timestamp.utcnow()
+            print(f"Gossip initiated by {self.pod_name}({self.host}) at {self.initial_gossip_timestamp.strftime('%Y-%m-%d %H:%M:%S')}", flush=True)
 
             # Write initiate message event to BigQuery
             row_to_insert = {
@@ -58,7 +56,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 'sender_id': sender_id,
                 'receiver_id': self.pod_name,
                 'received_timestamp': self.initial_gossip_timestamp,
-                'propagation_time': None,  # No propagation time for initiated messages
+                'propagation_time': None,
                 'event_type': 'initiate'
             }
             self._insert_into_bigquery(row_to_insert)
@@ -70,7 +68,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 'message': message,
                 'sender_id': sender_id,
                 'receiver_id': self.pod_name,
-                'received_timestamp': received_timestamp,
+                'received_timestamp': pd.Timestamp.utcnow(),
                 'propagation_time': None,
                 'event_type': 'duplicate'
             }
@@ -89,7 +87,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 'message': message,
                 'sender_id': sender_id,
                 'receiver_id': self.pod_name,
-                'received_timestamp': received_timestamp,
+                'received_timestamp': pd.Timestamp.utcnow(),
                 'propagation_time': propagation_time,
                 'event_type': 'received'
             }
@@ -129,15 +127,15 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
     def _insert_into_bigquery(self, row):
         """Inserts a row into BigQuery using pandas-gbq for convenience."""
 
-        # Convert the 'received_timestamp' (nanoseconds) to a BigQuery-compatible timestamp string
-        row['received_timestamp'] = time.strftime('%Y-%m-%d %H:%M:%S.%f', time.localtime(row['received_timestamp'] / 1e9))
-
         # Create a DataFrame with the row data
         df = pd.DataFrame([row])
 
         # Load the DataFrame into BigQuery using pandas-gbq
         try:
-            pandas_gbq.to_gbq(df, self.table_id, project_id='bcgossip-proj', if_exists='append')
+            pandas_gbq.to_gbq(df, self.table_id,
+                              project_id='bcgossip-proj',
+                              progress_bar=False,
+                              if_exists='append')  # Replace 'your-project-id' with your actual project ID
             print(f"Loaded 1 row into {self.table_id}", flush=True)
         except pandas_gbq.gbq.GenericGBQException as e:
             print(f"Error inserting into BigQuery: {e}", flush=True)
