@@ -28,7 +28,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         # Set up BigQuery client
         self.bigquery_client = bigquery.Client()
-        self.table_id = 'your-project-id.gossip_simulation.gossip_events'  # Replace with your actual table ID
+        self.table_id = 'bcgossip-proj.gossip_simulation.gossip_events'  # Replace with your actual table ID
 
         self.gossip_initiated = False
         self.initial_gossip_timestamp = None
