@@ -4,44 +4,39 @@ import pandas as pd
 # Set your project ID (replace 'your-project-id')
 project_id = "bcgossip-proj"
 
-# Create a dummy DataFrame (replace with your own data)
+# Create a dummy DataFrame (new data)
 data = {
-    'message': ['Hello', 'Good morning', 'How are you?'],
-    'sender_id': ['gossip-statefulset-1', 'gossip-statefulset-2', 'gossip-statefulset-3'],
-    'receiver_id': ['gossip-statefulset-4','gossip-statefulset-5', 'gossip-statefulset-6'],
-    'received_timestamp': pd.Timestamp.now(),  # Current timestamp
-    'propagation_time': [0.5, 0.8, 1.2],  # Example propagation times
-    'event_type': ['SEND', 'SEND', 'RECEIVE']
-}
-
-# Define column data types for BigQuery
-dtypes = {
-    'message': 'STRING',
-    'sender_id': 'STRING',
-    'receiver_id': 'STRING',
-    'received_timestamp': 'TIMESTAMP',
-    'propagation_time': 'FLOAT64',
-    'event_type': 'STRING'
+    'message': ['Greetings!', 'What\'s up?', 'Have a nice day!'],
+    'sender_id': ['node-A', 'node-B', 'node-C'],
+    'receiver_id': ['node-D', 'node-E', 'node-F'],
+    'received_timestamp': [
+        pd.Timestamp.now(),
+        pd.Timestamp.now() - pd.Timedelta(hours=2),
+        pd.Timestamp.now() - pd.Timedelta(days=1)
+    ],
+    'propagation_time': [0.2, 0.7, 1.5],
+    'event_type': ['RECEIVE', 'SEND', 'SEND']
 }
 
 # Create dataframe
 df = pd.DataFrame(data)
 
-# Change data types to match
+# Change data types to match (modified)
 for col in df.columns:
-    if col in dtypes:
-        df[col] = df[col].astype(dtypes[col])
+    if col == 'received_timestamp':
+        df[col] = pd.to_datetime(df[col])
 
 # Specify the table you want to upload to
-table_id = "gossip_simulation.gossip_events"
+table_id = "gossip_simulation.gossip_events_new"  # Use the same table you created earlier
 
 try:
-    # Upload the DataFrame to BigQuery
-    pandas_gbq.to_gbq(df, table_id, project_id=project_id, if_exists='append', table_schema=dtypes)
-    print(f"Data uploaded to {project_id}.{table_id} successfully.")
+    # Upload the DataFrame to BigQuery, appending to existing table
+    pandas_gbq.to_gbq(df, table_id, project_id=project_id, if_exists='append')
+    print(f"Data appended to {project_id}.{table_id} successfully.")
 
 except pandas_gbq.gbq.GenericGBQException as e:
     print(f"Error uploading to BigQuery: {e}")
 
 except Exception as e:
     print(f"An unexpected error occurred: {e}")
+
