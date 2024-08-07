@@ -167,6 +167,27 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         except Exception as e:
             print(f"An unexpected error occurred: {e}", flush=True)
 
+    def _calculate_weight(self, latency, bandwidth):
+        """
+        Calculates the weight for a neighbor based on the provided formula.
+        """
+        if latency is None or bandwidth is None:
+            return 0  # Handle cases where latency or bandwidth couldn't be measured
+
+        total_latency = sum(self.neighbor_latencies.values())
+        avg_latency = total_latency / len(self.neighbor_latencies)
+        relative_latency = avg_latency / (latency + 1e-6)  # Avoid division by zero
+
+        # Normalize the weight (you might want to adjust the normalization logic)
+        max_possible_weight = 1  # Assuming the maximum weight is 1
+        normalized_weight = relative_latency / max_possible_weight
+
+        # Combine with bandwidth (you can adjust the weighting here)
+        weight = normalized_weight * bandwidth
+
+        return weight
+
+
 
     def _log_event(self, message, sender_id, received_timestamp, propagation_time, event_type, log_message):
         """Logs the gossip event as structured JSON data."""
