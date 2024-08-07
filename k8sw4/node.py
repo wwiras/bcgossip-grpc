@@ -164,6 +164,8 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 stub = gossip_pb2_grpc.GossipServiceStub(channel)
                 response = stub.MeasureBandwidth(gossip_pb2.BandwidthRequest(payload_size=payload_size_bytes))
                 return response.bandwidth_mbps
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}", flush=True)
 
     def start_server(self):
         """
