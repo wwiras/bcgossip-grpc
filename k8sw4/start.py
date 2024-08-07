@@ -15,9 +15,6 @@ def get_pod_ip(pod_name, namespace="default"):
 
 def send_message_to_self(message):
     """Sends a message to the current pod (itself)."""
-    # pod_name = socket.gethostname()
-    # pod_ip = get_pod_ip(pod_name)
-    # target = f"{pod_ip}:5050"
     pod_name = socket.gethostname()
     print(f"pod_name={pod_name}", flush=True)
     pod_ip = get_pod_ip(pod_name)

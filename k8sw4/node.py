@@ -167,6 +167,26 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         except Exception as e:
             print(f"An unexpected error occurred: {e}", flush=True)
 
+
+    def _log_event(self, message, sender_id, received_timestamp, propagation_time, event_type, log_message):
+        """Logs the gossip event as structured JSON data."""
+        event_data = {
+            'message': message,
+            'sender_id': sender_id,
+            'receiver_id': self.pod_name,
+            'received_timestamp': received_timestamp,
+            'propagation_time': propagation_time,
+            'event_type': event_type,
+            'detail': log_message
+        }
+
+        # Log the JSON data using the logging module (for potential future use)
+        logging.info(json.dumps(event_data))
+
+        # Print both the log message and the JSON data to the console
+        # print(log_message, flush=True)
+        print(json.dumps(event_data), flush=True)
+
     def start_server(self):
         """
         Starts the gRPC server to listen for incoming requests.
