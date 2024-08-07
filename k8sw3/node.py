@@ -99,7 +99,8 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             'receiver_id': self.pod_name,
             'received_timestamp': received_timestamp,
             'propagation_time': propagation_time,
-            'event_type': event_type
+            'event_type': event_type,
+            'detail': log_message
         }
 
         # Log the JSON data using the logging module (for potential future use)
