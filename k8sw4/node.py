@@ -165,4 +165,23 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 response = stub.MeasureBandwidth(gossip_pb2.BandwidthRequest(payload_size=payload_size_bytes))
                 return response.bandwidth_mbps
 
+    def start_server(self):
+        """
+        Starts the gRPC server to listen for incoming requests.
+        """
+        server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+        gossip_pb2_grpc.add_GossipServiceServicer_to_server(self, server)
+        server.add_insecure_port(f'[::]:{self.port}')
+        print(f"{self.pod_name}({self.host}) listening on port {self.port}", flush=True)
+        server.start()
+        server.wait_for_termination()  # Keep the server running
 
+
+def run_server():
+    service_name = os.getenv('SERVICE_NAME', 'bcgossip')
+    node = Node(service_name)
+    node.start_server()
+
+
+if __name__ == '__main__':
+    run_server()
