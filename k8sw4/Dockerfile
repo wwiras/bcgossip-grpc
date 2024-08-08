@@ -6,7 +6,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y python3 python3-pip build-essential wget
 
 # Install network utils
-RUN apt-get install -y iputils-ping dnsutils iproute2
+RUN apt-get install -y iputils-ping dnsutils iproute2 iperf3
 
 # Install Python and necessary packages
 RUN pip3 install --no-cache-dir grpcio grpcio-tools kubernetes
