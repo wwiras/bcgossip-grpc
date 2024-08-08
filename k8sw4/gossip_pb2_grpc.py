@@ -19,34 +19,12 @@ class GossipServiceStub(object):
                 request_serializer=gossip__pb2.GossipMessage.SerializeToString,
                 response_deserializer=gossip__pb2.Acknowledgment.FromString,
                 )
-        self.Ping = channel.unary_unary(
-                '/gossip.GossipService/Ping',
-                request_serializer=gossip__pb2.PingRequest.SerializeToString,
-                response_deserializer=gossip__pb2.PongResponse.FromString,
-                )
-        self.MeasureBandwidth = channel.unary_unary(
-                '/gossip.GossipService/MeasureBandwidth',
-                request_serializer=gossip__pb2.BandwidthRequest.SerializeToString,
-                response_deserializer=gossip__pb2.BandwidthResponse.FromString,
-                )
 
 
 class GossipServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
 
     def SendMessage(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def Ping(self, request, context):
-        """Missing associated documentation comment in .proto file."""
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def MeasureBandwidth(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -59,16 +37,6 @@ def add_GossipServiceServicer_to_server(servicer, server):
                     servicer.SendMessage,
                     request_deserializer=gossip__pb2.GossipMessage.FromString,
                     response_serializer=gossip__pb2.Acknowledgment.SerializeToString,
-            ),
-            'Ping': grpc.unary_unary_rpc_method_handler(
-                    servicer.Ping,
-                    request_deserializer=gossip__pb2.PingRequest.FromString,
-                    response_serializer=gossip__pb2.PongResponse.SerializeToString,
-            ),
-            'MeasureBandwidth': grpc.unary_unary_rpc_method_handler(
-                    servicer.MeasureBandwidth,
-                    request_deserializer=gossip__pb2.BandwidthRequest.FromString,
-                    response_serializer=gossip__pb2.BandwidthResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -94,39 +62,5 @@ class GossipService(object):
         return grpc.experimental.unary_unary(request, target, '/gossip.GossipService/SendMessage',
             gossip__pb2.GossipMessage.SerializeToString,
             gossip__pb2.Acknowledgment.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def Ping(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/gossip.GossipService/Ping',
-            gossip__pb2.PingRequest.SerializeToString,
-            gossip__pb2.PongResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def MeasureBandwidth(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/gossip.GossipService/MeasureBandwidth',
-            gossip__pb2.BandwidthRequest.SerializeToString,
-            gossip__pb2.BandwidthResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

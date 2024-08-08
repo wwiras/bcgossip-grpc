@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bcgossip-bandwidth-restriction
+  namespace: default  # Adjust if your pods are in a different namespace
+spec:
+  podSelector:
+    matchLabels:
+      app: bcgossip
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector: {}
+    bandwidth:
+      ingressRate: 2M
+  egress:
+  - to:
+    - podSelector: {}
+    bandwidth:
+      egressRate: 2M

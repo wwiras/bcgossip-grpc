@@ -17,7 +17,7 @@ EXPOSE 5050
 CMD ["python", "node.py"]
 
 # For grpc compiler
-# python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. gossip.proto
+# python -m grpc_tools.protoc -I. --python_out=. --grpc_python_out=. gossip2.proto
 
 # For GKE Big Query key
 #kubectl create secret generic gossip-simulator-key --from-file=key.json=bcgossip.json
