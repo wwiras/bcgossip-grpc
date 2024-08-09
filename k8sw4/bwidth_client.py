@@ -10,22 +10,17 @@ def get_pod_ip(pod_name, namespace="default"):
     pod = v1.read_namespaced_pod(name=pod_name, namespace=namespace)
     return pod.status.pod_ip
 
-def perform_bandwidth_test(server_ip):
-# def perform_bandwidth_test(server_ip, duration=10):
-
+def perform_bandwidth_test(server_ip, duration=10):
     """Performs an iperf3 bandwidth test to the specified server IP."""
-    # client = iperf3.Client()
-    # client.server_hostname = server_ip
-    # client.zerocopy = True
-    # client.verbose = False
-    # client.port = 5201  # Default iperf3 server port
-    # client.num_streams = 10
-    # client.duration = int(duration)
-    # client.bandwidth = 1000000000
 
     client = iperf3.Client()
     client.server_hostname = server_ip
-    client.json_output = False
+    client.zerocopy = True
+    client.verbose = False
+    client.port = 5201
+    client.num_streams = 10
+    client.duration = int(duration)
+    client.bandwidth = 1000000000
 
     result = client.run()
 
@@ -34,7 +29,9 @@ def perform_bandwidth_test(server_ip):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Perform a bandwidth test to a target pod.")
     parser.add_argument('--target_pod', required=True, help="Target pod's name to perform the bandwidth test against")
+    parser.add_argument('--duration', type=int, default=10, help="Duration of the bandwidth test in seconds")
     args = parser.parse_args()
+
     server_ip = get_pod_ip(args.target_pod)
 
     current_time = datetime.now().strftime('%a, %d %b %Y %H:%M:%S %Z')
@@ -42,8 +39,10 @@ if __name__ == '__main__':
     print(f"Time: {current_time}")
     print(f"Connecting to host {server_ip}, port 5201")
 
-    # result = perform_bandwidth_test(server_ip, args.duration)
-    result = perform_bandwidth_test(server_ip)
+    result = perform_bandwidth_test(server_ip, args.duration)
 
-    # print(result.text)
-    print(result)
+    # Extract the bandwidth (received Mbps) from the result
+    bandwidth_mbps = result.received_Mbps
+
+    # Print the bandwidth result
+    print(f"Bandwidth: {bandwidth_mbps} Mbps")
