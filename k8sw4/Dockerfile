@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y python3 python3-pip build-essential wge
 RUN apt-get install -y iputils-ping dnsutils iproute2 iperf3
 
 # Install Python and necessary packages
-RUN pip3 install --no-cache-dir grpcio grpcio-tools kubernetes
+RUN pip3 install --no-cache-dir grpcio grpcio-tools kubernetes iperf3
 
 # Copy your application source code
 COPY . /app
