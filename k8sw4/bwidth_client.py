@@ -42,6 +42,7 @@ if __name__ == '__main__':
     print(f"Time: {current_time}")
     print(f"Connecting to host {server_ip}, port 5201")
 
-    result = perform_bandwidth_test(server_ip, args.duration)
+    # result = perform_bandwidth_test(server_ip, args.duration)
+    result = perform_bandwidth_test(server_ip)
 
     print(result.text)
