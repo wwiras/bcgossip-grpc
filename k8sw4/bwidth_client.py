@@ -45,4 +45,5 @@ if __name__ == '__main__':
     # result = perform_bandwidth_test(server_ip, args.duration)
     result = perform_bandwidth_test(server_ip)
 
-    print(result.text)
+    # print(result.text)
+    print(result)
