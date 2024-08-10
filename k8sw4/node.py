@@ -36,7 +36,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.initial_gossip_timestamp = None
 
         # Set initial bandwidth limits to 2 Mbps
-        # self.set_bandwidth_limits(ingress_limit="2mbit", egress_limit="2mbit")
+        self.set_bandwidth_limits(ingress_limit="1mbit", egress_limit="1mbit")
 
     def get_pod_ip(self, pod_name, namespace="default"):
         config.load_incluster_config()
@@ -108,7 +108,9 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         try:
             # Get the default network interface
             default_gateway = netifaces.gateways()['default'][netifaces.AF_INET][1]  # Assuming IPv4
+            print(f"default_gateway = {default_gateway}", flush=True)
             interface = netifaces.ifaddresses(default_gateway)[netifaces.AF_INET][0]['addr']
+            print(f"interface = {interface}", flush=True)
 
             # Set ingress limit
             subprocess.run([
@@ -134,8 +136,10 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         except subprocess.CalledProcessError as e:
             logging.error(f"Error setting bandwidth limits: {e}")
+            print(f"Error setting bandwidth limits: {e}", flush=True)
         except KeyError:
             logging.error("Could not determine the default network interface.")
+            print(f"Could not determine the default network interface.", flush=True)
 
     def _log_event(self, message, sender_id, received_timestamp, propagation_time, event_type, log_message):
         """Logs the gossip event as structured JSON data."""
