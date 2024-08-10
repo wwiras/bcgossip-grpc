@@ -58,7 +58,7 @@ if __name__ == '__main__':
     parser.add_argument('--duration', type=int, default=5, help="Duration of the bandwidth test in seconds")
     args = parser.parse_args()
 
-    server_ip = get_pod_ip(args.target_pod)
+    server_ip = get_pod_ip(args.targetpod)
 
     current_time = datetime.now().strftime('%a, %d %b %Y %H:%M:%S %Z')
 
