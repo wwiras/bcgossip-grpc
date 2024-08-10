@@ -20,5 +20,5 @@ G.add_edge('gossip-statefulset-2', 'gossip-statefulset-4', weight=0)
 G.add_edge('gossip-statefulset-3', 'gossip-statefulset-5', weight=0)
 
 topology = nx.node_link_data(G)
-with open('network_topology.json', 'w') as outfile:
+with open('network_topology2.json', 'w') as outfile:
     json.dump(topology, outfile)
