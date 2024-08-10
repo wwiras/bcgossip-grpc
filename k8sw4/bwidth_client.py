@@ -15,29 +15,33 @@ def get_pod_ip(pod_name, namespace="default"):
     return pod.status.pod_ip
 
 def perform_bandwidth_test(server_ip, duration=5):
-    """Performs an iperf3 bandwidth test to the specified server IP."""
+    """
+    Performs an iperf3 bandwidth test to the specified server IP.
+    """
 
     # Set Iperf Client Options
     client = iperf3.Client()
     client.server_hostname = server_ip
     client.zerocopy = True
-    client.verbose = False  # Set to True if you want more detailed iperf3 output
+    client.verbose = False
     client.reverse = True
     client.port = 5201
     client.num_streams = 10
     client.duration = int(duration)
+
     client.bandwidth = 1000000000
 
     try:
         # Run iperf3 test
         result = client.run()
 
-        # Log the iperf3 command and its output (for debugging)
-        logging.debug(f"iperf3 command: {client.get_command()}")
+        # Log the iperf3 output (for debugging)
         if result.error:
             logging.error(f"iperf3 error: {result.error}")
+            print(f"iperf3 error: {result.error}", flush=True)
         else:
             logging.debug(f"iperf3 output: {result.text}")
+            print(f"iperf3 output: {result.text}", flush=True)
 
         # Extract and return bandwidth results if successful
         if not result.error:
@@ -45,11 +49,12 @@ def perform_bandwidth_test(server_ip, duration=5):
             received_mbps = int(result.received_Mbps)
             return sent_mbps, received_mbps
         else:
-            return None, None  # Or some other default values indicating an error
+            return None, None
 
-    except iperf3.Iperf3Error as e:
-        # Handle specific iperf3 errors
+    except RuntimeError as e:  # Catch generic RuntimeError for older iperf3 versions
+        # Handle iperf3 errors
         logging.error(f"iperf3 error: {e}")
+        print(f"iperf3 error: {e}", flush=True)
         return None, None
 
 if __name__ == '__main__':
