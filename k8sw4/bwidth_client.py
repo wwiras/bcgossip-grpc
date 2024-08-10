@@ -41,7 +41,7 @@ def perform_bandwidth_test(server_ip, duration=5):
             print(f"iperf3 error: {result.error}", flush=True)
         else:
             logging.debug(f"iperf3 output: {result.text}")
-            print(f"iperf3 output: {result.text}", flush=True)
+            # print(f"iperf3 output: {result.text}", flush=True)
 
         # Extract and return bandwidth results if successful
         if not result.error:
