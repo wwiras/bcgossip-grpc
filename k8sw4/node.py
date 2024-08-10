@@ -35,9 +35,6 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.gossip_initiated = False
         self.initial_gossip_timestamp = None
 
-        # Set initial bandwidth limits to 2 Mbps
-        self.set_bandwidth_limits(ingress_limit="1mbit", egress_limit="1mbit")
-
     def get_pod_ip(self, pod_name, namespace="default"):
         config.load_incluster_config()
         v1 = client.CoreV1Api()
@@ -101,45 +98,6 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 neighbors.append(link['source'])
         return neighbors
 
-    def set_bandwidth_limits(self, ingress_limit, egress_limit):
-        """
-        Sets ingress and egress bandwidth limits using tc, dynamically determining the interface.
-        """
-        try:
-            # Get the default network interface
-            default_gateway = netifaces.gateways()['default'][netifaces.AF_INET][1]  # Assuming IPv4
-            print(f"default_gateway = {default_gateway}", flush=True)
-            interface = netifaces.ifaddresses(default_gateway)[netifaces.AF_INET][0]['addr']
-            print(f"interface = {interface}", flush=True)
-
-            # Set ingress limit
-            subprocess.run([
-                'tc', 'qdisc', 'add', 'dev', interface, 'root', 'handle', '1:', 'ingress'
-            ], check=True)
-            subprocess.run([
-                'tc', 'filter', 'add', 'dev', interface, 'parent', '1:', 'protocol', 'ip', 'prio', '1', 'u32',
-                'match', 'ip', 'dst', '0.0.0.0/0', 'police', 'rate', ingress_limit, 'burst', '10k', 'drop', 'flowid',
-                ':1'
-            ], check=True)
-
-            # Set egress limit
-            subprocess.run([
-                'tc', 'qdisc', 'add', 'dev', interface, 'root', 'handle', '1:', 'htb', 'default', '1'
-            ], check=True)
-            subprocess.run([
-                'tc', 'class', 'add', 'dev', interface, 'parent', '1:', 'classid', '1:1', 'htb',
-                'rate',
-            egress_limit, 'ceil', egress_limit
-            ], check = True)
-
-            print(f"Bandwidth limits set on {interface}: ingress={ingress_limit}, egress={egress_limit}", flush=True)
-
-        except subprocess.CalledProcessError as e:
-            logging.error(f"Error setting bandwidth limits: {e}")
-            print(f"Error setting bandwidth limits: {e}", flush=True)
-        except KeyError:
-            logging.error("Could not determine the default network interface.")
-            print(f"Could not determine the default network interface.", flush=True)
 
     def _log_event(self, message, sender_id, received_timestamp, propagation_time, event_type, log_message):
         """Logs the gossip event as structured JSON data."""
