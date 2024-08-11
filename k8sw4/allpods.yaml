@@ -1,0 +1,11 @@
+# mesh.yaml
+apiVersion: mesh.cloud.google.com/v1alpha1
+kind: Mesh
+metadata:
+  name: my-mesh  # Choose a name for your mesh
+  namespace: istio-system  # Typically in the istio-system namespace
+spec:
+  defaultTrafficPolicy:
+    tcp:
+      rateLimits:
+        - bandwidthLimit: 1M  # 1MB bandwidth limit

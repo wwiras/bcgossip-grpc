@@ -1,0 +1,20 @@
+# gossip-traffic-policy.yaml
+apiVersion: networking.gke.io/v1beta2
+kind: TrafficPolicy
+metadata:
+  name: gossip-traffic-policy-0-to-1
+  namespace: default # Or your namespace
+spec:
+  source:
+    selector:
+      app: bcgossip
+      statefulset.kubernetes.io/pod-name: gossip-statefulset-0
+  destination:
+    service: bcgossip-svc
+    subset: gossip-statefulset-1
+  rules:
+    - matches:
+        - http: {}  # Match all HTTP traffic
+      rateLimits:
+        - httpRateLimit:
+            bandwidthLimit: 1M  # 1MB bandwidth limit
