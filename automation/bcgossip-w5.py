@@ -200,7 +200,8 @@ def main(num_tests, deployment_folder):
         path_components = full_directory_path.split("/")
         # print(path_components)
         # print(path_components[:-2])
-        root_folder = "/".join(path_components[:-2])
+        # root_folder = "/".join(path_components[:-2])
+        root_folder = "/".join(full_directory_path.split("/")[:-2])
         print(f"root_folder={root_folder}", flush=True)
         # apply_kubernetes_config(pythonrole_folder, '/python-role.yaml')
 
