@@ -152,7 +152,7 @@ def main(num_tests, deployment_folder):
 
     if not deployment_files:
         print("No deployment files found in the directory.")
-        return
+        return False
 
     for deployment_file in deployment_files:
         deployment_yaml_path = os.path.join(full_directory_path, deployment_file)
@@ -179,17 +179,18 @@ def main(num_tests, deployment_folder):
                 print(f"full_topology_path = {full_topology_path}")
 
                 # Create ConfigMap from the topology file
-                # command = [
-                #     'kubectl', 'create', 'configmap', 'topology-config',
-                #     '--from-file=network_topology.json=' + full_topology_path
-                # ]
-                # try:
-                #     subprocess.run(command, check=True, text=True, capture_output=True)
-                #     print("ConfigMap 'topology-config' created successfully!")
-                # except subprocess.CalledProcessError as e:
-                #     print(f"Failed to create ConfigMap. Error: {e.stderr}")
+                command = [
+                    'kubectl', 'create', 'configmap', 'topology-config',
+                    '--from-file=' + full_topology_path
+                ]
+                try:
+                    subprocess.run(command, check=True, text=True, capture_output=True)
+                    print("ConfigMap 'topology-config' created successfully!")
+                except subprocess.CalledProcessError as e:
+                    print(f"Failed to create ConfigMap. Error: {e.stderr}")
             else:
                 print(f"No suitable topology file found for {num_nodes} nodes.")
+                return False
 
 
         # Apply configurations
@@ -217,4 +218,4 @@ if __name__ == '__main__':
         sys.exit(1)
     num_tests = int(sys.argv[1])
     deployment_folder = sys.argv[2]
-    main(num_tests, deployment_folder)
+    result = main(num_tests, deployment_folder)
