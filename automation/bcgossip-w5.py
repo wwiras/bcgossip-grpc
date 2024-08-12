@@ -134,6 +134,13 @@ def main(num_tests, deployment_folder):
     full_directory_path = os.path.join(base_dir, deployment_folder)
     print(f"full_directory_path = {full_directory_path}", flush=True)
 
+    # Modify the path to point to the 'topology' folder
+    path_components = full_directory_path.split("/")
+    path_components[-2] = 'topology'
+    topology_folder = "/".join(path_components)
+    topology_folder = "/".join(topology_folder.split("/")[:-1])  # Remove the last component
+    print(f"topology_folder={topology_folder}", flush=True)
+
     # Ensure the path provided is actually a directory
     if not os.path.isdir(full_directory_path):
         print(f"Error: The provided path {full_directory_path} is not a directory.")
@@ -150,6 +157,39 @@ def main(num_tests, deployment_folder):
         deployment_yaml_path = os.path.join(full_directory_path, deployment_file)
         replicas = get_replica_count_from_yaml(deployment_yaml_path)
         print(f"Processing {deployment_file}: Total replicas defined in YAML: {replicas}")
+
+
+        # Extract the number of nodes from the statefulset filename
+        match = re.search(r'(\d+)nodes', deployment_file)
+        if match:
+            num_nodes = int(match.group(1))
+            print(f"Detected {num_nodes} nodes from the statefulset filename.")
+
+            # Find the corresponding topology file
+            topology_file = None
+            for topology_filename in os.listdir(topology_folder):
+                if topology_filename.startswith(f'nt_nodes{num_nodes}_'):
+                    topology_file = topology_filename
+                    break
+
+            if topology_file:
+                print(f"Using topology file: {topology_file}")
+                full_topology_path = os.path.join(topology_folder, topology_file)
+                print(f"full_topology_path = {full_topology_path}")
+
+                # Create ConfigMap from the topology file
+                # command = [
+                #     'kubectl', 'create', 'configmap', 'topology-config',
+                #     '--from-file=network_topology.json=' + full_topology_path
+                # ]
+                # try:
+                #     subprocess.run(command, check=True, text=True, capture_output=True)
+                #     print("ConfigMap 'topology-config' created successfully!")
+                # except subprocess.CalledProcessError as e:
+                #     print(f"Failed to create ConfigMap. Error: {e.stderr}")
+            else:
+                print(f"No suitable topology file found for {num_nodes} nodes.")
+
 
         # Apply configurations
         # apply_kubernetes_config(base_dir, 'k8sw5/python-role.yaml')
