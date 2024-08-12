@@ -132,6 +132,7 @@ def wait_for_pods_to_be_ready(namespace='default', expected_pods=0, timeout=300)
 def main(num_tests, deployment_folder):
     base_dir = "/home/wwiras/bcgossip-grpc/"
     full_directory_path = os.path.join(base_dir, deployment_folder)
+    print(f"full_directory_path = {full_directory_path}", flush=True)
 
     # Ensure the path provided is actually a directory
     if not os.path.isdir(full_directory_path):
