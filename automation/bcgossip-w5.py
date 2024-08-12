@@ -195,8 +195,8 @@ def main(num_tests, deployment_folder):
 
 
         # Apply configurations
-        # apply_kubernetes_config(base_dir, 'k8sw5/python-role.yaml')
-        # apply_kubernetes_config(base_dir, 'k8sw5/svc-bcgossip.yaml')
+        apply_kubernetes_config(full_directory_path, '/python-role.yaml')
+        apply_kubernetes_config(full_directory_path, '/svc-bcgossip.yaml')
         # apply_kubernetes_config(base_dir, deployment_folder + '/' + deployment_file)
 
         # Ensure pods are ready before proceeding
