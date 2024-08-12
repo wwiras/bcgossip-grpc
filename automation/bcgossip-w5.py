@@ -198,11 +198,10 @@ def main(num_tests, deployment_folder):
 
         # python-role
         path_components = full_directory_path.split("/")
-        print(path_components)
-        print(path_components[:-2])
-        pythonrole_folder = "/".join(path_components[:-2])
-        # pythonrole_folder = "/".join(path_components.split("/")[:-2])  # Remove the last two components
-        print(f"pythonrole_folder={pythonrole_folder}", flush=True)
+        # print(path_components)
+        # print(path_components[:-2])
+        root_folder = "/".join(path_components[:-2])
+        print(f"root_folder={root_folder}", flush=True)
         # apply_kubernetes_config(pythonrole_folder, '/python-role.yaml')
 
         # apply_kubernetes_config(full_directory_path, '/svc-bcgossip.yaml')
