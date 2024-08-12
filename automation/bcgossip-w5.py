@@ -7,6 +7,7 @@ import time
 import select
 import yaml
 import uuid
+import re
 
 def run_command(command, shell=False):
     try:
