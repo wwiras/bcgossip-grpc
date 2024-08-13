@@ -211,12 +211,24 @@ def main(num_tests, deployment_folder):
             #     print(f"No suitable topology file found for {num_nodes} nodes.")
             #     return False
 
-
-        # Apply configurations
+        # Apply configurations (Using run_command)
         root_folder = "/".join(full_directory_path.split("/")[:-2])
-        print(f"root_folder={root_folder}", flush=True)
-        apply_kubernetes_config(root_folder, '/svc-bcgossip.yaml')
-        apply_kubernetes_config(root_folder, '/python-role.yaml')
+
+        # Check the success of each command and handle errors
+        success, output = run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'])
+        if not success:
+            print(f"Failed to apply svc-bcgossip.yaml. Error: {output}")
+            return False
+
+        success, output = run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'])
+        if not success:
+            print(f"Failed to apply python-role.yaml. Error: {output}")
+            return False
+
+        # root_folder = "/".join(full_directory_path.split("/")[:-2])
+        # print(f"root_folder={root_folder}", flush=True)
+        # apply_kubernetes_config(root_folder, '/svc-bcgossip.yaml')
+        # apply_kubernetes_config(root_folder, '/python-role.yaml')
         # apply_kubernetes_config(base_dir, deployment_folder + '/' + deployment_file)
 
         # Ensure pods are ready before proceeding
