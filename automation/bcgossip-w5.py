@@ -201,7 +201,7 @@ def main(num_tests, deployment_folder):
         run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'],"svc-bcgossip")
         run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'],"python-role")
         # run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'], "statefulset")
-        return False
+        # return False
 
         # root_folder = "/".join(full_directory_path.split("/")[:-2])
         # print(f"root_folder={root_folder}", flush=True)
