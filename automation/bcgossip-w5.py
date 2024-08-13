@@ -144,7 +144,7 @@ def main(num_tests, deployment_folder):
 
     # Ensure the path provided is actually a directory
     if not os.path.isdir(full_directory_path):
-        print(f"Error: The provided path {full_directory_path} is not a directory.")
+        print(f"Error: The provided path {full_directory_path} is not a directory.",flush=True)
         sys.exit(1)
 
     # List all files in the directory and filter out subdirectories
@@ -157,14 +157,14 @@ def main(num_tests, deployment_folder):
     for deployment_file in deployment_files:
         deployment_yaml_path = os.path.join(full_directory_path, deployment_file)
         replicas = get_replica_count_from_yaml(deployment_yaml_path)
-        print(f"Processing {deployment_file}: Total replicas defined in YAML: {replicas}")
+        print(f"Processing {deployment_file}: Total replicas defined in YAML: {replicas}",flush=True)
 
         # Extract the number of nodes from the statefulset filename
         match = re.search(r'(\d+)statefulset', deployment_file)
         print(f"match={match}", flush=True)
         if match:
             num_nodes = int(match.group(1))
-            print(f"Detected {num_nodes} nodes from the statefulset filename.")
+            print(f"Detected {num_nodes} nodes from the statefulset filename.",flush=True)
 
             # Find the corresponding topology file
             topology_file = None
@@ -174,25 +174,12 @@ def main(num_tests, deployment_folder):
                     break
 
             if topology_file:
-                print(f"Using topology file: {topology_file}")
+                print(f"Using topology file: {topology_file}",flush=True)
                 full_topology_path = os.path.join(topology_folder, topology_file)
 
                 # Create ConfigMap from the topology file (Using the modified run_command)
                 run_command(['kubectl', 'create', 'configmap', 'topology-config',
                     '--from-file=' + full_topology_path], "configmap : " + topology_file)
-            #     command = [
-            #         'kubectl', 'create', 'configmap', 'topology-config',
-            #         '--from-file=' + full_topology_path
-            #     ]
-            #     success, output = run_command(command)
-            #     if success:
-            #         print("ConfigMap 'topology-config' created successfully!")
-            #     else:
-            #         print(f"Failed to create ConfigMap. Error: {output}")  # Print the error message
-            #         return False
-            # else:
-            #     print(f"No suitable topology file found for {num_nodes} nodes.")
-            #     return False
 
         # Apply configurations (Using run_command)
         root_folder = "/".join(full_directory_path.split("/")[:-2])
@@ -200,8 +187,8 @@ def main(num_tests, deployment_folder):
         # Check the success of each command and handle errors
         run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'],"svc-bcgossip")
         run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'],"python-role")
-        # run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'], "statefulset")
-        # return False
+        run_command(['kubectl', 'apply', '-f', deployment_yaml_path], deployment_file)
+        return False
 
         # root_folder = "/".join(full_directory_path.split("/")[:-2])
         # print(f"root_folder={root_folder}", flush=True)
