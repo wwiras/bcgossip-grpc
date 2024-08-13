@@ -219,11 +219,15 @@ def main(num_tests, deployment_folder):
         if not success:
             print(f"Failed to apply svc-bcgossip.yaml. Error: {output}")
             return False
+        else:
+            print(f"svc-bcgossip.yaml created successfully!: {output}")
 
         success, output = run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'])
         if not success:
             print(f"Failed to apply python-role.yaml. Error: {output}")
             return False
+        else:
+            print(f"python-role.yaml created successfully!: {output}")
 
         # root_folder = "/".join(full_directory_path.split("/")[:-2])
         # print(f"root_folder={root_folder}", flush=True)
