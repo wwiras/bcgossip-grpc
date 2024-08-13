@@ -192,32 +192,13 @@ def main(num_tests, deployment_folder):
                 print(f"No suitable topology file found for {num_nodes} nodes.")
                 return False
 
-            # if topology_file:
-            #     print(f"Using topology file: {topology_file}")
-            #     full_topology_path = os.path.join(topology_folder, topology_file)
-            #     print(f"full_topology_path = {full_topology_path}")
-            #
-            #     # Create ConfigMap from the topology file
-            #     command = [
-            #         'kubectl', 'create', 'configmap', 'topology-config',
-            #         '--from-file=' + full_topology_path
-            #     ]
-            #     try:
-            #         subprocess.run(command, check=True, text=True, capture_output=True)
-            #         print("ConfigMap 'topology-config' created successfully!")
-            #     except subprocess.CalledProcessError as e:
-            #         print(f"Failed to create ConfigMap. Error: {e.stderr}")
-            # else:
-            #     print(f"No suitable topology file found for {num_nodes} nodes.")
-            #     return False
-
         # Apply configurations (Using run_command)
         root_folder = "/".join(full_directory_path.split("/")[:-2])
 
         # Check the success of each command and handle errors
         run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'],"svc-bcgossip")
         run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'],"python-role")
-
+        return False
 
         # root_folder = "/".join(full_directory_path.split("/")[:-2])
         # print(f"root_folder={root_folder}", flush=True)
