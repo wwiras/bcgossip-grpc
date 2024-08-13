@@ -215,19 +215,9 @@ def main(num_tests, deployment_folder):
         root_folder = "/".join(full_directory_path.split("/")[:-2])
 
         # Check the success of each command and handle errors
-        success, output = run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'])
-        if not success:
-            print(f"Failed to apply svc-bcgossip.yaml. Error: {output}")
-            return False
-        else:
-            print(f"svc-bcgossip.yaml created successfully!: {output}")
+        run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'],"svc-bcgossip")
+        run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'])
 
-        success, output = run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'])
-        if not success:
-            print(f"Failed to apply python-role.yaml. Error: {output}")
-            return False
-        else:
-            print(f"python-role.yaml created successfully!: {output}")
 
         # root_folder = "/".join(full_directory_path.split("/")[:-2])
         # print(f"root_folder={root_folder}", flush=True)
@@ -249,12 +239,33 @@ def main(num_tests, deployment_folder):
         # else:
         #     print(f"Failed to prepare pods for {deployment_file}.", flush=True)
 
-def run_command(command):
+# def run_command(command):
+#     """
+#     Runs a command and handles its output and errors.
+#
+#     Args:
+#         command: A list representing the command and its arguments.
+#
+#     Returns:
+#         A tuple (stdout, stderr) if the command succeeds.
+#         A tuple (None, stderr) if the command fails.
+#     """
+#     try:
+#         result = subprocess.run(command, check=True, text=True, capture_output=True)
+#         # print(result.stdout)  # Print the command's output for visibility
+#         return True, result.stdout  # Return both stdout and stderr on success
+#     except subprocess.CalledProcessError as e:
+#         # print(f"Error executing command: {e.stderr}")
+#         return None, e.stderr  # Return None for stdout and the error message on failure
+
+def run_command(command, full_path=None):
     """
     Runs a command and handles its output and errors.
 
     Args:
         command: A list representing the command and its arguments.
+        full_path: (Optional) The full path to a file being processed
+                   (used for informative messages in case of 'apply' commands).
 
     Returns:
         A tuple (stdout, stderr) if the command succeeds.
@@ -262,11 +273,31 @@ def run_command(command):
     """
     try:
         result = subprocess.run(command, check=True, text=True, capture_output=True)
-        # print(result.stdout)  # Print the command's output for visibility
-        return True, result.stdout  # Return both stdout and stderr on success
+
+        # If full_path is provided (likely for 'apply' commands), provide more informative output
+        if full_path:
+            if 'unchanged' in result.stdout or 'created' in result.stdout:
+                print(f"{full_path} applied successfully!", flush=True)
+            else:
+                print(f"Changes applied to {full_path}:", flush=True)
+                print(result.stdout, flush=True)
+
+        return result.stdout, result.stderr
     except subprocess.CalledProcessError as e:
-        # print(f"Error executing command: {e.stderr}")
-        return None, e.stderr  # Return None for stdout and the error message on failure
+        if full_path:
+            print(f"An error occurred while applying {full_path}.", flush=True)
+        else:
+            print(f"An error occurred while executing the command.", flush=True)
+        print(f"Error message: {e.stderr}", flush=True)
+        traceback.print_exc()
+        sys.exit(1)
+    except Exception as e:
+        if full_path:
+            print(f"An unexpected error occurred while applying {full_path}.", flush=True)
+        else:
+            print(f"An unexpected error occurred while executing the command.", flush=True)
+        traceback.print_exc()
+        sys.exit(1)
 
 
 if __name__ == '__main__':
