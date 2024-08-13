@@ -178,19 +178,21 @@ def main(num_tests, deployment_folder):
                 full_topology_path = os.path.join(topology_folder, topology_file)
 
                 # Create ConfigMap from the topology file (Using the modified run_command)
-                command = [
-                    'kubectl', 'create', 'configmap', 'topology-config',
-                    '--from-file=' + full_topology_path
-                ]
-                success, output = run_command(command)
-                if success:
-                    print("ConfigMap 'topology-config' created successfully!")
-                else:
-                    print(f"Failed to create ConfigMap. Error: {output}")  # Print the error message
-                    return False
-            else:
-                print(f"No suitable topology file found for {num_nodes} nodes.")
-                return False
+                run_command(['kubectl', 'create', 'configmap', 'topology-config',
+                    '--from-file=' + full_topology_path], "configmap : " + topology_file)
+            #     command = [
+            #         'kubectl', 'create', 'configmap', 'topology-config',
+            #         '--from-file=' + full_topology_path
+            #     ]
+            #     success, output = run_command(command)
+            #     if success:
+            #         print("ConfigMap 'topology-config' created successfully!")
+            #     else:
+            #         print(f"Failed to create ConfigMap. Error: {output}")  # Print the error message
+            #         return False
+            # else:
+            #     print(f"No suitable topology file found for {num_nodes} nodes.")
+            #     return False
 
         # Apply configurations (Using run_command)
         root_folder = "/".join(full_directory_path.split("/")[:-2])
@@ -198,6 +200,7 @@ def main(num_tests, deployment_folder):
         # Check the success of each command and handle errors
         run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'],"svc-bcgossip")
         run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'],"python-role")
+        # run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'], "statefulset")
         return False
 
         # root_folder = "/".join(full_directory_path.split("/")[:-2])
