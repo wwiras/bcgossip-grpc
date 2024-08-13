@@ -176,36 +176,47 @@ def main(num_tests, deployment_folder):
             if topology_file:
                 print(f"Using topology file: {topology_file}")
                 full_topology_path = os.path.join(topology_folder, topology_file)
-                print(f"full_topology_path = {full_topology_path}")
 
-                # Create ConfigMap from the topology file
+                # Create ConfigMap from the topology file (Using the modified run_command)
                 command = [
                     'kubectl', 'create', 'configmap', 'topology-config',
                     '--from-file=' + full_topology_path
                 ]
-                try:
-                    subprocess.run(command, check=True, text=True, capture_output=True)
+                success, output = run_command(command)
+                if success:
                     print("ConfigMap 'topology-config' created successfully!")
-                except subprocess.CalledProcessError as e:
-                    print(f"Failed to create ConfigMap. Error: {e.stderr}")
+                else:
+                    print(f"Failed to create ConfigMap. Error: {output}")  # Print the error message
+                    return False
             else:
                 print(f"No suitable topology file found for {num_nodes} nodes.")
                 return False
 
+            # if topology_file:
+            #     print(f"Using topology file: {topology_file}")
+            #     full_topology_path = os.path.join(topology_folder, topology_file)
+            #     print(f"full_topology_path = {full_topology_path}")
+            #
+            #     # Create ConfigMap from the topology file
+            #     command = [
+            #         'kubectl', 'create', 'configmap', 'topology-config',
+            #         '--from-file=' + full_topology_path
+            #     ]
+            #     try:
+            #         subprocess.run(command, check=True, text=True, capture_output=True)
+            #         print("ConfigMap 'topology-config' created successfully!")
+            #     except subprocess.CalledProcessError as e:
+            #         print(f"Failed to create ConfigMap. Error: {e.stderr}")
+            # else:
+            #     print(f"No suitable topology file found for {num_nodes} nodes.")
+            #     return False
+
 
         # Apply configurations
-
-
-        # python-role
-        path_components = full_directory_path.split("/")
-        # print(path_components)
-        # print(path_components[:-2])
-        # root_folder = "/".join(path_components[:-2])
         root_folder = "/".join(full_directory_path.split("/")[:-2])
         print(f"root_folder={root_folder}", flush=True)
-        # apply_kubernetes_config(pythonrole_folder, '/python-role.yaml')
-
-        # apply_kubernetes_config(full_directory_path, '/svc-bcgossip.yaml')
+        apply_kubernetes_config(root_folder, '/svc-bcgossip.yaml')
+        apply_kubernetes_config(root_folder, '/python-role.yaml')
         # apply_kubernetes_config(base_dir, deployment_folder + '/' + deployment_file)
 
         # Ensure pods are ready before proceeding
@@ -221,6 +232,26 @@ def main(num_tests, deployment_folder):
         #     delete_deployment(deployment_yaml_path)
         # else:
         #     print(f"Failed to prepare pods for {deployment_file}.", flush=True)
+
+def run_command(command):
+    """
+    Runs a command and handles its output and errors.
+
+    Args:
+        command: A list representing the command and its arguments.
+
+    Returns:
+        A tuple (stdout, stderr) if the command succeeds.
+        A tuple (None, stderr) if the command fails.
+    """
+    try:
+        result = subprocess.run(command, check=True, text=True, capture_output=True)
+        # print(result.stdout)  # Print the command's output for visibility
+        return True, result.stdout  # Return both stdout and stderr on success
+    except subprocess.CalledProcessError as e:
+        # print(f"Error executing command: {e.stderr}")
+        return None, e.stderr  # Return None for stdout and the error message on failure
+
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
