@@ -8,8 +8,8 @@ import gossip_pb2_grpc
 import json
 import time
 import logging
-import subprocess
-import netifaces # For running ping or other latency measurement tools
+# import subprocess
+# import netifaces # For running ping or other latency measurement tools
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
