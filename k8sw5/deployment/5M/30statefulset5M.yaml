@@ -18,15 +18,15 @@ spec:
     spec:
       containers:
         - name: gossip-node
-          image: wwiras/gpbc4:v1  # Replace with your Docker image name
+          image: wwiras/gpbc30:v1  # Replace with your Docker image name
           ports:
             - containerPort: 5050
-          volumeMounts:
-            - name: config-volume
-              mountPath: /app/config
-      volumes:
-        - name: config-volume
-          configMap:
-            name: topology-config
+#          volumeMounts:
+#            - name: config-volume
+#              mountPath: /app/config
+#      volumes:
+#        - name: config-volume
+#          configMap:
+#            name: topology-config
 
 
