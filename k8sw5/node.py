@@ -42,7 +42,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         """
         config.load_incluster_config()
         v1 = client.AppsV1Api()
-        statefulset = v1.read_namespaced_statefulset(statefulset_name, namespace)
+        statefulset = v1.read_namespaced_stateful_set(statefulset_name, namespace)
         total_replicas = statefulset.spec.replicas
 
         # Get the current working directory
