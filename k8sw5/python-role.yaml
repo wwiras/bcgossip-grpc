@@ -5,7 +5,7 @@ metadata:
   name: pods-list
 rules:
 - apiGroups: [""]
-  resources: ["pods", "services", "endpoints"]
+  resources: ["pods", "services", "endpoints","statefulsets"]
   verbs: ["list", "get"]
 
 ---
