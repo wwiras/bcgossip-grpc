@@ -5,7 +5,7 @@ metadata:
   name: pods-list
 rules:
 - apiGroups: [""]
-  resources: ["pods", "services", "endpoints","statefulsets"]
+  resources: ["pods", "services", "endpoints", "statefulsets"]
   verbs: ["list", "get"]
 
 ---
@@ -15,7 +15,7 @@ metadata:
   name: pods-list-binding
 subjects:
 - kind: ServiceAccount
-  name: default  # Assuming you're using the default service account within the default namespace
+  name: default
   namespace: default
 roleRef:
   kind: ClusterRole
