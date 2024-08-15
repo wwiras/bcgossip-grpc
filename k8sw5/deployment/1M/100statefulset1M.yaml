@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: gossip-node
-          image: wwiras/gpbc4:v1  # Replace with your Docker image name
+          image: wwiras/gpbc100:v1  # Replace with your Docker image name
           ports:
             - containerPort: 5050
           volumeMounts:
