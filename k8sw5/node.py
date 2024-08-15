@@ -23,8 +23,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.service_name = service_name
 
         # Load the topology from the "topology" folder
-        self.topology = None # Initialize topology
-        self.get_topology("topology")
+        self.topology = self.get_topology("topology")
 
         # Find neighbors based on the topology (without measuring latency yet)
         self.neighbor_pod_names = self._find_neighbors(self.pod_name)
@@ -43,11 +42,12 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         """
 
         # Get the StatefulSet replica count using kubectl
-        command = f"kubectl get statefulset {statefulset_name} -n {namespace} -o jsonpath='{{.spec.replicas}}'"
-        try:
-            total_replicas = int(subprocess.check_output(command, shell=True).decode('utf-8').strip())
-        except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"Error getting StatefulSet replicas using kubectl: {e}")
+        # command = f"kubectl get statefulset {statefulset_name} -n {namespace} -o jsonpath='{{.spec.replicas}}'"
+        #         # try:
+        #         #     total_replicas = int(subprocess.check_output(command, shell=True).decode('utf-8').strip())
+        #         # except subprocess.CalledProcessError as e:
+        #         #     raise RuntimeError(f"Error getting StatefulSet replicas using kubectl: {e}")
+
 
         # Get the current working directory
         current_directory = os.getcwd()
@@ -64,7 +64,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         if topology_file:
             with open(os.path.join(topology_folder, topology_file), 'r') as f:
-                self.topology = json.load(f)
+                return json.load(f)
         else:
             raise FileNotFoundError(f"No topology file found for {total_replicas} nodes.")
 
