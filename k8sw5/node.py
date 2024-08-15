@@ -23,7 +23,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.service_name = service_name
 
         # Load the topology from the "topology" folder
-        self.topology = self.get_topology("topology")
+        self.topology = self.get_topology(10, "topology")
 
         # Find neighbors based on the topology (without measuring latency yet)
         self.neighbor_pod_names = self._find_neighbors(self.pod_name)
@@ -34,7 +34,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.gossip_initiated = False
         self.initial_gossip_timestamp = None
 
-    def get_topology(self, topology_folder, statefulset_name="gossip-statefulset",  namespace="default"):
+    def get_topology(self, total_replicas, topology_folder, statefulset_name="gossip-statefulset",  namespace="default"):
         """
         Retrieves the number of replicas for the specified StatefulSet using kubectl
         and finds the corresponding topology file in the 'topology' subfolder
