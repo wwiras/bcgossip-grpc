@@ -15,14 +15,15 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 class Node(gossip_pb2_grpc.GossipServiceServicer):
     def __init__(self, service_name):
+
         self.pod_name = socket.gethostname()
         self.host = socket.gethostbyname(self.pod_name)
         self.port = '5050'
         self.service_name = service_name
 
-        # Load the topology from the ConfigMap
-        with open('/app/config/network_topology.json', 'r') as f:
-            self.topology = json.load(f)
+        # Load the topology from the "topology" folder
+        self.topology = None # Initialize topology
+        self.get_topology("topology")
 
         # Find neighbors based on the topology (without measuring latency yet)
         self.neighbor_pod_names = self._find_neighbors(self.pod_name)
@@ -32,6 +33,36 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         self.gossip_initiated = False
         self.initial_gossip_timestamp = None
+
+    def get_topology(self, topology_folder, statefulset_name="gossip-statefulset",  namespace="default"):
+        """
+        Retrieves the number of replicas for the specified StatefulSet
+        and finds the corresponding topology file in the 'topology' subfolder
+        within the current working directory.
+        """
+        config.load_incluster_config()
+        v1 = client.AppsV1Api()
+        statefulset = v1.read_namespaced_statefulset(statefulset_name, namespace)
+        total_replicas = statefulset.spec.replicas
+
+        # Get the current working directory
+        current_directory = os.getcwd()
+
+        # Construct the full path to the topology folder
+        topology_folder = os.path.join(current_directory, topology_folder)
+
+        # Find the corresponding topology file
+        topology_file = None
+        for topology_filename in os.listdir(topology_folder):
+            if topology_filename.startswith(f'nt_nodes{total_replicas}_'):
+                topology_file = topology_filename
+                break
+
+        if topology_file:
+            with open(os.path.join(topology_folder, topology_file), 'r') as f:
+                self.topology = json.load(f)
+        else:
+            raise FileNotFoundError(f"No topology file found for {total_replicas} nodes.")
 
     def get_pod_ip(self, pod_name, namespace="default"):
         config.load_incluster_config()
