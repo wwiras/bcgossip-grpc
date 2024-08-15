@@ -8,6 +8,7 @@ import gossip_pb2_grpc
 import json
 import time
 import logging
+import subprocess
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -36,14 +37,17 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
     def get_topology(self, topology_folder, statefulset_name="gossip-statefulset",  namespace="default"):
         """
-        Retrieves the number of replicas for the specified StatefulSet
+        Retrieves the number of replicas for the specified StatefulSet using kubectl
         and finds the corresponding topology file in the 'topology' subfolder
         within the current working directory.
         """
-        config.load_incluster_config()
-        v1 = client.AppsV1Api()
-        statefulset = v1.read_namespaced_stateful_set(statefulset_name, namespace)
-        total_replicas = statefulset.spec.replicas
+
+        # Get the StatefulSet replica count using kubectl
+        command = f"kubectl get statefulset {statefulset_name} -n {namespace} -o jsonpath='{{.spec.replicas}}'"
+        try:
+            total_replicas = int(subprocess.check_output(command, shell=True).decode('utf-8').strip())
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(f"Error getting StatefulSet replicas using kubectl: {e}")
 
         # Get the current working directory
         current_directory = os.getcwd()
