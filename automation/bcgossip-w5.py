@@ -71,11 +71,11 @@ def select_random_pod():
         raise Exception("No running pods found.")
     return random.choice(pod_list)
 
-def access_pod_and_initiate_gossip(pod_name, replicas, unique_id, iteration):
+def access_pod_and_initiate_gossip(pod_name, replicas, speed, unique_id, iteration):
     try:
         session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--', 'sh'], stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        message = f'{unique_id}-cubaan{replicas}-{iteration}'
+        message = f'{unique_id}-{replicas}Nodes{speed}-{iteration}'
         session.stdin.write(f'python3 start.py --message {message}\n')
         session.stdin.flush()
         end_time = time.time() + 300
@@ -233,25 +233,24 @@ def main(num_tests, deployment_folder):
         print(f"deployment_yaml_file={deployment_yaml_file}", flush=True)
 
         # Apply configurations (Using run_command)
-        # if num_nodes == 10:
-        #     run_command(['kubectl', 'apply', '-f', deployment_yaml_file], deployment_file)
-        #     delete_deployment(deployment_yaml_file)
+        if num_nodes == 10:
+            run_command(['kubectl', 'apply', '-f', deployment_yaml_file], deployment_file)
+            delete_deployment(deployment_yaml_file)
 
-
-        # Ensure pods are ready before proceeding
-        # if wait_for_pods_to_be_ready(namespace='default', expected_pods=num_nodes, timeout=300):
-        #     unique_id = str(uuid.uuid4())[:5]  # Generate a unique ID for the entire test
-        #     for i in range(1, num_tests + 1):
-        #         pod_name = "gossip-statefulset-0"
-        #         # pod_name = select_random_pod()
-        #         print(f"Selected pod for test {i}: {pod_name}", flush=True)
-        #         if access_pod_and_initiate_gossip(pod_name, num_nodes, unique_id, i):
-        #             print(f"Test {i} complete for {deployment_file}.", flush=True)
-        #         else:
-        #             print(f"Test {i} failed for {deployment_file}.", flush=True)
-        #     delete_deployment(deployment_yaml_file)
-        # else:
-        #     print(f"Failed to prepare pods for {deployment_file}.", flush=True)
+            # Ensure pods are ready before proceeding
+            if wait_for_pods_to_be_ready(namespace='default', expected_pods=num_nodes, timeout=300):
+                unique_id = str(uuid.uuid4())[:5]  # Generate a unique ID for the entire test
+                for i in range(1, num_tests + 1):
+                    pod_name = "gossip-statefulset-0"
+                    # pod_name = select_random_pod()
+                    print(f"Selected pod for test {i}: {pod_name}", flush=True)
+                    if access_pod_and_initiate_gossip(pod_name, num_nodes, speed, unique_id, i):
+                        print(f"Test {i} complete for {deployment_file}.", flush=True)
+                    else:
+                        print(f"Test {i} failed for {deployment_file}.", flush=True)
+                delete_deployment(deployment_yaml_file)
+            else:
+                print(f"Failed to prepare pods for {deployment_file}.", flush=True)
 
     # Delete service and python role
     run_command(['kubectl', 'delete', '-f', root_folder + '/svc-bcgossip.yaml'], "svc-bcgossip")
