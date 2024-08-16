@@ -225,12 +225,6 @@ def main(num_tests, deployment_folder):
             delete_deployment(deployment_yaml_file)
             return False
 
-        # root_folder = "/".join(full_directory_path.split("/")[:-2])
-        # print(f"root_folder={root_folder}", flush=True)
-        # apply_kubernetes_config(root_folder, '/svc-bcgossip.yaml')
-        # apply_kubernetes_config(root_folder, '/python-role.yaml')
-        # apply_kubernetes_config(base_dir, deployment_folder + '/' + deployment_file)
-
         # Ensure pods are ready before proceeding
         # if wait_for_pods_to_be_ready(namespace='default', expected_pods=replicas, timeout=300):
         #     unique_id = str(uuid.uuid4())[:5]  # Generate a unique ID for the entire test
