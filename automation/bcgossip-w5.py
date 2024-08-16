@@ -218,7 +218,7 @@ def main(num_tests, deployment_folder):
 
         # Apply configurations (Using run_command)
         # Check the success of each command and handle errors
-        if num_nodes == 10 then:
+        if num_nodes == 10:
             run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'],"svc-bcgossip")
             run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'],"python-role")
             run_command(['kubectl', 'apply', '-f', deployment_yaml_file], deployment_file)
