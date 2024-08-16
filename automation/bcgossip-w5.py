@@ -185,8 +185,8 @@ def main(num_tests, deployment_folder):
     print(f"root_folder = {root_folder}", flush=True)
 
     # Get 'topology' folder path
-    topology_folder = os.path.join(root_folder, "topology")
-    print(f"topology_folder={topology_folder}", flush=True)
+    # topology_folder = os.path.join(root_folder, "topology")
+    # print(f"topology_folder={topology_folder}", flush=True)
 
     # Ensure the path provided is actually a directory
     if not os.path.isdir(deployment_path):
@@ -207,33 +207,6 @@ def main(num_tests, deployment_folder):
         # Get deployment file
         deployment_yaml_file = os.path.join(deployment_path, deployment_file)
         print(f"deployment_yaml_file={deployment_yaml_file}", flush=True)
-
-        # deployment_yaml_path = os.path.join(deployment_path, deployment_file)
-        # replicas = get_replica_count_from_yaml(deployment_yaml_path)
-        # print(f"Processing {deployment_file}: Total replicas defined in YAML: {replicas}",flush=True)
-
-        # Getting the number of nodes from the statefulset filename
-        # match = re.search(r'(\d+)statefulset', deployment_file)
-        # print(f"match={match}", flush=True)
-        # if match:
-        #     num_nodes = int(match.group(1))
-        #     print(f"Detected {num_nodes} nodes from the statefulset filename.",flush=True)
-
-            # Find the corresponding topology file based on number of nodes
-            # topology_file = None
-            # for topology_filename in os.listdir(topology_folder):
-            #     if topology_filename.startswith(f'nt_nodes{num_nodes}_'):
-            #         topology_file = topology_filename
-            #         break
-
-            # Getting full topology path and file
-            # if topology_file:
-            #     print(f"Using topology file: {topology_file}",flush=True)
-            #     full_topology_path = os.path.join(topology_folder, topology_file)
-            #
-            #     # Create ConfigMap from the topology file (Using the modified run_command)
-            #     run_command(['kubectl', 'create', 'configmap', 'topology-config',
-            #         '--from-file=' + full_topology_path], "configmap : " + topology_file)
 
         # Apply configurations (Using run_command)
         # Check the success of each command and handle errors

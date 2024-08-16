@@ -21,12 +21,12 @@ spec:
           image: wwiras/gpbc70:v1  # Replace with your Docker image name
           ports:
             - containerPort: 5050
-          volumeMounts:
-            - name: config-volume
-              mountPath: /app/config
-      volumes:
-        - name: config-volume
-          configMap:
-            name: topology-config
+#          volumeMounts:
+#            - name: config-volume
+#              mountPath: /app/config
+#      volumes:
+#        - name: config-volume
+#          configMap:
+#            name: topology-config
 
 
