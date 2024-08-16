@@ -201,8 +201,16 @@ def main(num_tests, deployment_folder):
         print("No deployment files found in the directory.")
         return False
 
+
     # Getting total replicas from deployment file
     for deployment_file in deployment_files:
+
+        # Extract the number of nodes from the statefulset filename
+        match = re.search(r'(\d+)statefulset', deployment_file)
+        print(f"match={match}", flush=True)
+        if match:
+            num_nodes = int(match.group(1))
+            print(f"Detected {num_nodes} nodes from the statefulset filename.", flush=True)
 
         # Get deployment file
         deployment_yaml_file = os.path.join(deployment_path, deployment_file)
@@ -210,10 +218,12 @@ def main(num_tests, deployment_folder):
 
         # Apply configurations (Using run_command)
         # Check the success of each command and handle errors
-        # run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'],"svc-bcgossip")
-        # run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'],"python-role")
-        # run_command(['kubectl', 'apply', '-f', deployment_yaml_path], deployment_file)
-    return False
+        if num_nodes == 10 then:
+            run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'],"svc-bcgossip")
+            run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'],"python-role")
+            run_command(['kubectl', 'apply', '-f', deployment_yaml_file], deployment_file)
+            delete_deployment(deployment_yaml_file)
+            return False
 
         # root_folder = "/".join(full_directory_path.split("/")[:-2])
         # print(f"root_folder={root_folder}", flush=True)
@@ -231,7 +241,7 @@ def main(num_tests, deployment_folder):
         #             print(f"Test {i} complete for {deployment_file}.", flush=True)
         #         else:
         #             print(f"Test {i} failed for {deployment_file}.", flush=True)
-        #     delete_deployment(deployment_yaml_path)
+        #     delete_deployment(deployment_yaml_file)
         # else:
         #     print(f"Failed to prepare pods for {deployment_file}.", flush=True)
 
