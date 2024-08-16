@@ -172,27 +172,21 @@ def run_command(command, full_path=None):
         sys.exit(1)
 
 def main(num_tests, deployment_folder):
-    # base directory of our main gossip folder
+    # base directory of our main gossip folder path
     base_dir = "/home/wwiras/bcgossip-grpc/"
     print(f"base_dir = {base_dir}", flush=True)
 
-    # deployment folder
+    # deployment folder path
     deployment_path = os.path.join(base_dir, deployment_folder)
     print(f"deployment_path = {deployment_path}", flush=True)
 
-    # root folder (k8swx folder)
+    # root folder (k8swx folder) path
     root_folder = "/".join(deployment_path.split("/")[:-2])
     print(f"root_folder = {root_folder}", flush=True)
 
-    # Modify the path to point to the 'topology' folder
-    # path_components = deployment_path.split("/")
-    # path_components[-2] = 'topology'
-    # topology_folder = "/".join(path_components)
-    # topology_folder = "/".join(topology_folder.split("/")[:-1])  # Remove the last component
+    # Get 'topology' folder path
     topology_folder = os.path.join(root_folder, "topology")
-    # topology_folder = root_folder + "/" + "topology/"
     print(f"topology_folder={topology_folder}", flush=True)
-    return False
 
     # Ensure the path provided is actually a directory
     if not os.path.isdir(deployment_path):
@@ -209,16 +203,21 @@ def main(num_tests, deployment_folder):
 
     # Getting total replicas from deployment file
     for deployment_file in deployment_files:
-        deployment_yaml_path = os.path.join(deployment_path, deployment_file)
-        replicas = get_replica_count_from_yaml(deployment_yaml_path)
-        print(f"Processing {deployment_file}: Total replicas defined in YAML: {replicas}",flush=True)
+
+        # Get deployment file
+        deployment_yaml_file = os.path.join(deployment_path, deployment_file)
+        print(f"deployment_yaml_file={deployment_yaml_file}", flush=True)
+
+        # deployment_yaml_path = os.path.join(deployment_path, deployment_file)
+        # replicas = get_replica_count_from_yaml(deployment_yaml_path)
+        # print(f"Processing {deployment_file}: Total replicas defined in YAML: {replicas}",flush=True)
 
         # Getting the number of nodes from the statefulset filename
-        match = re.search(r'(\d+)statefulset', deployment_file)
-        print(f"match={match}", flush=True)
-        if match:
-            num_nodes = int(match.group(1))
-            print(f"Detected {num_nodes} nodes from the statefulset filename.",flush=True)
+        # match = re.search(r'(\d+)statefulset', deployment_file)
+        # print(f"match={match}", flush=True)
+        # if match:
+        #     num_nodes = int(match.group(1))
+        #     print(f"Detected {num_nodes} nodes from the statefulset filename.",flush=True)
 
             # Find the corresponding topology file based on number of nodes
             # topology_file = None
@@ -238,10 +237,10 @@ def main(num_tests, deployment_folder):
 
         # Apply configurations (Using run_command)
         # Check the success of each command and handle errors
-        run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'],"svc-bcgossip")
-        run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'],"python-role")
+        # run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'],"svc-bcgossip")
+        # run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'],"python-role")
         # run_command(['kubectl', 'apply', '-f', deployment_yaml_path], deployment_file)
-        return False
+    return False
 
         # root_folder = "/".join(full_directory_path.split("/")[:-2])
         # print(f"root_folder={root_folder}", flush=True)
