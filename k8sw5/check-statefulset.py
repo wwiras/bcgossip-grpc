@@ -2,7 +2,10 @@ from kubernetes import client, config
 import argparse  # Import the argparse module for handling command-line arguments
 
 # Load Kubernetes configuration (usually from ~/.kube/config)
-config.load_kube_config()
+# config.load_kube_config()
+
+# Load in-cluster configuration if running within a Pod
+config.load_incluster_config()
 
 # Create API instance for interacting with StatefulSets
 apps_v1 = client.AppsV1Api()
