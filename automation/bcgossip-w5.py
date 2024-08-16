@@ -130,105 +130,6 @@ def wait_for_pods_to_be_ready(namespace='default', expected_pods=0, timeout=300)
     print(f"Timeout waiting for all {expected_pods} pods to be running in namespace {namespace}.", flush=True)
     return False
 
-def main(num_tests, deployment_folder):
-    base_dir = "/home/wwiras/bcgossip-grpc/"
-    full_directory_path = os.path.join(base_dir, deployment_folder)
-    print(f"full_directory_path = {full_directory_path}", flush=True)
-
-    # Modify the path to point to the 'topology' folder
-    path_components = full_directory_path.split("/")
-    path_components[-2] = 'topology'
-    topology_folder = "/".join(path_components)
-    topology_folder = "/".join(topology_folder.split("/")[:-1])  # Remove the last component
-    print(f"topology_folder={topology_folder}", flush=True)
-
-    # Ensure the path provided is actually a directory
-    if not os.path.isdir(full_directory_path):
-        print(f"Error: The provided path {full_directory_path} is not a directory.",flush=True)
-        sys.exit(1)
-
-    # List all files in the directory and filter out subdirectories
-    deployment_files = [f for f in os.listdir(full_directory_path) if os.path.isfile(os.path.join(full_directory_path, f))]
-
-    if not deployment_files:
-        print("No deployment files found in the directory.")
-        return False
-
-    for deployment_file in deployment_files:
-        deployment_yaml_path = os.path.join(full_directory_path, deployment_file)
-        replicas = get_replica_count_from_yaml(deployment_yaml_path)
-        print(f"Processing {deployment_file}: Total replicas defined in YAML: {replicas}",flush=True)
-
-        # Extract the number of nodes from the statefulset filename
-        match = re.search(r'(\d+)statefulset', deployment_file)
-        print(f"match={match}", flush=True)
-        if match:
-            num_nodes = int(match.group(1))
-            print(f"Detected {num_nodes} nodes from the statefulset filename.",flush=True)
-
-            # Find the corresponding topology file
-            topology_file = None
-            for topology_filename in os.listdir(topology_folder):
-                if topology_filename.startswith(f'nt_nodes{num_nodes}_'):
-                    topology_file = topology_filename
-                    break
-
-            if topology_file:
-                print(f"Using topology file: {topology_file}",flush=True)
-                full_topology_path = os.path.join(topology_folder, topology_file)
-
-                # Create ConfigMap from the topology file (Using the modified run_command)
-                run_command(['kubectl', 'create', 'configmap', 'topology-config',
-                    '--from-file=' + full_topology_path], "configmap : " + topology_file)
-
-        # Apply configurations (Using run_command)
-        root_folder = "/".join(full_directory_path.split("/")[:-2])
-
-        # Check the success of each command and handle errors
-        run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'],"svc-bcgossip")
-        run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'],"python-role")
-        run_command(['kubectl', 'apply', '-f', deployment_yaml_path], deployment_file)
-        return False
-
-        # root_folder = "/".join(full_directory_path.split("/")[:-2])
-        # print(f"root_folder={root_folder}", flush=True)
-        # apply_kubernetes_config(root_folder, '/svc-bcgossip.yaml')
-        # apply_kubernetes_config(root_folder, '/python-role.yaml')
-        # apply_kubernetes_config(base_dir, deployment_folder + '/' + deployment_file)
-
-        # Ensure pods are ready before proceeding
-        # if wait_for_pods_to_be_ready(namespace='default', expected_pods=replicas, timeout=300):
-        #     unique_id = str(uuid.uuid4())[:5]  # Generate a unique ID for the entire test
-        #     for i in range(1, num_tests + 1):
-        #         pod_name = select_random_pod()
-        #         print(f"Selected pod for test {i}: {pod_name}", flush=True)
-        #         if access_pod_and_initiate_gossip(pod_name, replicas, unique_id, i):
-        #             print(f"Test {i} complete for {deployment_file}.", flush=True)
-        #         else:
-        #             print(f"Test {i} failed for {deployment_file}.", flush=True)
-        #     delete_deployment(deployment_yaml_path)
-        # else:
-        #     print(f"Failed to prepare pods for {deployment_file}.", flush=True)
-
-# def run_command(command):
-#     """
-#     Runs a command and handles its output and errors.
-#
-#     Args:
-#         command: A list representing the command and its arguments.
-#
-#     Returns:
-#         A tuple (stdout, stderr) if the command succeeds.
-#         A tuple (None, stderr) if the command fails.
-#     """
-#     try:
-#         result = subprocess.run(command, check=True, text=True, capture_output=True)
-#         # print(result.stdout)  # Print the command's output for visibility
-#         return True, result.stdout  # Return both stdout and stderr on success
-#     except subprocess.CalledProcessError as e:
-#         # print(f"Error executing command: {e.stderr}")
-#         return None, e.stderr  # Return None for stdout and the error message on failure
-
 def run_command(command, full_path=None):
     """
     Runs a command and handles its output and errors.
@@ -269,6 +170,96 @@ def run_command(command, full_path=None):
             print(f"An unexpected error occurred while executing the command.", flush=True)
         traceback.print_exc()
         sys.exit(1)
+
+def main(num_tests, deployment_folder):
+    # base directory of our main gossip folder
+    base_dir = "/home/wwiras/bcgossip-grpc/"
+
+    # deployment folder
+    deployment_path = os.path.join(base_dir, deployment_folder)
+    print(f"deployment_path = {deployment_path}", flush=True)
+
+    # root folder (k8swx folder)
+    root_folder = "/".join(deployment_path.split("/")[:-2])
+    print(f"root_folder = {root_folder}", flush=True)
+
+    # Modify the path to point to the 'topology' folder
+    # path_components = deployment_path.split("/")
+    # path_components[-2] = 'topology'
+    # topology_folder = "/".join(path_components)
+    # topology_folder = "/".join(topology_folder.split("/")[:-1])  # Remove the last component
+    topology_folder = root_folder + "/" + "topology/"
+    print(f"topology_folder={topology_folder}", flush=True)
+    return False
+
+    # Ensure the path provided is actually a directory
+    if not os.path.isdir(deployment_path):
+        print(f"Error: The provided path {deployment_path} is not a directory.",flush=True)
+        sys.exit(1)
+
+    # List all files in the directory and filter out subdirectories
+    deployment_files = [f for f in os.listdir(deployment_path) if os.path.isfile(os.path.join(deployment_path, f))]
+
+    # Check if deployment files found or not
+    if not deployment_files:
+        print("No deployment files found in the directory.")
+        return False
+
+    # Getting total replicas from deployment file
+    for deployment_file in deployment_files:
+        deployment_yaml_path = os.path.join(deployment_path, deployment_file)
+        replicas = get_replica_count_from_yaml(deployment_yaml_path)
+        print(f"Processing {deployment_file}: Total replicas defined in YAML: {replicas}",flush=True)
+
+        # Getting the number of nodes from the statefulset filename
+        match = re.search(r'(\d+)statefulset', deployment_file)
+        print(f"match={match}", flush=True)
+        if match:
+            num_nodes = int(match.group(1))
+            print(f"Detected {num_nodes} nodes from the statefulset filename.",flush=True)
+
+            # Find the corresponding topology file based on number of nodes
+            # topology_file = None
+            # for topology_filename in os.listdir(topology_folder):
+            #     if topology_filename.startswith(f'nt_nodes{num_nodes}_'):
+            #         topology_file = topology_filename
+            #         break
+
+            # Getting full topology path and file
+            # if topology_file:
+            #     print(f"Using topology file: {topology_file}",flush=True)
+            #     full_topology_path = os.path.join(topology_folder, topology_file)
+            #
+            #     # Create ConfigMap from the topology file (Using the modified run_command)
+            #     run_command(['kubectl', 'create', 'configmap', 'topology-config',
+            #         '--from-file=' + full_topology_path], "configmap : " + topology_file)
+
+        # Apply configurations (Using run_command)
+        # Check the success of each command and handle errors
+        run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'],"svc-bcgossip")
+        run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'],"python-role")
+        run_command(['kubectl', 'apply', '-f', deployment_yaml_path], deployment_file)
+        return False
+
+        # root_folder = "/".join(full_directory_path.split("/")[:-2])
+        # print(f"root_folder={root_folder}", flush=True)
+        # apply_kubernetes_config(root_folder, '/svc-bcgossip.yaml')
+        # apply_kubernetes_config(root_folder, '/python-role.yaml')
+        # apply_kubernetes_config(base_dir, deployment_folder + '/' + deployment_file)
+
+        # Ensure pods are ready before proceeding
+        # if wait_for_pods_to_be_ready(namespace='default', expected_pods=replicas, timeout=300):
+        #     unique_id = str(uuid.uuid4())[:5]  # Generate a unique ID for the entire test
+        #     for i in range(1, num_tests + 1):
+        #         pod_name = select_random_pod()
+        #         print(f"Selected pod for test {i}: {pod_name}", flush=True)
+        #         if access_pod_and_initiate_gossip(pod_name, replicas, unique_id, i):
+        #             print(f"Test {i} complete for {deployment_file}.", flush=True)
+        #         else:
+        #             print(f"Test {i} failed for {deployment_file}.", flush=True)
+        #     delete_deployment(deployment_yaml_path)
+        # else:
+        #     print(f"Failed to prepare pods for {deployment_file}.", flush=True)
 
 
 if __name__ == '__main__':
