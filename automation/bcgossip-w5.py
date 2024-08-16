@@ -238,7 +238,7 @@ def main(num_tests, deployment_folder):
         # Check the success of each command and handle errors
         run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'],"svc-bcgossip")
         run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'],"python-role")
-        run_command(['kubectl', 'apply', '-f', deployment_yaml_path], deployment_file)
+        # run_command(['kubectl', 'apply', '-f', deployment_yaml_path], deployment_file)
         return False
 
         # root_folder = "/".join(full_directory_path.split("/")[:-2])
