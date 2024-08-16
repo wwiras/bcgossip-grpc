@@ -76,7 +76,7 @@ def access_pod_and_initiate_gossip(pod_name, replicas, unique_id, iteration):
         session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--', 'sh'], stdin=subprocess.PIPE,
                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         message = f'{unique_id}-cubaan{replicas}-{iteration}'
-        session.stdin.write(f'python initiate.py --message {message}\n')
+        session.stdin.write(f'python3 start.py --message {message}\n')
         session.stdin.flush()
         end_time = time.time() + 300
         while time.time() < end_time:
@@ -85,7 +85,7 @@ def access_pod_and_initiate_gossip(pod_name, replicas, unique_id, iteration):
             if ready:
                 output = session.stdout.readline()
                 print(output, flush=True)
-                if 'Done propagate!' in output:
+                if 'Received acknowledgment:' in output:
                     print("Gossip propagation complete.", flush=True)
                     break
             if session.poll() is not None:
@@ -212,28 +212,40 @@ def main(num_tests, deployment_folder):
 
         # Extract the number of nodes from the statefulset filename
         match = re.search(r'(\d+)statefulset', deployment_file)
-        # print(f"match={match}", flush=True)
         if match:
             num_nodes = int(match.group(1))
             print(f"Detected {num_nodes} nodes from the statefulset filename.", flush=True)
+        else:
+            print(f"Error: Could not extract num_nodes from  {deployment_file} filename.", flush=True)
+            return False
+
+        # Extract the speed (like 1M, 3M,...) from the statefulset filename
+        match = re.search(r'(\d+M)', filename)
+        if match:
+            speed = match.group(1)
+            print(f"Extracted speed: {speed}",flush=True)
+        else:
+            print(f"Speed pattern not found in the filename : {deployment_file}",flush=True)
+            return False
 
         # Get deployment file
         deployment_yaml_file = os.path.join(deployment_path, deployment_file)
         print(f"deployment_yaml_file={deployment_yaml_file}", flush=True)
 
         # Apply configurations (Using run_command)
-        if num_nodes == 10:
-            run_command(['kubectl', 'apply', '-f', deployment_yaml_file], deployment_file)
-            delete_deployment(deployment_yaml_file)
+        # if num_nodes == 10:
+        #     run_command(['kubectl', 'apply', '-f', deployment_yaml_file], deployment_file)
+        #     delete_deployment(deployment_yaml_file)
 
 
         # Ensure pods are ready before proceeding
-        # if wait_for_pods_to_be_ready(namespace='default', expected_pods=replicas, timeout=300):
+        # if wait_for_pods_to_be_ready(namespace='default', expected_pods=num_nodes, timeout=300):
         #     unique_id = str(uuid.uuid4())[:5]  # Generate a unique ID for the entire test
         #     for i in range(1, num_tests + 1):
-        #         pod_name = select_random_pod()
+        #         pod_name = "gossip-statefulset-0"
+        #         # pod_name = select_random_pod()
         #         print(f"Selected pod for test {i}: {pod_name}", flush=True)
-        #         if access_pod_and_initiate_gossip(pod_name, replicas, unique_id, i):
+        #         if access_pod_and_initiate_gossip(pod_name, num_nodes, unique_id, i):
         #             print(f"Test {i} complete for {deployment_file}.", flush=True)
         #         else:
         #             print(f"Test {i} failed for {deployment_file}.", flush=True)
