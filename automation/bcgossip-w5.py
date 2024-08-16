@@ -189,7 +189,8 @@ def main(num_tests, deployment_folder):
     # path_components[-2] = 'topology'
     # topology_folder = "/".join(path_components)
     # topology_folder = "/".join(topology_folder.split("/")[:-1])  # Remove the last component
-    topology_folder = root_folder + "/" + "topology/"
+    topology_folder = os.path.join(root_folder, "topology")
+    # topology_folder = root_folder + "/" + "topology/"
     print(f"topology_folder={topology_folder}", flush=True)
     return False
 
