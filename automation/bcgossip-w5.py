@@ -201,6 +201,9 @@ def main(num_tests, deployment_folder):
         print("No deployment files found in the directory.")
         return False
 
+    # Apply service and python role
+    run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'], "svc-bcgossip")
+    run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'], "python-role")
 
     # Getting total replicas from deployment file
     for deployment_file in deployment_files:
@@ -217,10 +220,7 @@ def main(num_tests, deployment_folder):
         print(f"deployment_yaml_file={deployment_yaml_file}", flush=True)
 
         # Apply configurations (Using run_command)
-        # Check the success of each command and handle errors
         if num_nodes == 10:
-            run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'],"svc-bcgossip")
-            run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'],"python-role")
             run_command(['kubectl', 'apply', '-f', deployment_yaml_file], deployment_file)
             delete_deployment(deployment_yaml_file)
             return False
