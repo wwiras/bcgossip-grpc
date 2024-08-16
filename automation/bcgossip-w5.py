@@ -174,6 +174,7 @@ def run_command(command, full_path=None):
 def main(num_tests, deployment_folder):
     # base directory of our main gossip folder
     base_dir = "/home/wwiras/bcgossip-grpc/"
+    print(f"base_dir = {base_dir}", flush=True)
 
     # deployment folder
     deployment_path = os.path.join(base_dir, deployment_folder)
