@@ -225,7 +225,7 @@ def main(num_tests, deployment_folder):
         if num_nodes == 10:
             run_command(['kubectl', 'apply', '-f', deployment_yaml_file], deployment_file)
             delete_deployment(deployment_yaml_file)
-            return False
+
 
         # Ensure pods are ready before proceeding
         # if wait_for_pods_to_be_ready(namespace='default', expected_pods=replicas, timeout=300):
@@ -244,6 +244,7 @@ def main(num_tests, deployment_folder):
     # Delete service and python role
     run_command(['kubectl', 'delete', '-f', root_folder + '/svc-bcgossip.yaml'], "svc-bcgossip")
     run_command(['kubectl', 'delete', '-f', root_folder + '/python-role.yaml'], "python-role")
+    # return False
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
