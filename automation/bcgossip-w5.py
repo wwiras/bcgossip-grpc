@@ -239,6 +239,9 @@ def main(num_tests, deployment_folder):
         # else:
         #     print(f"Failed to prepare pods for {deployment_file}.", flush=True)
 
+    # Delete service and python role
+    run_command(['kubectl', 'delete', '-f', root_folder + '/svc-bcgossip.yaml'], "svc-bcgossip")
+    run_command(['kubectl', 'delete', '-f', root_folder + '/python-role.yaml'], "python-role")
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
