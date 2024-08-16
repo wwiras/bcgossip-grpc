@@ -220,10 +220,10 @@ def main(num_tests, deployment_folder):
             return False
 
         # Extract the speed (like 1M, 3M,...) from the statefulset filename
-        match = re.search(r'(\d+M)', filename)
+        match = re.search(r'(\d+M)',  deployment_file)
         if match:
             speed = match.group(1)
-            print(f"Extracted speed: {speed}",flush=True)
+            print(f"Extracted speed: {speed} from {deployment_file}",flush=True)
         else:
             print(f"Speed pattern not found in the filename : {deployment_file}",flush=True)
             return False
