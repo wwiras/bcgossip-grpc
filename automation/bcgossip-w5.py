@@ -207,7 +207,7 @@ def main(num_tests, deployment_folder):
 
         # Extract the number of nodes from the statefulset filename
         match = re.search(r'(\d+)statefulset', deployment_file)
-        print(f"match={match}", flush=True)
+        # print(f"match={match}", flush=True)
         if match:
             num_nodes = int(match.group(1))
             print(f"Detected {num_nodes} nodes from the statefulset filename.", flush=True)
