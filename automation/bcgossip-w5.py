@@ -150,6 +150,8 @@ def run_command(command, full_path=None):
         if full_path:
             if 'unchanged' in result.stdout or 'created' in result.stdout:
                 print(f"{full_path} applied successfully!", flush=True)
+            elif 'deleted' in result.stdout:
+                print(f"{full_path} deleted successfully!", flush=True)
             else:
                 print(f"Changes applied to {full_path}:", flush=True)
                 print(result.stdout, flush=True)
