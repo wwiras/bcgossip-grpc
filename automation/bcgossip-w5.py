@@ -214,9 +214,9 @@ def main(num_tests, deployment_folder):
         match = re.search(r'(\d+)statefulset', deployment_file)
         if match:
             num_nodes = int(match.group(1))
-            print(f"Detected {num_nodes} nodes from the statefulset filename.", flush=True)
+            print(f"Detected {num_nodes} nodes from the statefulset: {deployment_file}.", flush=True)
         else:
-            print(f"Error: Could not extract num_nodes from  {deployment_file} filename.", flush=True)
+            print(f"Error: Could not extract num_nodes from {deployment_file} filename.", flush=True)
             return False
 
         # Extract the speed (like 1M, 3M,...) from the statefulset filename
@@ -234,8 +234,9 @@ def main(num_tests, deployment_folder):
 
         # Apply configurations (Using run_command)
         if num_nodes == 10:
+
+            # Apply statefulset
             run_command(['kubectl', 'apply', '-f', deployment_yaml_file], deployment_file)
-            delete_deployment(deployment_yaml_file)
 
             # Ensure pods are ready before proceeding
             if wait_for_pods_to_be_ready(namespace='default', expected_pods=num_nodes, timeout=300):
