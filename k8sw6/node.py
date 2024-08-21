@@ -144,6 +144,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                         "GossipService.SendMessage"
                     ]
                     full_command = trickle_command + grpcurl_command
+                    print(full_command,flush=True)
 
                     # Execute the combined command
                     subprocess.call(full_command)
