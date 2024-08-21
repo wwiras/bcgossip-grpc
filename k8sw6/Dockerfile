@@ -8,6 +8,9 @@ RUN apt-get update && apt-get install -y python3 python3-pip build-essential wge
 # Install network utils including trickle
 RUN apt-get install -y iputils-ping dnsutils iproute2 iperf3 trickle
 
+# Install grpcurl (add this line)
+RUN apt-get install -y grpcurl
+
 # Install Python and necessary packages
 RUN pip3 install --no-cache-dir grpcio grpcio-tools kubernetes iperf3
 

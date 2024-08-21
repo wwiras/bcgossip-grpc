@@ -55,8 +55,18 @@ def generate_random_graph(num_nodes, probability, bandwidth=None):
     nodes = ['gossip-statefulset-' + str(i) for i in range(num_nodes)]
     G.add_nodes_from(nodes)
 
-    # bandwidth_options = [1, 3, 5, 10]  # Mbps (used if bandwidth is None)
-    bandwidth_options = [512, 1000, 3000, 5000, 10000]  # Kbps (used if bandwidth is None)
+    # bandwidth options
+    # Mbps  |   Kbps    | KB/s (Kilobytes per second) - official trickle bandwidth measurement
+    # 1     |   1000    | 125
+    # 3     |   3000    | 375
+    # 5     |   5000    | 625
+    # 10    |   10000   | 1250
+    # For example:
+    # 1 Mbps:
+    # 1 Mbps * 1000 = 1000Kbps
+    # 1000Kbps / 8 = 125KB/s
+    bandwidth_options = [1, 3, 5, 10]  # Mbps (used if bandwidth is None)
+    # bandwidth_options = [125, 375, 625, 1250]  # Kbps (used if bandwidth is None)
 
     # Step 1: Ensure every node has at least one neighbor
     for i in range(num_nodes - 1):
@@ -100,7 +110,9 @@ G = generate_random_graph(args.nodes, args.prob, args.bandwidth)
 uuid_str = str(uuid.uuid4()).replace('-', '')[:5]
 
 # Determine bandwidth type for filename
-bandwidth_type = f"{args.bandwidth}k" if args.bandwidth else "rk"  # 'rm' for random
+bandwidth_type = f"{args.bandwidth}M" if args.bandwidth else "RM"  # 'rm' for random
+# KB for static bandwidth
+# RKB for random bandwidth
 
 # Create filename with nodes, probability, bandwidth type, and UUID
 filename = f'nt_nodes{args.nodes}_p{args.prob}_{bandwidth_type}_{uuid_str}.json'
