@@ -137,7 +137,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                     ]
                     full_command = trickle_command + grpcurl_command
 
-                    print(f"Executing command: {full_command}",flush=True)  # Print for debugging
+
 
                     # Execute the combined command (try without shell)
                     subprocess.call(full_command, shell=False)
@@ -145,6 +145,8 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                     print(
                         f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip})",
                         flush=True)
+
+                    print(f"Executing command: {full_command}", flush=True)  # Print for debugging
                 except subprocess.CalledProcessError as e:
                     print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
 
