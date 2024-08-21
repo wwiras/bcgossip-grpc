@@ -11,14 +11,13 @@ RUN apt-get install -y iputils-ping dnsutils iproute2 iperf3 trickle
 # Install grpcurl (add this line)
 #RUN #apt-get install -y grpcurl
 # Download and install grpcurl manually
-#RUN wget -qO /usr/local/bin/grpcurl https://github.com/fullstorydev/grpcurl/releases/download/v1.11.0/grpcurl_1.11.0_linux_x86_64 && \
-#    chmod +x /usr/local/bin/grpcurl
+RUN wget -qO /usr/local/bin/grpcurl https://github.com/fullstorydev/grpcurl/releases/download/v1.11.0/grpcurl_1.11.0_linux_x86_64 && chmod +x /usr/local/bin/grpcurl
 
 # Add the 'testing' repository
-RUN echo "deb http://dl-cdn.alpinelinux.org/alpine/edge/testing main" >> /etc/apk/repositories && apk update
+#RUN echo "deb http://dl-cdn.alpinelinux.org/alpine/edge/testing main" >> /etc/apk/repositories && apk update
 
 # Install grpcurl
-RUN apk add --no-cache grpcurl
+#RUN apk add --no-cache grpcurl
 
 
 # Install Python and necessary packages
