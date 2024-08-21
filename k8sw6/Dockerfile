@@ -3,7 +3,7 @@ FROM ubuntu:22.04
 WORKDIR /app
 
 # Install required packages for Python
-RUN apt-get update && apt-get install -y python3 python3-pip build-essential wget curl unzip && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y python3 python3-pip build-essential wget curl unzip
 
 #sudo apt install golang-go
 # Download and install grpcurl
