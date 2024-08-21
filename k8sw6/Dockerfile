@@ -15,7 +15,8 @@ RUN wget -qO go1.21.linux-amd64.tar.gz https://go.dev/dl/go1.21.linux-amd64.tar.
 
 # Set GOPATH (adjust if needed)
 ENV GOPATH=/go
-ENV PATH=$PATH:/usr/local/go/bin # Add Go to PATH
+ENV PATH=$PATH:/usr/local/go/bin
+# Add Go to PATH
 
 # Install grpcurl using Go
 RUN go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
