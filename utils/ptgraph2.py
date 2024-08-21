@@ -18,7 +18,7 @@ G = nx.node_link_graph(topology)
 # Extract bandwidth information for edge labels
 edge_labels = nx.get_edge_attributes(G, 'bandwidth')
 for (u, v) in edge_labels:
-    edge_labels[(u, v)] = f"{edge_labels[(u, v)]} Mbps"
+    edge_labels[(u, v)] = f"{edge_labels[(u, v)]} Kbps"
 
 # Customize the plot with edge labels showing bandwidth (smaller font size)
 pos = nx.spring_layout(G)

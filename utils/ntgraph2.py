@@ -55,7 +55,8 @@ def generate_random_graph(num_nodes, probability, bandwidth=None):
     nodes = ['gossip-statefulset-' + str(i) for i in range(num_nodes)]
     G.add_nodes_from(nodes)
 
-    bandwidth_options = [1, 3, 5, 10]  # Mbps (used if bandwidth is None)
+    # bandwidth_options = [1, 3, 5, 10]  # Mbps (used if bandwidth is None)
+    bandwidth_options = [512, 1000, 3000, 5000, 10000]  # Kbps (used if bandwidth is None)
 
     # Step 1: Ensure every node has at least one neighbor
     for i in range(num_nodes - 1):
@@ -89,7 +90,7 @@ def generate_random_graph(num_nodes, probability, bandwidth=None):
 parser = argparse.ArgumentParser(description='Generate a random network graph and save its topology.')
 parser.add_argument('--nodes', type=int, required=True, help='The number of nodes in the graph.')
 parser.add_argument('--prob', type=float, required=True, help='The probability of an edge between two nodes (0.0 to 1.0).')
-parser.add_argument('--bandwidth', type=int, help='(Optional) Constant bandwidth for all edges (in Mbps).')
+parser.add_argument('--bandwidth', type=int, help='(Optional) Constant bandwidth for all edges (in Kbps).')
 args = parser.parse_args()
 
 # Generate the random graph with optional bandwidth
@@ -99,7 +100,7 @@ G = generate_random_graph(args.nodes, args.prob, args.bandwidth)
 uuid_str = str(uuid.uuid4()).replace('-', '')[:5]
 
 # Determine bandwidth type for filename
-bandwidth_type = f"{args.bandwidth}m" if args.bandwidth else "rm"  # 'rm' for random
+bandwidth_type = f"{args.bandwidth}k" if args.bandwidth else "rk"  # 'rm' for random
 
 # Create filename with nodes, probability, bandwidth type, and UUID
 filename = f'nt_nodes{args.nodes}_p{args.prob}_{bandwidth_type}_{uuid_str}.json'
