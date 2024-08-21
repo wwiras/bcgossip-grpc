@@ -109,7 +109,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 target = f"{neighbor_ip}:5050"
 
                 # Get bandwidth for this specific connection from topology
-                bandwidth_KBs = next((link['bandwidth'] * 1000 / 8
+                bandwidth_kbps = next((link['bandwidth'] * 1000 / 8
                                        for link in self.topology['links']
                                        if (link['source'] == self.pod_name and link['target'] == neighbor_pod_name) or
                                        (link['target'] == self.pod_name and link['source'] == neighbor_pod_name)),
@@ -118,13 +118,20 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 try:
                     # Construct trickle command with bandwidth limit (if available)
                     trickle_command = ["trickle"]
-                    if bandwidth_KBs:
-                        trickle_command.extend(["-s", "-d", str(bandwidth_KBs), "-u", str(bandwidth_KBs)])
+                    if bandwidth_kbps:
+                        trickle_command.extend(["-s", "-d", str(bandwidth_kbps), "-u", str(bandwidth_kbps)])
 
-                    # Combine trickle and grpcurl commands
+                    # Get the current script's directory
+                    script_dir = os.path.dirname(os.path.realpath(__file__))
+
+                    # Construct the full path to the .proto file
+                    proto_file_path = os.path.join(script_dir, "gossip.proto")
+
+                    # Combine trickle and grpcurl commands with -proto flag
                     grpcurl_command = [
                         "grpcurl",
                         "-plaintext",
+                        "-proto", proto_file_path,  # Use the dynamically constructed path
                         "-d",
                         json.dumps({
                             "message": message,
@@ -144,6 +151,49 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                         flush=True)
                 except subprocess.CalledProcessError as e:
                     print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
+
+    # def gossip_message(self, message, sender_id, received_timestamp):
+    #     for neighbor_pod_name in self.neighbor_pod_names:
+    #         if neighbor_pod_name != sender_id:
+    #             neighbor_ip = self.get_pod_ip(neighbor_pod_name)
+    #             target = f"{neighbor_ip}:5050"
+    #
+    #             # Get bandwidth for this specific connection from topology
+    #             bandwidth_KBs = next((link['bandwidth'] * 1000 / 8
+    #                                    for link in self.topology['links']
+    #                                    if (link['source'] == self.pod_name and link['target'] == neighbor_pod_name) or
+    #                                    (link['target'] == self.pod_name and link['source'] == neighbor_pod_name)),
+    #                                   None)  # Default to None if no bandwidth found
+    #
+    #             try:
+    #                 # Construct trickle command with bandwidth limit (if available)
+    #                 trickle_command = ["trickle"]
+    #                 if bandwidth_KBs:
+    #                     trickle_command.extend(["-s", "-d", str(bandwidth_KBs), "-u", str(bandwidth_KBs)])
+    #
+    #                 # Combine trickle and grpcurl commands
+    #                 grpcurl_command = [
+    #                     "grpcurl",
+    #                     "-plaintext",
+    #                     "-d",
+    #                     json.dumps({
+    #                         "message": message,
+    #                         "sender_id": self.pod_name,
+    #                         "timestamp": received_timestamp
+    #                     }),
+    #                     target,
+    #                     "GossipService.SendMessage"
+    #                 ]
+    #                 full_command = trickle_command + grpcurl_command
+    #
+    #                 # Execute the combined command
+    #                 subprocess.call(full_command)
+    #
+    #                 print(
+    #                     f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip})",
+    #                     flush=True)
+    #             except subprocess.CalledProcessError as e:
+    #                 print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
 
     # def gossip_message(self, message, sender_id, received_timestamp):
     #     for neighbor_pod_name in self.neighbor_pod_names:
