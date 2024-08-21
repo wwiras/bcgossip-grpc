@@ -30,4 +30,4 @@ EXPOSE 5050
 # Command to run the application
 CMD ["python3", "node.py"]
 
-#trickle -s -d 125 -u 125 grpcurl -plaintext -proto gossip.proto -d '{"message": "testgrpcurl2", "sender_id": "gossip-statefulset-0", "timestamp": 1234567890}' 10.44.1.17:5050 gossip.GossipService/SendMessage
+#trickle -s -d 125 -u 125 grpcurl -plaintext -proto gossip.proto -d '{"message": "testgrpcurldirect", "sender_id": "gossip-statefulset-0", "timestamp": 1234567890}' 10.44.1.17:5050 gossip.GossipService/SendMessage

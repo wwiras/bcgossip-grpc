@@ -141,7 +141,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                             "timestamp": received_timestamp
                         }),
                         target,
-                        "GossipService.SendMessage"
+                        "gossip.GossipService/SendMessage"
                     ]
                     full_command = trickle_command + grpcurl_command
                     print(full_command,flush=True)
