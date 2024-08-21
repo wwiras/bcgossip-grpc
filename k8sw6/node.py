@@ -117,38 +117,89 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
                 try:
                     # Construct trickle command with bandwidth limit (if available)
-                    trickle_command = ["trickle"]
+                    trickle_command = "trickle"
                     if bandwidth_kbps:
-                        trickle_command.extend(["-s", "-d", str(bandwidth_kbps), "-u", str(bandwidth_kbps)])
+                        trickle_command += f" -s -d {bandwidth_kbps} -u {bandwidth_kbps}"
 
                     # Combine trickle and grpcurl commands with -proto flag
-                    grpcurl_command = [
-                        "grpcurl",
-                        "-plaintext",
-                        "-proto gossip.proto",
-                        "-d",
-                        json.dumps({
-                            "message": message,
-                            "sender_id": self.pod_name,
-                            "timestamp": received_timestamp
-                        }),
-                        target,
-                        "gossip.GossipService/SendMessage"  # Ensure fully qualified service/method name
-                    ]
-                    full_command = trickle_command + grpcurl_command
+                    grpcurl_command = f"""
+                        grpcurl -plaintext \
+                            -proto gossip.proto \
+                            -d '{json.dumps({
+                        "message": message,
+                        "sender_id": self.pod_name,
+                        "timestamp": received_timestamp
+                    })}' \
+                            {target} \
+                            gossip.GossipService/SendMessage
+                    """
 
-
-
-                    # Execute the combined command (try without shell)
-                    subprocess.call(full_command, shell=False)
-
-                    print(
-                        f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip})",
-                        flush=True)
+                    # Combine the commands into a single string for os.system
+                    full_command = f"{trickle_command} {grpcurl_command.strip()}"
 
                     print(f"Executing command: {full_command}", flush=True)  # Print for debugging
-                except subprocess.CalledProcessError as e:
+
+                    # Execute the combined command using os.system
+                    exit_code = os.system(full_command)
+
+                    if exit_code == 0:
+                        print(
+                            f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip})",
+                            flush=True)
+                    else:
+                        print(f"Failed to send message: '{message}' to {neighbor_pod_name} (exit code: {exit_code})",
+                              flush=True)
+
+                except Exception as e:
                     print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
+
+    # def gossip_message(self, message, sender_id, received_timestamp):
+    #     for neighbor_pod_name in self.neighbor_pod_names:
+    #         if neighbor_pod_name != sender_id:
+    #             neighbor_ip = self.get_pod_ip(neighbor_pod_name)
+    #             target = f"{neighbor_ip}:5050"
+    #
+    #             # Get bandwidth for this specific connection from topology
+    #             bandwidth_kbps = next((link['bandwidth'] * 1000 / 8
+    #                                    for link in self.topology['links']
+    #                                    if (link['source'] == self.pod_name and link['target'] == neighbor_pod_name) or
+    #                                    (link['target'] == self.pod_name and link['source'] == neighbor_pod_name)),
+    #                                   None)  # Default to None if no bandwidth found
+    #
+    #             try:
+    #                 # Construct trickle command with bandwidth limit (if available)
+    #                 trickle_command = ["trickle"]
+    #                 if bandwidth_kbps:
+    #                     trickle_command.extend(["-s", "-d", str(bandwidth_kbps), "-u", str(bandwidth_kbps)])
+    #
+    #                 # Combine trickle and grpcurl commands with -proto flag
+    #                 grpcurl_command = [
+    #                     "grpcurl",
+    #                     "-plaintext",
+    #                     "-proto gossip.proto",
+    #                     "-d",
+    #                     json.dumps({
+    #                         "message": message,
+    #                         "sender_id": self.pod_name,
+    #                         "timestamp": received_timestamp
+    #                     }),
+    #                     target,
+    #                     "gossip.GossipService/SendMessage"  # Ensure fully qualified service/method name
+    #                 ]
+    #                 full_command = trickle_command + grpcurl_command
+    #
+    #
+    #
+    #                 # Execute the combined command (try without shell)
+    #                 subprocess.call(full_command, shell=False)
+    #
+    #                 print(
+    #                     f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip})",
+    #                     flush=True)
+    #
+    #                 print(f"Executing command: {full_command}", flush=True)  # Print for debugging
+    #             except subprocess.CalledProcessError as e:
+    #                 print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
 
     def _find_neighbors(self, node_id):
         """Identifies the neighbors of the given node based on the topology."""
