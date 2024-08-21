@@ -15,8 +15,7 @@ RUN apt-get install -y iputils-ping dnsutils iproute2 iperf3 trickle
 #    chmod +x /usr/local/bin/grpcurl
 
 # Add the 'testing' repository
-RUN echo "deb http://dl-cdn.alpinelinux.org/alpine/edge/testing main" >> /etc/apk/repositories && \
-    apk update
+RUN echo "deb http://dl-cdn.alpinelinux.org/alpine/edge/testing main" >> /etc/apk/repositories && apk update
 
 # Install grpcurl
 RUN apk add --no-cache grpcurl
