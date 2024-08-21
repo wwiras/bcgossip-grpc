@@ -137,7 +137,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                     ]
                     full_command = trickle_command + grpcurl_command
 
-                    print(f"Executing command: {full_command}")  # Print for debugging
+                    print(f"Executing command: {full_command}",flush=True)  # Print for debugging
 
                     # Execute the combined command (try without shell)
                     subprocess.call(full_command, shell=False)
