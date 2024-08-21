@@ -10,6 +10,9 @@ import time
 import logging
 import subprocess
 
+# Import for gRPC reflection
+from grpc_reflection.v1alpha import reflection
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -234,7 +237,16 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
     def start_server(self):
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         gossip_pb2_grpc.add_GossipServiceServicer_to_server(self, server)
+
+        # Enable gRPC reflection on the server
+        SERVICE_NAMES = (
+            gossip_pb2.DESCRIPTOR.services_by_name['GossipService'].full_name,
+            reflection.SERVICE_NAME,
+        )
+        reflection.enable_server_reflection(SERVICE_NAMES, server)
+
         server.add_insecure_port(f'[::]:{self.port}')
+
         print(f"{self.pod_name}({self.host}) listening on port {self.port}", flush=True)
         server.start()
         server.wait_for_termination()

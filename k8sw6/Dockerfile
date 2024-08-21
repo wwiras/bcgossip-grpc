@@ -19,7 +19,7 @@ RUN apt-get install -y iputils-ping dnsutils iproute2 iperf3 trickle
 #RUN go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
 
 # Install Python and necessary packages
-RUN pip3 install --no-cache-dir grpcio grpcio-tools kubernetes iperf3
+RUN pip3 install --no-cache-dir grpcio grpcio-tools kubernetes iperf3 grpcio-reflection
 
 # Copy your application source code
 COPY . /app
