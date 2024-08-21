@@ -122,11 +122,11 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                         trickle_command.extend(["-s", "-d", str(bandwidth_kbps), "-u", str(bandwidth_kbps)])
 
                     # Get the current script's directory
-                    script_dir = os.path.dirname(os.path.realpath(__file__))
+                    # script_dir = os.path.dirname(os.path.realpath(__file__))
 
                     # Construct the full path to the .proto file
                     # proto_file_path = os.path.join(script_dir, "gossip.proto")
-                    proto_file_path = "/app/gossip.proto"
+                    proto_file_path = "gossip.proto"
                     print(f"Protobuf file: {proto_file_path} ",flush=True)
 
                     # Combine trickle and grpcurl commands with -proto flag
