@@ -120,40 +120,43 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
                 try:
                     # Construct trickle command with bandwidth limit (if available)
-                    trickle_command = "trickle"
+                    trickle_command = ["trickle"]
                     if bandwidth_kbps:
-                        trickle_command += f" -s -d {bandwidth_kbps} -u {bandwidth_kbps}"
+                        trickle_command.extend(["-s", "-d", str(bandwidth_kbps), "-u", str(bandwidth_kbps)])
 
-                    # Combine trickle and grpcurl commands with -proto flag
-                    grpcurl_command = f"""
-                        grpcurl -plaintext \
-                            -proto gossip.proto \
-                            -d '{json.dumps({
+                    # Prepare the input data for grpcurl
+                    input_data = {
                         "message": message,
                         "sender_id": self.pod_name,
                         "timestamp": received_timestamp
-                    })}' \
-                            {target} \
-                            gossip.GossipService/SendMessage
-                    """
+                    }
 
-                    # Combine the commands into a single string for os.system
-                    full_command = f"{trickle_command} {grpcurl_command.strip()}"
+                    # Construct the grpcurl command
+                    grpcurl_command = [
+                        "grpcurl",
+                        "--plaintext",
+                        "-d", json.dumps(input_data),
+                        target,
+                        "gossip.GossipService/SendMessage"
+                    ]
 
-                    print(f"Executing command: {full_command}", flush=True)  # Print for debugging
+                    # Combine trickle and grpcurl commands
+                    full_command = trickle_command + grpcurl_command
 
-                    # Execute the combined command using os.system
-                    exit_code = os.system(full_command)
+                    # Execute the combined command and capture output
+                    result = subprocess.check_output(full_command)
 
-                    if exit_code == 0:
-                        print(
-                            f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip})",
-                            flush=True)
-                    else:
-                        print(f"Failed to send message: '{message}' to {neighbor_pod_name} (exit code: {exit_code})",
-                              flush=True)
+                    # Parse the JSON response (if needed)
+                    response = json.loads(result)
 
-                except Exception as e:
+                    # Print the response for debugging
+                    print(f"Response from {neighbor_pod_name}: {response}", flush=True)
+
+                    print(
+                        f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip})",
+                        flush=True)
+
+                except subprocess.CalledProcessError as e:
                     print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
 
     # def gossip_message(self, message, sender_id, received_timestamp):
