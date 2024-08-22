@@ -149,10 +149,11 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                     full_command = trickle_command + grpcurl_command
 
                     # Execute the combined command and capture output
-                    result = subprocess.check_output(full_command)
+                    # result = subprocess.check_output(full_command)
+                    subprocess.check_output(full_command)
 
                     # Parse the JSON response (if needed)
-                    response = json.loads(result)
+                    # response = json.loads(result)
 
                     # Print the response for debugging
                     # print(f"Response from {neighbor_pod_name}: {response}", flush=True)
