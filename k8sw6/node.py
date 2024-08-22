@@ -120,13 +120,14 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
                 try:
                     # Construct trickle command with bandwidth limit (convert to KB/s)
+                    # Append bandwidth information to the message (in Mbps)
                     trickle_command = ["trickle"]
                     if bandwidth_mbps:
                         bandwidth_kbps = bandwidth_mbps * 1000 / 8
                         trickle_command.extend(["-s", "-d", str(bandwidth_kbps), "-u", str(bandwidth_kbps)])
-
-                    # Append bandwidth information to the message (in Mbps)
-                    message_with_bandwidth = f"{message} (bandwidth: {bandwidth_mbps if bandwidth_mbps else 'N/A'} Mbps)"
+                        message_with_bandwidth = f"{message} (bandwidth: {bandwidth_mbps} Mbps)"
+                    else:
+                        message_with_bandwidth = f"{message} (bandwidth: N/A Mbps)"
 
                     # Prepare the input data for grpcurl
                     input_data = {
