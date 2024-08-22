@@ -111,27 +111,22 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 neighbor_ip = self.get_pod_ip(neighbor_pod_name)
                 target = f"{neighbor_ip}:5050"
 
-                # Get bandwidth for this specific connection from topology (keep it in Mbps)
-                bandwidth_mbps = next((link['bandwidth']
+                # Get bandwidth for this specific connection from topology
+                bandwidth_kbps = next((link['bandwidth'] * 1000 / 8
                                        for link in self.topology['links']
                                        if (link['source'] == self.pod_name and link['target'] == neighbor_pod_name) or
                                        (link['target'] == self.pod_name and link['source'] == neighbor_pod_name)),
                                       None)  # Default to None if no bandwidth found
 
                 try:
-                    # Construct trickle command with bandwidth limit (convert to KB/s)
-                    # Append bandwidth information to the message (in Mbps)
+                    # Construct trickle command with bandwidth limit (if available)
                     trickle_command = ["trickle"]
-                    if bandwidth_mbps:
-                        bandwidth_kbps = bandwidth_mbps * 1000 / 8
+                    if bandwidth_kbps:
                         trickle_command.extend(["-s", "-d", str(bandwidth_kbps), "-u", str(bandwidth_kbps)])
-                        message_with_bandwidth = f"{message} (bandwidth: {bandwidth_mbps} Mbps)"
-                    else:
-                        message_with_bandwidth = f"{message} (bandwidth: N/A Mbps)"
 
                     # Prepare the input data for grpcurl
                     input_data = {
-                        "message": message_with_bandwidth,
+                        "message": message,
                         "sender_id": self.pod_name,
                         "timestamp": received_timestamp
                     }
@@ -149,8 +144,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                     full_command = trickle_command + grpcurl_command
 
                     # Execute the combined command and capture output
-                    # result = subprocess.check_output(full_command)
-                    subprocess.check_output(full_command)
+                    result = subprocess.check_output(full_command)
 
                     # Parse the JSON response (if needed)
                     # response = json.loads(result)
@@ -159,7 +153,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                     # print(f"Response from {neighbor_pod_name}: {response}", flush=True)
 
                     print(
-                        f"{self.pod_name}({self.host}) forwarded message: '{message_with_bandwidth}' to {neighbor_pod_name} ({neighbor_ip})",
+                        f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip})",
                         flush=True)
 
                 except subprocess.CalledProcessError as e:
