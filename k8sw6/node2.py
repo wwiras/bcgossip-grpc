@@ -44,6 +44,14 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         within the current working directory.
         """
 
+        # Get the StatefulSet replica count using kubectl
+        # command = f"kubectl get statefulset {statefulset_name} -n {namespace} -o jsonpath='{{.spec.replicas}}'"
+        #         # try:
+        #         #     total_replicas = int(subprocess.check_output(command, shell=True).decode('utf-8').strip())
+        #         # except subprocess.CalledProcessError as e:
+        #         #     raise RuntimeError(f"Error getting StatefulSet replicas using kubectl: {e}")
+
+
         # Get the current working directory
         current_directory = os.getcwd()
 
@@ -72,7 +80,6 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
     def SendMessage(self, request, context):
         message = request.message
         sender_id = request.sender_id
-        bandwidth_mbps = request.bandwidth_mbps
         received_timestamp = time.time_ns()
 
         # Check for message initiation and set the initial timestamp
@@ -80,19 +87,19 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             self.gossip_initiated = True
             self.initial_gossip_timestamp = received_timestamp
             log_message = f"Gossip initiated by {self.pod_name}({self.host}) at {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(received_timestamp / 1e9))}"
-            self._log_event(message, sender_id, received_timestamp, None, 'initiate',bandwidth_mbps, log_message)
+            self._log_event(message, sender_id, received_timestamp, None, 'initiate', log_message)
 
         # Check for duplicate messages
         elif message in self.received_messages:
             log_message = f"{self.pod_name}({self.host}) ignoring duplicate message: '{message}' from {sender_id}"
-            self._log_event(message, sender_id, received_timestamp, None, 'duplicate',bandwidth_mbps, log_message)
+            self._log_event(message, sender_id, received_timestamp, None, 'duplicate', log_message)
             return gossip_pb2.Acknowledgment(details=f"Duplicate message ignored by {self.pod_name}({self.host})")
 
         else:
             self.received_messages.add(message)
             propagation_time = (received_timestamp - request.timestamp) / 1e6
             log_message = f"{self.pod_name}({self.host}) received: '{message}' from {sender_id} in {propagation_time:.2f} ms"
-            self._log_event(message, sender_id, received_timestamp, propagation_time, 'received', bandwidth_mbps, log_message)
+            self._log_event(message, sender_id, received_timestamp, propagation_time, 'received', log_message)
 
         # Gossip to neighbors (only if the message is new)
         self.gossip_message(message, sender_id, received_timestamp)
@@ -105,30 +112,23 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 target = f"{neighbor_ip}:5050"
 
                 # Get bandwidth for this specific connection from topology
-                bandwidth_mbps = next((link['bandwidth']
+                bandwidth_kbps = next((link['bandwidth'] * 1000 / 8
                                        for link in self.topology['links']
                                        if (link['source'] == self.pod_name and link['target'] == neighbor_pod_name) or
-                                       (link['target'] == self.pod_name and link['source'] == neighbor_pod_name)), None)
-
-                if bandwidth_mbps is None:
-                    print(f"No bandwidth information found for link to {neighbor_pod_name}. Using default bandwidth.",
-                          flush=True)
-                    bandwidth_mbps = 2  # Default bandwidth in Mbps
-
-                # Convert bandwidth from Mbps to Kbps for trickle
-                bandwidth_limit_kbps = int(bandwidth_mbps * 1000)
+                                       (link['target'] == self.pod_name and link['source'] == neighbor_pod_name)),
+                                      None)  # Default to None if no bandwidth found
 
                 try:
-                    # Construct trickle command with bandwidth limit
-                    trickle_command = ["trickle", "-s", "-d", str(bandwidth_limit_kbps), "-u",
-                                       str(bandwidth_limit_kbps)]
+                    # Construct trickle command with bandwidth limit (if available)
+                    trickle_command = ["trickle"]
+                    if bandwidth_kbps:
+                        trickle_command.extend(["-s", "-d", str(bandwidth_kbps), "-u", str(bandwidth_kbps)])
 
                     # Prepare the input data for grpcurl
                     input_data = {
                         "message": message,
-                        "sender_id": sender_id,
-                        "timestamp": received_timestamp,
-                        "bandwidth_mbps": bandwidth_mbps
+                        "sender_id": self.pod_name,
+                        "timestamp": received_timestamp
                     }
 
                     # Construct the grpcurl command
@@ -146,8 +146,14 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                     # Execute the combined command and capture output
                     result = subprocess.check_output(full_command)
 
+                    # Parse the JSON response (if needed)
+                    # response = json.loads(result)
+
+                    # Print the response for debugging
+                    # print(f"Response from {neighbor_pod_name}: {response}", flush=True)
+
                     print(
-                        f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip}) with bandwidth limit {bandwidth_limit_kbps} Kbps",
+                        f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip})",
                         flush=True)
 
                 except subprocess.CalledProcessError as e:
@@ -164,8 +170,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         return neighbors
 
 
-    def _log_event(self, message, sender_id, received_timestamp,
-                   propagation_time, event_type, bandwidth_mbps, log_message):
+    def _log_event(self, message, sender_id, received_timestamp, propagation_time, event_type, log_message):
         """Logs the gossip event as structured JSON data."""
         event_data = {
             'message': message,
@@ -173,7 +178,6 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             'receiver_id': self.pod_name,
             'received_timestamp': received_timestamp,
             'propagation_time': propagation_time,
-            'bandwidth_mbps': bandwidth_mbps,
             'event_type': event_type,
             'detail': log_message
         }
