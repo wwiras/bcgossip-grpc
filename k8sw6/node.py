@@ -126,7 +126,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                     # Prepare the input data for grpcurl
                     input_data = {
                         "message": message,
-                        "sender_id": sender_id,
+                        "sender_id": self.pod_name,
                         "timestamp": received_timestamp,
                         "bandwidth_mbps": bandwidth_mbps
                     }
