@@ -26,7 +26,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.service_name = service_name
 
         # Load the topology from the "topology" folder
-        self.topology = self.get_topology(10, "topology")
+        self.topology = self.get_topology(10, "topology/" + os.environ['BANDWIDTH_LIMIT'])
 
         # Find neighbors based on the topology (without measuring latency yet)
         self.neighbor_pod_names = self._find_neighbors(self.pod_name)

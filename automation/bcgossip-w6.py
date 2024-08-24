@@ -177,12 +177,15 @@ def main(num_tests, deployment_folder):
         if match:
             num_nodes = int(match.group(1))
             print(f"Detected {num_nodes} nodes from the statefulset: {deployment_file}.", flush=True)
+            if num_nodes!=10:
+                continue
         else:
             print(f"Error: Could not extract num_nodes from {deployment_file} filename.", flush=True)
             return False
 
-        # Extract the speed (like 1M, 3M,...) from the statefulset filename
-        match = re.search(r'(\d+M)',  deployment_file)
+        # Extract the speed (like 1M, 3M, 5M, 10M or RM-random bwidth) from the statefulset filename
+        # Modified regex pattern to capture both numeric bandwidth and "RM"
+        match = re.search(r'(\d+M|RM)', deployment_file)
         if match:
             speed = match.group(1)
             print(f"Extracted speed: {speed} from {deployment_file}",flush=True)
