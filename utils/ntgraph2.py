@@ -4,38 +4,6 @@ import random
 import uuid
 import argparse
 
-# def generate_random_graph(num_nodes, probability, bandwidth=None):
-#     """
-#     Generates a random network graph with optional constant or random bandwidth.
-#
-#     Args:
-#         num_nodes: The number of nodes in the graph.
-#         probability: The probability of an edge existing between any two nodes.
-#         bandwidth: (Optional) If provided, all edges will have this constant bandwidth.
-#                    If None, edges will have random bandwidth from bandwidth_options.
-#
-#     Returns:
-#         A NetworkX graph object representing the generated graph.
-#     """
-#     G = nx.Graph()
-#     nodes = ['gossip-statefulset-' + str(i) for i in range(num_nodes)]
-#     G.add_nodes_from(nodes)
-#
-#     bandwidth_options = [1, 3, 5, 10]  # Mbps (used if bandwidth is None)
-#
-#     # Randomly add edges with bandwidth based on the given probability
-#     for i in range(num_nodes):
-#         for j in range(i + 1, num_nodes):
-#             if random.random() < probability:
-#                 if bandwidth is None:
-#                     edge_bandwidth = random.choice(bandwidth_options)
-#                 else:
-#                     edge_bandwidth = bandwidth
-#                 G.add_edge(nodes[i], nodes[j], bandwidth=edge_bandwidth)
-#
-#     return G
-
-# Parse command-line arguments
 
 def generate_random_graph(num_nodes, probability, bandwidth=None):
     """
@@ -100,7 +68,7 @@ def generate_random_graph(num_nodes, probability, bandwidth=None):
 parser = argparse.ArgumentParser(description='Generate a random network graph and save its topology.')
 parser.add_argument('--nodes', type=int, required=True, help='The number of nodes in the graph.')
 parser.add_argument('--prob', type=float, required=True, help='The probability of an edge between two nodes (0.0 to 1.0).')
-parser.add_argument('--bandwidth', type=int, help='(Optional) Constant bandwidth for all edges (in Kbps).')
+parser.add_argument('--bandwidth', type=int, help='(Optional) Constant bandwidth for all edges (in Mbps).')
 args = parser.parse_args()
 
 # Generate the random graph with optional bandwidth
