@@ -4,8 +4,7 @@ metadata:
   name: gossip-statefulset
 spec:
   serviceName: "bcgossip-svc"
-#  replicas: 10  # Start with 2 replicas for testing $(IMAGE_TAG)
-  replicas: $(REPLICA_COUNT)
+  replicas: 10  # Start with 2 replicas for testing
   selector:
     matchLabels:
       app: bcgossip
@@ -16,14 +15,8 @@ spec:
     spec:
       containers:
         - name: gossip-node
-          image: wwiras/gpbc10:v3  # Replace with your Docker image name
+          image: wwiras/gpbc4:v1  # Replace with your Docker image name
           ports:
             - containerPort: 5050
-          env:
-            - name: BANDWIDTH_LIMIT
-              value: $(SPEED)
-            - name: NODES
-              value: $(REPLICA_COUNT)
-
 
 
