@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package gossip;
+
+message GossipMessage {
+  string message = 1;
+  string sender_id = 2;
+  int64 timestamp = 3;
+}
+
+message Acknowledgment {
+  string details = 1;
+}
+
+// For latency measurement
+message PingRequest {}
+message PongResponse {
+  int64 timestamp = 1;
+}
+
+// For bandwidth measurement 
+message BandwidthRequest {
+  int32 payload_size = 1; // Size of the payload in bytes
+}
+message BandwidthResponse {
+  float bandwidth_mbps = 1;
+}
+
+service GossipService {
+    rpc SendMessage (GossipMessage) returns (Acknowledgment);
+    rpc Ping (PingRequest) returns (PongResponse);
+    rpc MeasureBandwidth (BandwidthRequest) returns (BandwidthResponse);
+}

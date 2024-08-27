@@ -1,0 +1,35 @@
+# cilium-policy-0-to-1.yaml
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: limit-bandwidth-0-to-1
+spec:
+  endpointSelector:
+    matchLabels:
+      app: bcgossip
+      statefulset-ordinal: "0"
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        app: bcgossip
+        statefulset-ordinal: "1"
+    bandwidth:
+      rate: 3M
+---
+# cilium-policy-1-to-2.yaml
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: limit-bandwidth-1-to-2
+spec:
+  endpointSelector:
+    matchLabels:
+      app: bcgossip
+      statefulset-ordinal: "1"
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        app: bcgossip
+        statefulset-ordinal: "2"
+    bandwidth:
+      rate: 10M
