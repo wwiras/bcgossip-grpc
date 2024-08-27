@@ -18,7 +18,10 @@ spec:
           image: wwiras/gpbc10:v1  # Make sure this image has iperf3 installed
           ports:
             - containerPort: 5050
-
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
 
 #apiVersion: apps/v1
 #kind: StatefulSet
