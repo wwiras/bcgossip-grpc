@@ -155,7 +155,7 @@ def apply_tc_rules(pod_name, pod_ips, speed):
 
         # Construct the combined tc commands as a single string
         tc_commands = f"tc qdisc add dev eth0 root handle 1: htb default 12; \
-                        tc class add dev eth0 parent 1: classid 1:1 htb rate {speed} ceil {speed}; \
+                        tc class add dev eth0 parent 1: classid 1:1 htb rate {speed}mbit ceil {speed}mbit; \
                         tc filter add dev eth0 parent 1: protocol ip prio 1 u32 match ip dst {neighbor_ip} flowid 1:1"
 
         try:
