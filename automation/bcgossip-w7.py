@@ -151,18 +151,19 @@ def apply_tc_rules(pod_name, pod_ips, speed):
     neighbor_pods = [ip for ip in pod_ips if ip != pod_name]
 
     for neighbor_ip in neighbor_pods:
-        # Construct tc commands as lists for better handling
+        print(f"Applying tc rules on {pod_name} for neighbor {neighbor_ip} with speed {speed}mbit...")
+
+        # Construct tc commands as lists
         tc_qdisc_cmd = ["tc", "qdisc", "add", "dev", "eth0", "root", "handle", "1:", "htb", "default", "12"]
         tc_class_cmd = ["tc", "class", "add", "dev", "eth0", "parent", "1:", "classid", "1:1", "htb", "rate", f"{speed}mbit", "ceil", f"{speed}mbit"]
         tc_filter_cmd = ["tc", "filter", "add", "dev", "eth0", "parent", "1:", "protocol", "ip", "prio", "1", "u32", "match", "ip", "dst", neighbor_ip, "flowid", "1:1"]
 
         try:
-            # Execute each tc command using kubectl exec
             subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "sh", "-c", " ".join(tc_qdisc_cmd)], check=True)
             subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "sh", "-c", " ".join(tc_class_cmd)], check=True)
             subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "sh", "-c", " ".join(tc_filter_cmd)], check=True)
 
-            print(f"Applied tc rules on {pod_name} for neighbor {neighbor_ip} with speed {speed}mbit")
+            print(f"Successfully applied tc rules on {pod_name} for neighbor {neighbor_ip}")
         except subprocess.CalledProcessError as e:
             print(f"Error applying tc rules on {pod_name}: {e.stderr}")
 
