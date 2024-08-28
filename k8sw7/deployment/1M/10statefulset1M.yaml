@@ -25,3 +25,6 @@ spec:
             capabilities:
               add:
                 - NET_ADMIN
+          env:
+            - name: BANDWIDTH_LIMIT  # Add environment variable for ingress bandwidth
+              value: "1M"  # Set the bandwidth limit using trickle

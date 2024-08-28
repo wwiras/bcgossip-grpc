@@ -8,7 +8,6 @@ import gossip_pb2_grpc
 import json
 import time
 import logging
-import subprocess
 
 # Import for gRPC reflection
 from grpc_reflection.v1alpha import reflection
@@ -31,6 +30,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # Find neighbors based on the topology (without measuring latency yet)
         self.neighbor_pod_names = self._find_neighbors(self.pod_name)
         print(f"{self.pod_name}({self.host}) neighbors: {self.neighbor_pod_names}", flush=True)
+        # os.environ['NEIGHBOR_POD_NAMES'] = self.neighbor_pod_names
 
         self.received_messages = set()
 
@@ -99,70 +99,38 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         return gossip_pb2.Acknowledgment(details=f"{self.pod_name}({self.host}) processed message: '{message}'")
 
     def gossip_message(self, message, sender_id, received_timestamp):
-        for neighbor_pod_name in self.neighbor_pod_names:
+        for neighbor_pod_name, bandwidth_mbps in self.neighbor_pod_names:
             if neighbor_pod_name != sender_id:
                 neighbor_ip = self.get_pod_ip(neighbor_pod_name)
                 target = f"{neighbor_ip}:5050"
 
-                # Get bandwidth for this specific connection from topology
-                bandwidth_mbps = next((link['bandwidth']
-                                       for link in self.topology['links']
-                                       if (link['source'] == self.pod_name and link['target'] == neighbor_pod_name) or
-                                       (link['target'] == self.pod_name and link['source'] == neighbor_pod_name)), None)
-
-                if bandwidth_mbps is None:
-                    print(f"No bandwidth information found for link to {neighbor_pod_name}. Using default bandwidth.",
-                          flush=True)
-                    bandwidth_mbps = 2  # Default bandwidth in Mbps
-
-                # Convert bandwidth from Mbps to Kbps for trickle
-                bandwidth_limit_kbps = int(bandwidth_mbps * 1000)
-
-                try:
-                    # Construct trickle command with bandwidth limit
-                    trickle_command = ["trickle", "-s", "-d", str(bandwidth_limit_kbps), "-u",
-                                       str(bandwidth_limit_kbps)]
-
-                    # Prepare the input data for grpcurl
-                    input_data = {
-                        "message": message,
-                        "sender_id": self.pod_name,
-                        "timestamp": received_timestamp,
-                        "bandwidth_mbps": bandwidth_mbps
-                    }
-
-                    # Construct the grpcurl command
-                    grpcurl_command = [
-                        "grpcurl",
-                        "--plaintext",
-                        "-d", json.dumps(input_data),
-                        target,
-                        "gossip.GossipService/SendMessage"
-                    ]
-
-                    # Combine trickle and grpcurl commands
-                    full_command = trickle_command + grpcurl_command
-
-                    # Execute the combined command and capture output
-                    result = subprocess.check_output(full_command)
-
-                    print(
-                        f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip}) with bandwidth limit {bandwidth_limit_kbps} Kbps",
-                        flush=True)
-
-                except subprocess.CalledProcessError as e:
-                    print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
+                with grpc.insecure_channel(target) as channel:
+                    try:
+                        stub = gossip_pb2_grpc.GossipServiceStub(channel)
+                        stub.SendMessage(gossip_pb2.GossipMessage(
+                            message=message,
+                            sender_id=self.pod_name,
+                            timestamp=received_timestamp,
+                            bandwidth=bandwidth_mbps
+                        ))
+                        print(
+                            f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip}) with bandwidth limit {bandwidth_mbps} Mbps",
+                            flush=True)
+                    except grpc.RpcError as e:
+                        print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
 
     def _find_neighbors(self, node_id):
-        """Identifies the neighbors of the given node based on the topology."""
+        """
+        Identifies the neighbors of the given node based on the topology,
+        including the bandwidth of the connection.
+        """
         neighbors = []
         for link in self.topology['links']:
             if link['source'] == node_id:
-                neighbors.append(link['target'])
+                neighbors.append((link['target'], link['bandwidth']))
             elif link['target'] == node_id:
-                neighbors.append(link['source'])
+                neighbors.append((link['source'], link['bandwidth']))
         return neighbors
-
 
     def _log_event(self, message, sender_id, received_timestamp,
                    propagation_time, event_type, bandwidth_mbps, log_message):
@@ -211,6 +179,3 @@ def run_server():
 
 if __name__ == '__main__':
     run_server()
-
-## Test sending grpcurl with trickle
-#trickle -s -d 125 -u 125 grpcurl -plaintext -proto gossip.proto -d '{"message": "testgrpcurldirect", "sender_id": "gossip-statefulset-0", "timestamp": 1234567890}' 10.44.1.17:5050 gossip.GossipService/SendMessage
