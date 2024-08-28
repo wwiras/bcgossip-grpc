@@ -151,18 +151,16 @@ def apply_tc_rules(pod_name, pod_ips, speed):
     neighbor_pods = [ip for ip in pod_ips if ip != pod_name]
 
     for neighbor_ip in neighbor_pods:
-        print(f"Applying tc rules on {pod_name} for neighbor {neighbor_ip} with speed {speed}mbit...")
+        print(f"Applying tc rules on {pod_name} for neighbor {neighbor_ip} with speed {speed}...")
 
-        # Construct tc commands as lists
-        tc_qdisc_cmd = ["tc", "qdisc", "add", "dev", "eth0", "root", "handle", "1:", "htb", "default", "12"]
-        tc_class_cmd = ["tc", "class", "add", "dev", "eth0", "parent", "1:", "classid", "1:1", "htb", "rate", f"{speed}mbit", "ceil", f"{speed}mbit"]
-        tc_filter_cmd = ["tc", "filter", "add", "dev", "eth0", "parent", "1:", "protocol", "ip", "prio", "1", "u32", "match", "ip", "dst", neighbor_ip, "flowid", "1:1"]
+        # Construct the combined tc commands as a single string
+        tc_commands = f"tc qdisc add dev eth0 root handle 1: htb default 12; \
+                        tc class add dev eth0 parent 1: classid 1:1 htb rate {speed} ceil {speed}; \
+                        tc filter add dev eth0 parent 1: protocol ip prio 1 u32 match ip dst {neighbor_ip} flowid 1:1"
 
         try:
-            # Execute each tc command using kubectl exec, passing commands as separate arguments
-            subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "sh", "-c", "sudo"] + tc_qdisc_cmd, check=True)
-            subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "sh", "-c", "sudo"] + tc_class_cmd, check=True)
-            subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "sh", "-c", "sudo"] + tc_filter_cmd, check=True)
+            # Execute the combined tc commands using kubectl exec
+            subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "sh", "-c", tc_commands], check=True)
 
             print(f"Successfully applied tc rules on {pod_name} for neighbor {neighbor_ip}")
         except subprocess.CalledProcessError as e:
