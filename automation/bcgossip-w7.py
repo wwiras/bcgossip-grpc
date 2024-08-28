@@ -112,7 +112,7 @@ def wait_for_pods_to_be_ready(namespace='default', expected_pods=0, timeout=300)
                 # 2. Iterate through pods and apply tc rules
                 for i in range(expected_pods):
                     pod_name = f"gossip-statefulset-{i}"
-                    apply_tc_rules(pod_name, pod_ips, i)
+                    apply_tc_rules(pod_name, pod_ips, 1)
 
                 # --------------------------
 
