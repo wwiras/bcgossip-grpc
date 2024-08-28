@@ -159,9 +159,10 @@ def apply_tc_rules(pod_name, pod_ips, speed):
         tc_filter_cmd = ["tc", "filter", "add", "dev", "eth0", "parent", "1:", "protocol", "ip", "prio", "1", "u32", "match", "ip", "dst", neighbor_ip, "flowid", "1:1"]
 
         try:
-            subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "sh", "-c", " ".join(tc_qdisc_cmd)], check=True)
-            subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "sh", "-c", " ".join(tc_class_cmd)], check=True)
-            subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "sh", "-c", " ".join(tc_filter_cmd)], check=True)
+            # Execute each tc command using kubectl exec, passing commands as separate arguments
+            subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "sh", "-c", "sudo"] + tc_qdisc_cmd, check=True)
+            subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "sh", "-c", "sudo"] + tc_class_cmd, check=True)
+            subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "sh", "-c", "sudo"] + tc_filter_cmd, check=True)
 
             print(f"Successfully applied tc rules on {pod_name} for neighbor {neighbor_ip}")
         except subprocess.CalledProcessError as e:
