@@ -151,7 +151,7 @@ def apply_tc_rules(pod_name, pod_ips, speed):
     neighbor_pods = [ip for ip in pod_ips if ip != pod_name]
 
     for neighbor_ip in neighbor_pods:
-        print(f"Applying tc rules on {pod_name} for neighbor {neighbor_ip} with speed {speed}...")
+        print(f"Applying tc rules on {pod_name} for neighbor {neighbor_ip} with speed {speed}Mbps...")
 
         # Construct the combined tc commands as a single string
         tc_commands = f"tc qdisc add dev eth0 root handle 1: htb default 12; \
