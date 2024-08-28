@@ -148,17 +148,67 @@ def apply_tc_rules(pod_name, pod_ips, speed):
         speed: The desired bandwidth limit (e.g., '5M', '10M').
     """
 
-    # Logic to determine neighboring pods (adjust as needed)
-    # In this simplified version, we assume all pods are neighbors
     neighbor_pods = [ip for ip in pod_ips if ip != pod_name]
 
     for neighbor_ip in neighbor_pods:
-        tc_command = f"tc qdisc add dev eth0 root handle 1: htb default 12; \
-                       tc class add dev eth0 parent 1: classid 1:1 htb rate {speed} ceil {speed}; \
-                       tc filter add dev eth0 parent 1: protocol ip prio 1 u32 match ip dst {neighbor_ip} flowid 1:1"
+        # Create root qdisc
+        tc_command = [
+            "tc",
+            "qdisc",
+            "add",
+            "dev",
+            "eth0",
+            "root",
+            "handle",
+            "1:",
+            "htb",
+            "default",
+            "12",
+        ]
+        subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "bash", "-c", "sudo"] + tc_command, check=True)
 
+        # Add class
+        tc_command = [
+            "tc",
+            "class",
+            "add",
+            "dev",
+            "eth0",
+            "parent",
+            "1:",
+            "classid",
+            "1:1",
+            "htb",
+            "rate",
+            speed,
+            "ceil",
+            speed,
+        ]
+        subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "bash", "-c", "sudo"] + tc_command, check=True)
+
+        # Add filter
+        tc_command = [
+            "tc",
+            "filter",
+            "add",
+            "dev",
+            "eth0",
+            "parent",
+            "1:",
+            "protocol",
+            "ip",
+            "prio",
+            "1",
+            "u32",
+            "match",
+            "ip",
+            "dst",
+            neighbor_ip,
+            "flowid",
+            "1:1",
+        ]
         try:
-            subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "bash", "-c", f"sudo {tc_command}"], check=True)
+            subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "bash", "-c", "sudo"] + tc_command, check=True)
             print(f"Applied tc rules on {pod_name} for neighbor {neighbor_ip} with speed {speed}")
         except subprocess.CalledProcessError as e:
             print(f"Error applying tc rules on {pod_name}: {e.stderr}")
