@@ -165,7 +165,8 @@ def apply_tc_rules(pod_name, pod_ips, speed):
             "default",
             "12",
         ]
-        subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "bash", "-c", "sudo"] + tc_command, check=True)
+        # subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "bash", "-c", "sudo"] + tc_command, check=True)
+        subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "bash", "-c"] + tc_command, check=True)
 
         # Add class
         tc_command = [
@@ -184,7 +185,8 @@ def apply_tc_rules(pod_name, pod_ips, speed):
             "ceil",
             speed,
         ]
-        subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "bash", "-c", "sudo"] + tc_command, check=True)
+        # subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "bash", "-c", "sudo"] + tc_command, check=True)
+        subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "bash", "-c"] + tc_command, check=True)
 
         # Add filter
         tc_command = [
@@ -208,7 +210,8 @@ def apply_tc_rules(pod_name, pod_ips, speed):
             "1:1",
         ]
         try:
-            subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "bash", "-c", "sudo"] + tc_command, check=True)
+            # subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "bash", "-c", "sudo"] + tc_command, check=True)
+            subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "bash", "-c"] + tc_command, check=True)
             print(f"Applied tc rules on {pod_name} for neighbor {neighbor_ip} with speed {speed}")
         except subprocess.CalledProcessError as e:
             print(f"Error applying tc rules on {pod_name}: {e.stderr}")
