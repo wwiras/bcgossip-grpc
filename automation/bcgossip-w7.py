@@ -248,8 +248,8 @@ def main(num_tests, deployment_folder):
         if match:
             num_nodes = int(match.group(1))
             print(f"Detected {num_nodes} nodes from the statefulset: {deployment_file}.", flush=True)
-            # if num_nodes!=10:
-            #     continue
+            if num_nodes!=10:
+                continue
         else:
             print(f"Error: Could not extract num_nodes from {deployment_file} filename.", flush=True)
             return False
