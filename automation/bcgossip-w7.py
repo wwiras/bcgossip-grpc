@@ -300,7 +300,7 @@ def main(num_tests, deployment_folder):
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
-        print("Usage: python bcgossip-w5.py <number_of_tests> <deployment_folder>")
+        print("Usage: python bcgossip-w7.py <number_of_tests> <deployment_folder>")
         sys.exit(1)
     num_tests = int(sys.argv[1])
     deployment_folder = sys.argv[2]
