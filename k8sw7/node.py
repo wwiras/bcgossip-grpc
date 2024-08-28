@@ -10,6 +10,9 @@ import time
 import logging
 import subprocess
 
+# Import for gRPC reflection
+from grpc_reflection.v1alpha import reflection
+
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -23,7 +26,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.service_name = service_name
 
         # Load the topology from the "topology" folder
-        self.topology = self.get_topology(10, "topology")
+        self.topology = self.get_topology(10, "topology/" + os.environ['BANDWIDTH_LIMIT'])
 
         # Find neighbors based on the topology (without measuring latency yet)
         self.neighbor_pod_names = self._find_neighbors(self.pod_name)
@@ -40,14 +43,6 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         and finds the corresponding topology file in the 'topology' subfolder
         within the current working directory.
         """
-
-        # Get the StatefulSet replica count using kubectl
-        # command = f"kubectl get statefulset {statefulset_name} -n {namespace} -o jsonpath='{{.spec.replicas}}'"
-        #         # try:
-        #         #     total_replicas = int(subprocess.check_output(command, shell=True).decode('utf-8').strip())
-        #         # except subprocess.CalledProcessError as e:
-        #         #     raise RuntimeError(f"Error getting StatefulSet replicas using kubectl: {e}")
-
 
         # Get the current working directory
         current_directory = os.getcwd()
@@ -77,6 +72,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
     def SendMessage(self, request, context):
         message = request.message
         sender_id = request.sender_id
+        bandwidth_mbps = request.bandwidth_mbps
         received_timestamp = time.time_ns()
 
         # Check for message initiation and set the initial timestamp
@@ -84,19 +80,19 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             self.gossip_initiated = True
             self.initial_gossip_timestamp = received_timestamp
             log_message = f"Gossip initiated by {self.pod_name}({self.host}) at {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(received_timestamp / 1e9))}"
-            self._log_event(message, sender_id, received_timestamp, None, 'initiate', log_message)
+            self._log_event(message, sender_id, received_timestamp, None, 'initiate',bandwidth_mbps, log_message)
 
         # Check for duplicate messages
         elif message in self.received_messages:
             log_message = f"{self.pod_name}({self.host}) ignoring duplicate message: '{message}' from {sender_id}"
-            self._log_event(message, sender_id, received_timestamp, None, 'duplicate', log_message)
+            self._log_event(message, sender_id, received_timestamp, None, 'duplicate',bandwidth_mbps, log_message)
             return gossip_pb2.Acknowledgment(details=f"Duplicate message ignored by {self.pod_name}({self.host})")
 
         else:
             self.received_messages.add(message)
             propagation_time = (received_timestamp - request.timestamp) / 1e6
             log_message = f"{self.pod_name}({self.host}) received: '{message}' from {sender_id} in {propagation_time:.2f} ms"
-            self._log_event(message, sender_id, received_timestamp, propagation_time, 'received', log_message)
+            self._log_event(message, sender_id, received_timestamp, propagation_time, 'received', bandwidth_mbps, log_message)
 
         # Gossip to neighbors (only if the message is new)
         self.gossip_message(message, sender_id, received_timestamp)
@@ -107,19 +103,55 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             if neighbor_pod_name != sender_id:
                 neighbor_ip = self.get_pod_ip(neighbor_pod_name)
                 target = f"{neighbor_ip}:5050"
-                with grpc.insecure_channel(target) as channel:
-                    try:
-                        stub = gossip_pb2_grpc.GossipServiceStub(channel)
-                        stub.SendMessage(gossip_pb2.GossipMessage(
-                            message=message,
-                            sender_id=self.pod_name,
-                            timestamp=received_timestamp
-                        ))
-                        print(
-                            f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip})",
-                            flush=True)
-                    except grpc.RpcError as e:
-                        print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
+
+                # Get bandwidth for this specific connection from topology
+                bandwidth_mbps = next((link['bandwidth']
+                                       for link in self.topology['links']
+                                       if (link['source'] == self.pod_name and link['target'] == neighbor_pod_name) or
+                                       (link['target'] == self.pod_name and link['source'] == neighbor_pod_name)), None)
+
+                if bandwidth_mbps is None:
+                    print(f"No bandwidth information found for link to {neighbor_pod_name}. Using default bandwidth.",
+                          flush=True)
+                    bandwidth_mbps = 2  # Default bandwidth in Mbps
+
+                # Convert bandwidth from Mbps to Kbps for trickle
+                bandwidth_limit_kbps = int(bandwidth_mbps * 1000)
+
+                try:
+                    # Construct trickle command with bandwidth limit
+                    trickle_command = ["trickle", "-s", "-d", str(bandwidth_limit_kbps), "-u",
+                                       str(bandwidth_limit_kbps)]
+
+                    # Prepare the input data for grpcurl
+                    input_data = {
+                        "message": message,
+                        "sender_id": self.pod_name,
+                        "timestamp": received_timestamp,
+                        "bandwidth_mbps": bandwidth_mbps
+                    }
+
+                    # Construct the grpcurl command
+                    grpcurl_command = [
+                        "grpcurl",
+                        "--plaintext",
+                        "-d", json.dumps(input_data),
+                        target,
+                        "gossip.GossipService/SendMessage"
+                    ]
+
+                    # Combine trickle and grpcurl commands
+                    full_command = trickle_command + grpcurl_command
+
+                    # Execute the combined command and capture output
+                    result = subprocess.check_output(full_command)
+
+                    print(
+                        f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip}) with bandwidth limit {bandwidth_limit_kbps} Kbps",
+                        flush=True)
+
+                except subprocess.CalledProcessError as e:
+                    print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
 
     def _find_neighbors(self, node_id):
         """Identifies the neighbors of the given node based on the topology."""
@@ -132,7 +164,8 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         return neighbors
 
 
-    def _log_event(self, message, sender_id, received_timestamp, propagation_time, event_type, log_message):
+    def _log_event(self, message, sender_id, received_timestamp,
+                   propagation_time, event_type, bandwidth_mbps, log_message):
         """Logs the gossip event as structured JSON data."""
         event_data = {
             'message': message,
@@ -140,6 +173,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             'receiver_id': self.pod_name,
             'received_timestamp': received_timestamp,
             'propagation_time': propagation_time,
+            'bandwidth_mbps': bandwidth_mbps,
             'event_type': event_type,
             'detail': log_message
         }
@@ -154,7 +188,16 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
     def start_server(self):
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         gossip_pb2_grpc.add_GossipServiceServicer_to_server(self, server)
+
+        # Enable gRPC reflection on the server
+        SERVICE_NAMES = (
+            gossip_pb2.DESCRIPTOR.services_by_name['GossipService'].full_name,
+            reflection.SERVICE_NAME,
+        )
+        reflection.enable_server_reflection(SERVICE_NAMES, server)
+
         server.add_insecure_port(f'[::]:{self.port}')
+
         print(f"{self.pod_name}({self.host}) listening on port {self.port}", flush=True)
         server.start()
         server.wait_for_termination()
@@ -168,3 +211,6 @@ def run_server():
 
 if __name__ == '__main__':
     run_server()
+
+## Test sending grpcurl with trickle
+#trickle -s -d 125 -u 125 grpcurl -plaintext -proto gossip.proto -d '{"message": "testgrpcurldirect", "sender_id": "gossip-statefulset-0", "timestamp": 1234567890}' 10.44.1.17:5050 gossip.GossipService/SendMessage
