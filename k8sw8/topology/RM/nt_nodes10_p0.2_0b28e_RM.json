@@ -1,0 +1,104 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "id": "gossip-statefulset-0"
+    },
+    {
+      "id": "gossip-statefulset-1"
+    },
+    {
+      "id": "gossip-statefulset-2"
+    },
+    {
+      "id": "gossip-statefulset-3"
+    },
+    {
+      "id": "gossip-statefulset-4"
+    },
+    {
+      "id": "gossip-statefulset-5"
+    },
+    {
+      "id": "gossip-statefulset-6"
+    },
+    {
+      "id": "gossip-statefulset-7"
+    },
+    {
+      "id": "gossip-statefulset-8"
+    },
+    {
+      "id": "gossip-statefulset-9"
+    }
+  ],
+  "links": [
+    {
+      "bandwidth": 1,
+      "source": "gossip-statefulset-0",
+      "target": "gossip-statefulset-2"
+    },
+    {
+      "bandwidth": 10,
+      "source": "gossip-statefulset-0",
+      "target": "gossip-statefulset-3"
+    },
+    {
+      "bandwidth": 3,
+      "source": "gossip-statefulset-0",
+      "target": "gossip-statefulset-6"
+    },
+    {
+      "bandwidth": 1,
+      "source": "gossip-statefulset-0",
+      "target": "gossip-statefulset-7"
+    },
+    {
+      "bandwidth": 3,
+      "source": "gossip-statefulset-0",
+      "target": "gossip-statefulset-8"
+    },
+    {
+      "bandwidth": 3,
+      "source": "gossip-statefulset-1",
+      "target": "gossip-statefulset-6"
+    },
+    {
+      "bandwidth": 1,
+      "source": "gossip-statefulset-2",
+      "target": "gossip-statefulset-7"
+    },
+    {
+      "bandwidth": 1,
+      "source": "gossip-statefulset-3",
+      "target": "gossip-statefulset-6"
+    },
+    {
+      "bandwidth": 10,
+      "source": "gossip-statefulset-3",
+      "target": "gossip-statefulset-8"
+    },
+    {
+      "bandwidth": 10,
+      "source": "gossip-statefulset-4",
+      "target": "gossip-statefulset-7"
+    },
+    {
+      "bandwidth": 10,
+      "source": "gossip-statefulset-5",
+      "target": "gossip-statefulset-8"
+    },
+    {
+      "bandwidth": 3,
+      "source": "gossip-statefulset-6",
+      "target": "gossip-statefulset-7"
+    },
+    {
+      "bandwidth": 5,
+      "source": "gossip-statefulset-6",
+      "target": "gossip-statefulset-9"
+    }
+  ]
+}

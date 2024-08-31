@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gossip-statefulset
+spec:
+  serviceName: "bcgossip-svc"
+  replicas: 10  # Start with 2 replicas for testing
+  selector:
+    matchLabels:
+      app: bcgossip
+  template:
+    metadata:
+      labels:
+        app: bcgossip
+      annotations:
+        kubernetes.io/ingress-bandwidth: 5M    # Limit the inbound bandwidth of the pod.
+        kubernetes.io/egress-bandwidth: 5M
+    spec:
+      containers:
+        - name: gossip-node
+          image: wwiras/gpbc10:v1  # Replace with your Docker image name
+          ports:
+            - containerPort: 5050
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+          env:
+            - name: BANDWIDTH_LIMIT  # Add environment variable for ingress bandwidth
+              value: "5M"  # Set the bandwidth limit using trickle
