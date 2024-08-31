@@ -95,7 +95,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             self._log_event(message, sender_id, received_timestamp, propagation_time, 'received', bandwidth_mbps, log_message)
 
         # Gossip to neighbors (only if the message is new)
-        self.gossip_message(message, sender_id, received_timestamp)
+        self.gossip_message(message, self.pod_name, received_timestamp, bandwidth_mbps)
         return gossip_pb2.Acknowledgment(details=f"{self.pod_name}({self.host}) processed message: '{message}'")
 
     def gossip_message(self, message, sender_id, received_timestamp):
