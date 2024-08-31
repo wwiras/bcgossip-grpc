@@ -111,7 +111,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                             message=message,
                             sender_id=self.pod_name,
                             timestamp=received_timestamp,
-                            bandwidth=bandwidth_mbps
+                            bandwidth_mbps=bandwidth_mbps
                         ))
                         print(
                             f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip}) with bandwidth limit {bandwidth_mbps} Mbps",
