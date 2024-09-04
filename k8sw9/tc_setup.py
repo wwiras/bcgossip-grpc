@@ -2,7 +2,6 @@ import json
 import os
 import subprocess
 import sys
-
 from kubernetes import client, config
 
 
@@ -25,30 +24,12 @@ def get_topology(total_replicas, topology_folder):
     else:
         raise FileNotFoundError(f"No topology file found for {total_replicas} nodes in {topology_folder}.")
 
-
 def get_pod_ip(pod_name, namespace="default"):
-    """
-    Retrieves the IP address of the specified pod using kubectl.
-    """
-    result = subprocess.run(
-        [
-            "kubectl",
-            "get",
-            "pods",
-            "-n",
-            namespace,
-            pod_name,
-            "-o",
-            "jsonpath='{.status.podIP}'",
-        ],
-        capture_output=True,
-        text=True,
-    )
-    if result.returncode == 0:
-        return result.stdout.strip("'")
-    else:
-        raise RuntimeError(f"Failed to get IP for pod {pod_name}: {result.stderr}")
-
+    """Fetches the IP address of a pod in the specified namespace."""
+    config.load_incluster_config()
+    v1 = client.CoreV1Api()
+    pod = v1.read_namespaced_pod(name=pod_name, namespace=namespace)
+    return pod.status.pod_ip
 
 def _find_neighbors(node_id, topology):
     """
