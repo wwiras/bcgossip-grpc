@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gossip-statefulset
+spec:
+  serviceName: "bcgossip-svc"
+  replicas: 10  # Start with 2 replicas for testing
+  selector:
+    matchLabels:
+      app: bcgossip
+  template:
+    metadata:
+      labels:
+        app: bcgossip
+    spec:
+      containers:
+        - name: gossip-node
+          image: wwiras/k8sw9_10:v1  # Replace with your Docker image name
+          ports:
+            - containerPort: 5050
+          securityContext:
+            capabilities:
+              add:
+                - NET_ADMIN
+          env:
+            - name: BANDWIDTH_LIMIT  # Add environment variable for ingress bandwidth
+              value: "1M"  # Set the bandwidth limit using trickle
