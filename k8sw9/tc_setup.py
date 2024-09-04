@@ -74,7 +74,7 @@ def apply_tc_rules(interface="eth0"):
         raise ValueError("Total number of replicas not provided as an argument")
     total_replicas = int(sys.argv[1])
 
-    topology_folder = os.environ['BANDWIDTH_LIMIT']
+    topology_folder = 'topology/' + os.environ['BANDWIDTH_LIMIT']
     topology = get_topology(total_replicas, topology_folder)
 
     neighbors = _find_neighbors(pod_name, topology)
