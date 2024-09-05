@@ -325,10 +325,9 @@ def main(num_tests, deployment_folder):
             print(f"statefulsets={statefulsets}")
 
             # --- Apply tc rules directly ---
-            for statefulset in statefulsets:
-                print(f"statefulset={statefulset}")
-                # print(f"statefulset_podname={statefulset},statefulset_podip={statefulset_podip}")
-                run_command(['kubectl', 'exec', '-it', statefulset_podname + '-- python3 tc_setup.py ' + str(num_nodes)])
+            for statefulset_name, statefulset_ip in statefulsets.items():
+                print(f"statefulset_name={statefulset_name},statefulset_ip={statefulset_ip}")
+                run_command(['kubectl', 'exec', '-it', statefulset_name + '-- python3 tc_setup.py ' + str(num_nodes)])
 
             # --- Original gossip initiation logic ---
             unique_id = str(uuid.uuid4())[:5]  # Generate a unique ID for the entire test
