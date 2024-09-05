@@ -250,7 +250,7 @@ def get_pod_names_and_ips(namespace="default", num_nodes=0):
 
             if num_nodes > 0 and len(pod_info) >= num_nodes:
                 break
-        print(pod_info)
+        # print(pod_info)
         return pod_info
 
     except subprocess.CalledProcessError as e:
@@ -325,8 +325,9 @@ def main(num_tests, deployment_folder):
             print(f"statefulsets={statefulsets}")
 
             # --- Apply tc rules directly ---
-            for statefulset_podname, statefulset_podip  in statefulsets:
-                print(f"statefulset_podname={statefulset_podname},statefulset_podip={statefulset_podip}")
+            for statefulset in statefulsets:
+                print(f"statefulset={statefulset}")
+                # print(f"statefulset_podname={statefulset},statefulset_podip={statefulset_podip}")
                 run_command(['kubectl', 'exec', '-it', statefulset_podname + '-- python3 tc_setup.py ' + str(num_nodes)])
 
             # --- Original gossip initiation logic ---
