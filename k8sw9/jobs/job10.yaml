@@ -10,7 +10,7 @@ spec:
     spec:
       containers:
       - name: tc-setup
-        image: wwiras/k8sw9_10:v5  # Use the same image as your StatefulSet pods
+        image: wwiras/k8sw9_10:v6  # Use the same image as your StatefulSet pods
         command: ["/bin/bash", "-c"]
         args:
           - |

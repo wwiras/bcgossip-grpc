@@ -96,122 +96,52 @@ def wait_for_pods_to_be_ready(namespace='default', expected_pods=0, timeout=300)
     print(f"Timeout waiting for all {expected_pods} pods to be running in namespace {namespace}.", flush=True)
     return False
 
-# def apply_tc_rules(pod_name, pod_ips, speed):
-#     """
-#     Applies tc rules to limit bandwidth between neighboring pods.
-#
-#     Args:
-#         pod_name: The name of the pod.
-#         pod_ips: A list of IP addresses of all pods in the StatefulSet.
-#         speed: The desired bandwidth limit (e.g., '5mbit').
-#     """
-#
-#     neighbor_pods = [ip for ip in pod_ips if ip != pod_name]
-#
-#     for neighbor_ip in neighbor_pods:
-#         print(f"Applying tc rules on {pod_name} for neighbor {neighbor_ip} with speed {speed}Mbps...")
-#
-#         # Construct the combined tc commands as a single string
-#         tc_commands = f"tc qdisc add dev eth0 root handle 1: htb default 12; \
-#                         tc class add dev eth0 parent 1: classid 1:1 htb rate {speed}mbit ceil {speed}mbit; \
-#                         tc filter add dev eth0 parent 1: protocol ip prio 1 u32 match ip dst {neighbor_ip} flowid 1:1"
-#
-#         try:
-#             # Execute the combined tc commands using kubectl exec
-#             subprocess.run(["kubectl", "exec", "-it", pod_name, "--", "sh", "-c", tc_commands], check=True)
-#
-#             print(f"Successfully applied tc rules on {pod_name} for neighbor {neighbor_ip}")
-#         except subprocess.CalledProcessError as e:
-#             print(f"Error applying tc rules on {pod_name}: {e.stderr}")
 
-# def wait_for_job_completion(job_name, namespace="default", timeout_seconds=300):
-#     """
-#     Waits for the specified Job to complete successfully.
-#     """
-#     config.load_incluster_config()
-#     batch_v1 = client.BatchV1Api()
-#
-#     start_time = time.time()
-#     while True:
-#         job = batch_v1.read_namespaced_job(job_name, namespace)
-#         if job.status.succeeded == 1:
-#             print(f"Job '{job_name}' completed successfully!")
-#             break
-#         elif job.status.failed == 1:
-#             raise RuntimeError(f"Job '{job_name}' failed!")
-#
-#         elapsed_time = time.time() - start_time
-#         if elapsed_time > timeout_seconds:
-#             raise TimeoutError(f"Timeout waiting for job '{job_name}' to complete")
-#
-#         print(f"Waiting for job '{job_name}' to complete...")
-#         time.sleep(5)  # Check every 5 seconds
-
-def wait_for_job_completion(job_name, namespace="default", timeout_seconds=300):
+def apply_tc_rules(pod_name, pod_ips, topology, interface="eth0"):
     """
-    Waits for the specified Job to complete successfully using kubectl.
+    Applies tc rules to limit bandwidth between neighboring pods based on topology data.
+
+    Args:
+        pod_name: The name of the pod.
+        pod_ips: A list of IP addresses of all pods in the StatefulSet.
+        topology: The network topology data (assuming it's a dictionary loaded from JSON).
+        interface: The network interface to apply tc rules to (default: "eth0").
     """
 
-    start_time = time.time()
-    while True:
-        status = get_job_status(job_name, namespace)
-        if status == "Complete":
-            print(f"Job '{job_name}' completed successfully!")
-            break
-        elif status == "Failed":
-            raise RuntimeError(f"Job '{job_name}' failed!")
+    neighbor_pods = [ip for ip in pod_ips if ip != get_pod_ip(pod_name)]
 
-        elapsed_time = time.time() - start_time
-        if elapsed_time > timeout_seconds:
-            raise TimeoutError(f"Timeout waiting for job '{job_name}' to complete")
+    for neighbor_ip in neighbor_pods:
+        # Get bandwidth limit from topology (adjust based on your topology structure)
+        bandwidth_mbps = next(
+            (link["bandwidth"] for link in topology["links"]
+             if (link["source"] == pod_name and link["target"] == neighbor_pod_name) or
+                (link["target"] == pod_name and link["source"] == neighbor_pod_name)),
+            None  # Default if no matching link is found
+        )
 
-        print(f"Waiting for job '{job_name}' to complete...")
-        time.sleep(5)  # Check every 5 seconds
+        if bandwidth_mbps is None:
+            print(f"Warning: No bandwidth limit found in topology for connection {pod_name} to {neighbor_pod_name}. Skipping tc rule application.")
+            continue
 
-def get_job_status(job_name, namespace="default"):
-    """
-    Gets the status of the specified Kubernetes Job using kubectl.
-    """
+        print(f"Applying tc rules on {pod_name} for neighbor {neighbor_ip} with speed {bandwidth_mbps}Mbps...")
 
-    command = [
-        "kubectl",
-        "get",
-        "job",
-        job_name,
-        "-n",
-        namespace,
-        "-o",
-        "jsonpath='{.status.conditions[?(@.type==\"Complete\")].status}'",
-    ]
+        # Construct tc commands as a list
+        tc_commands = [
+            "tc", "qdisc", "add", "dev", interface, "root", "handle", "1:", "htb", "default", "12",
+            "tc", "class", "add", "dev", interface, "parent", "1:", "classid", "1:1", "htb",
+                "rate", f"{bandwidth_mbps}mbit", "ceil", f"{bandwidth_mbps}mbit",
+            "tc", "filter", "add", "dev", interface, "parent", "1:", "protocol", "ip", "prio", "1", "u32",
+                "match", "ip", "dst", neighbor_ip, "flowid", "1:1"
+        ]
 
-    try:
-        result = subprocess.run(command, check=True, capture_output=True, text=True)
-        status = result.stdout.strip("'")
-
-        if status == "True":
-            return "Complete"
-        else:
-            # Check if the job has failed
-            command = [
-                "kubectl",
-                "get",
-                "job",
-                job_name,
-                "-n",
-                namespace,
-                "-o",
-                "jsonpath='{.status.conditions[?(@.type==\"Failed\")].status}'",
-            ]
-            result = subprocess.run(command, check=True, capture_output=True, text=True)
-            status = result.stdout.strip("'")
-            if status == "True":
-                return "Failed"
+        try:
+            result = subprocess.run(tc_commands, check=True, capture_output=True, text=True)
+            if result.returncode == 0:
+                print(f"Successfully applied tc rules on {pod_name} for neighbor {neighbor_ip}")
             else:
-                return "Active"  # Job is still running
-
-    except subprocess.CalledProcessError as e:
-        print(f"Error getting Job status: {e.stderr}", flush=True)
-        return None
+                print(f"Error applying tc rules on {pod_name}: {result.stderr}")
+        except subprocess.CalledProcessError as e:
+            print(f"Error applying tc rules on {pod_name}: {e.stderr}")
 
 def run_command(command, full_path=None):
     """
@@ -255,6 +185,68 @@ def run_command(command, full_path=None):
             print(f"An unexpected error occurred while executing the command.", flush=True)
         traceback.print_exc()
         sys.exit(1)
+
+def get_topology(self, total_replicas, topology_folder):
+    """
+    Retrieves the number of replicas for the specified StatefulSet using kubectl
+    and finds the corresponding topology file in the 'topology' subfolder
+    within the current working directory.
+    """
+
+    # Get the current working directory
+    current_directory = os.getcwd()
+
+    # Construct the full path to the topology folder
+    topology_folder = os.path.join(current_directory, topology_folder)
+
+    # Find the corresponding topology file
+    topology_file = None
+    for topology_filename in os.listdir(topology_folder):
+        if topology_filename.startswith(f'nt_nodes{total_replicas}_'):
+            topology_file = topology_filename
+            break
+
+    if topology_file:
+        with open(os.path.join(topology_folder, topology_file), 'r') as f:
+            return json.load(f)
+    else:
+        raise FileNotFoundError(f"No topology file found for {total_replicas} nodes.")
+
+def get_pod_names_and_ips(namespace="default"):
+    """
+    Retrieves the names and IP addresses of pods in the specified namespace using kubectl.
+
+    Args:
+        namespace: The namespace where the pods are located (default: "default").
+
+    Returns:
+        A dictionary where keys are pod names and values are their corresponding IP addresses.
+        An empty dictionary if no pods are found or an error occurs.
+    """
+    command = [
+        "kubectl",
+        "get",
+        "pods",
+        "-n",
+        namespace,
+        "-o",
+        "jsonpath='{range .items[*]}{@.metadata.name}{\" \}{@.status.podIP}{\"\\n'}{end}'",
+    ]
+
+    try:
+        result = subprocess.run(command, check=True, capture_output=True, text=True)
+        output = result.stdout.strip()
+
+        pod_info = {}
+        for line in output.splitlines():
+            pod_name, pod_ip = line.split()
+            pod_info[pod_name] = pod_ip
+
+        return pod_info
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error getting pod names and IPs: {e.stderr}", flush=True)
+        return {}
 
 def main(num_tests, deployment_folder):
     # base directory of our main gossip folder path
@@ -319,12 +311,12 @@ def main(num_tests, deployment_folder):
         # Ensure pods are ready before proceeding
         if wait_for_pods_to_be_ready(namespace='default', expected_pods=num_nodes, timeout=300):
 
-            # Apply Job to set up tc rules
-            job_yaml_file = os.path.join(root_folder, 'jobs/job' + str(num_nodes) + '.yaml')  # Assuming your job yaml is in the root folder
-            run_command(['kubectl', 'apply', '-f', job_yaml_file], job_yaml_file)
+            # Get statefulset pod names and ips
+            statefulsets = get_pod_names_and_ips(namespace="default")
 
-            # Wait for the Job to complete
-            wait_for_job_completion("apply-tc-rules-job")
+            # --- Apply tc rules directly ---
+            for statefulset_podname, statefulset_podip  in statefulsets:
+                run_command(['kubectl', 'exec', '-it', statefulset_podname + 'python3 tc_setup.py ' + str(num_nodes)])
 
             # --- Original gossip initiation logic ---
             unique_id = str(uuid.uuid4())[:5]  # Generate a unique ID for the entire test
