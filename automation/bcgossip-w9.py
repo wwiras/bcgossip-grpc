@@ -236,16 +236,16 @@ def get_pod_names_and_ips(namespace,num_nodes):
     try:
         result = subprocess.run(command, check=True, capture_output=True, text=True)
         output = result.stdout.strip()
-        print(output)
+        # print(output)
 
         pod_info = {}
         for line in output.splitlines():
-            print(line)
-            print(len(pod_info))
+            # print(line)
+            # print(len(pod_info))
             if len(pod_info)<num_nodes:
                 print(line.split())
-            pod_name, pod_ip = line.split()
-            pod_info[pod_name] = pod_ip
+                pod_name, pod_ip = line.split()
+                pod_info[pod_name] = pod_ip
 
         return pod_info
 
