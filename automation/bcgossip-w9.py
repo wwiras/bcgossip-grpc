@@ -230,7 +230,7 @@ def get_pod_names_and_ips(namespace="default"):
         "-n",
         namespace,
         "-o",
-        "jsonpath='{range .items[*]}{@.metadata.name}{\" \}{@.status.podIP}{\"\\n'}{end}'",
+        "jsonpath='{range .items[*]}{@.metadata.name} {.status.podIP}{\"\\n\"}{end}'",
     ]
 
     try:
