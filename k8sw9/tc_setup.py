@@ -10,6 +10,8 @@ def get_topology(total_replicas, topology_folder):
     Retrieves the topology for the specified number of replicas from the given topology folder.
     """
     current_directory = os.getcwd()
+    print(f"Current directory: {current_directory}")
+    print(f"topology_folder: {topology_folder}")
     topology_folder = os.path.join(current_directory, topology_folder)
 
     topology_file = None
