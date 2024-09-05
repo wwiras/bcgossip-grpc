@@ -323,6 +323,7 @@ def main(num_tests, deployment_folder):
 
             # --- Apply tc rules directly ---
             for statefulset_podname, statefulset_podip  in statefulsets:
+                print(f"statefulset_podname={statefulset_podname},statefulset_podip={statefulset_podip}")
                 run_command(['kubectl', 'exec', '-it', statefulset_podname + '-- python3 tc_setup.py ' + str(num_nodes)])
 
             # --- Original gossip initiation logic ---
