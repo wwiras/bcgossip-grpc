@@ -8,6 +8,7 @@ import select
 import yaml
 import uuid
 import re
+from kubernetes import client, config
 
 def delete_deployment(file_path, namespace='default', timeout=300):
     command = ['kubectl', 'delete', '-f', file_path, '-n', namespace]
