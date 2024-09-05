@@ -241,7 +241,8 @@ def get_pod_names_and_ips(namespace="default"):
         pod_info = {}
         for line in output.splitlines():
             print(line)
-            if (line):
+            print(len(pod_info))
+            if len(pod_info)<=10:
                 print(line.split())
             pod_name, pod_ip = line.split()
             pod_info[pod_name] = pod_ip
