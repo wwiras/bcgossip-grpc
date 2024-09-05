@@ -8,7 +8,6 @@ import select
 import yaml
 import uuid
 import re
-from kubernetes import client, config
 
 def delete_deployment(file_path, namespace='default', timeout=300):
     command = ['kubectl', 'delete', '-f', file_path, '-n', namespace]
@@ -125,20 +124,41 @@ def wait_for_pods_to_be_ready(namespace='default', expected_pods=0, timeout=300)
 #         except subprocess.CalledProcessError as e:
 #             print(f"Error applying tc rules on {pod_name}: {e.stderr}")
 
+# def wait_for_job_completion(job_name, namespace="default", timeout_seconds=300):
+#     """
+#     Waits for the specified Job to complete successfully.
+#     """
+#     config.load_incluster_config()
+#     batch_v1 = client.BatchV1Api()
+#
+#     start_time = time.time()
+#     while True:
+#         job = batch_v1.read_namespaced_job(job_name, namespace)
+#         if job.status.succeeded == 1:
+#             print(f"Job '{job_name}' completed successfully!")
+#             break
+#         elif job.status.failed == 1:
+#             raise RuntimeError(f"Job '{job_name}' failed!")
+#
+#         elapsed_time = time.time() - start_time
+#         if elapsed_time > timeout_seconds:
+#             raise TimeoutError(f"Timeout waiting for job '{job_name}' to complete")
+#
+#         print(f"Waiting for job '{job_name}' to complete...")
+#         time.sleep(5)  # Check every 5 seconds
+
 def wait_for_job_completion(job_name, namespace="default", timeout_seconds=300):
     """
-    Waits for the specified Job to complete successfully.
+    Waits for the specified Job to complete successfully using kubectl.
     """
-    config.load_incluster_config()
-    batch_v1 = client.BatchV1Api()
 
     start_time = time.time()
     while True:
-        job = batch_v1.read_namespaced_job(job_name, namespace)
-        if job.status.succeeded == 1:
+        status = get_job_status(job_name, namespace)
+        if status == "Complete":
             print(f"Job '{job_name}' completed successfully!")
             break
-        elif job.status.failed == 1:
+        elif status == "Failed":
             raise RuntimeError(f"Job '{job_name}' failed!")
 
         elapsed_time = time.time() - start_time
@@ -147,6 +167,51 @@ def wait_for_job_completion(job_name, namespace="default", timeout_seconds=300):
 
         print(f"Waiting for job '{job_name}' to complete...")
         time.sleep(5)  # Check every 5 seconds
+
+def get_job_status(job_name, namespace="default"):
+    """
+    Gets the status of the specified Kubernetes Job using kubectl.
+    """
+
+    command = [
+        "kubectl",
+        "get",
+        "job",
+        job_name,
+        "-n",
+        namespace,
+        "-o",
+        "jsonpath='{.status.conditions[?(@.type==\"Complete\")].status}'",
+    ]
+
+    try:
+        result = subprocess.run(command, check=True, capture_output=True, text=True)
+        status = result.stdout.strip("'")
+
+        if status == "True":
+            return "Complete"
+        else:
+            # Check if the job has failed
+            command = [
+                "kubectl",
+                "get",
+                "job",
+                job_name,
+                "-n",
+                namespace,
+                "-o",
+                "jsonpath='{.status.conditions[?(@.type==\"Failed\")].status}'",
+            ]
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            status = result.stdout.strip("'")
+            if status == "True":
+                return "Failed"
+            else:
+                return "Active"  # Job is still running
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error getting Job status: {e.stderr}", flush=True)
+        return None
 
 def run_command(command, full_path=None):
     """
