@@ -212,12 +212,13 @@ def get_topology(self, total_replicas, topology_folder):
     else:
         raise FileNotFoundError(f"No topology file found for {total_replicas} nodes.")
 
-def get_pod_names_and_ips(namespace,num_nodes):
+def get_pod_names_and_ips(namespace, num_nodes):
     """
     Retrieves the names and IP addresses of pods in the specified namespace using kubectl.
 
     Args:
         namespace: The namespace where the pods are located (default: "default").
+        num_nodes: The expected number of nodes (optional).
 
     Returns:
         A dictionary where keys are pod names and values are their corresponding IP addresses.
@@ -235,18 +236,20 @@ def get_pod_names_and_ips(namespace,num_nodes):
 
     try:
         result = subprocess.run(command, check=True, capture_output=True, text=True)
-        output = result.stdout.strip()
+        output = result.stdout.strip()  # Remove leading/trailing whitespace, including newlines
         print(output)
 
         pod_info = {}
         for line in output.splitlines():
-            # print(line)
-            # print(len(pod_info))
-            if len(pod_info)<num_nodes:
-                print(line.split())
-                pod_name, pod_ip = line.split()
-                pod_info[pod_name] = pod_ip
+            if not line.strip():  # Skip empty lines
+                continue
 
+            pod_name, pod_ip = line.split()
+            pod_info[pod_name] = pod_ip
+
+            if num_nodes > 0 and len(pod_info) >= num_nodes:  # Stop if we have enough pods
+                break
+        print(pod_info)
         return pod_info
 
     except subprocess.CalledProcessError as e:
