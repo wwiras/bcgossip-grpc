@@ -16,7 +16,7 @@ client = bigquery.Client(project=project_id)
 try:
     # Execute the query
     query_job = client.query(delete_query)
-    query_job.result()  # Wait for the job to complete
+    query_job.result()  # Wait for the jobs to complete
 
     print(f"Rows with event_type='SEND' deleted from table {table_id}")
 

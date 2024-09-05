@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: apply-tc-rules-job
+spec:
+  template:
+    metadata:
+      labels:
+        app: tc-setup-job
+    spec:
+      containers:
+      - name: tc-setup
+        image: wwiras/k8sw9_10:v1  # Use the same image as your StatefulSet pods
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            #!/bin/bash
+
+            # 1. Wait for all StatefulSet pods to be ready
+            STATEFULSET_NAME="gossip-statefulset"  # Replace with your actual StatefulSet name
+            DESIRED_REPLICAS=$(kubectl get statefulset "$STATEFULSET_NAME" -o jsonpath='{.spec.replicas}')
+
+            while true; do
+              CURRENT_POD_COUNT=$(kubectl get pods -l app="$STATEFULSET_NAME" --field-selector=status.phase=Running | wc -l)
+              if [ "$CURRENT_POD_COUNT" -eq "$DESIRED_REPLICAS" ]; then
+                echo "All pods are running. Triggering tc_setup..."
+                python /app/tc_setup.py "$DESIRED_REPLICAS"  # Execute your Python script
+                break 
+              else
+                echo "Waiting for all pods to be running... ($CURRENT_POD_COUNT/$DESIRED_REPLICAS)"
+                sleep 1
+              fi
+            done
+      restartPolicy: Never
+  backoffLimit: 0
