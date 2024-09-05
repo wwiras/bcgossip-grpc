@@ -283,4 +283,4 @@ if __name__ == '__main__':
         sys.exit(1)
     num_tests = int(sys.argv[1])
     deployment_folder = sys.argv[2]
-    result = main(num_tests, deployment_folder
+    result = main(num_tests, deployment_folder)
