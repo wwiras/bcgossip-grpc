@@ -254,7 +254,7 @@ def main(num_tests, deployment_folder):
         if wait_for_pods_to_be_ready(namespace='default', expected_pods=num_nodes, timeout=300):
 
             # Apply Job to set up tc rules
-            job_yaml_file = os.path.join(root_folder, 'job.yaml')  # Assuming your job yaml is in the root folder
+            job_yaml_file = os.path.join(root_folder, 'jobs/job' + str(num_nodes) + '.yaml')  # Assuming your job yaml is in the root folder
             run_command(['kubectl', 'apply', '-f', job_yaml_file], job_yaml_file)
 
             # Wait for the Job to complete
