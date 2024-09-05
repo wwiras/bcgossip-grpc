@@ -320,6 +320,7 @@ def main(num_tests, deployment_folder):
 
             # Get statefulset pod names and ips
             statefulsets = get_pod_names_and_ips("default",num_nodes)
+            print(f"statefulsets={statefulsets}")
 
             # --- Apply tc rules directly ---
             for statefulset_podname, statefulset_podip  in statefulsets:
