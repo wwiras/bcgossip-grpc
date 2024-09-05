@@ -236,6 +236,7 @@ def get_pod_names_and_ips(namespace="default"):
     try:
         result = subprocess.run(command, check=True, capture_output=True, text=True)
         output = result.stdout.strip()
+        print(output)
 
         pod_info = {}
         for line in output.splitlines():
