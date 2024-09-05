@@ -212,7 +212,7 @@ def get_topology(self, total_replicas, topology_folder):
     else:
         raise FileNotFoundError(f"No topology file found for {total_replicas} nodes.")
 
-def get_pod_names_and_ips(namespace="default"):
+def get_pod_names_and_ips(namespace="default",num_nodes):
     """
     Retrieves the names and IP addresses of pods in the specified namespace using kubectl.
 
@@ -242,7 +242,7 @@ def get_pod_names_and_ips(namespace="default"):
         for line in output.splitlines():
             print(line)
             print(len(pod_info))
-            if len(pod_info)<=10:
+            if len(pod_info)<num_nodes:
                 print(line.split())
             pod_name, pod_ip = line.split()
             pod_info[pod_name] = pod_ip
@@ -317,7 +317,7 @@ def main(num_tests, deployment_folder):
         if wait_for_pods_to_be_ready(namespace='default', expected_pods=num_nodes, timeout=300):
 
             # Get statefulset pod names and ips
-            statefulsets = get_pod_names_and_ips(namespace="default")
+            statefulsets = get_pod_names_and_ips(namespace="default",num_nodes)
 
             # --- Apply tc rules directly ---
             for statefulset_podname, statefulset_podip  in statefulsets:
