@@ -244,7 +244,7 @@ def get_pod_names_and_ips(namespace="default", num_nodes=0):
                 continue
 
             pod_name, pod_ip = line.split()
-            if len(pod_info)==0:
+            if len(pod_info)==0: # need to remove " from string
                 pod_name = pod_name[1:]
             pod_info[pod_name] = pod_ip
 

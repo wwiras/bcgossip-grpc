@@ -81,6 +81,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             self.initial_gossip_timestamp = received_timestamp
             log_message = f"Gossip initiated by {self.pod_name}({self.host}) at {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(received_timestamp / 1e9))}"
             self._log_event(message, sender_id, received_timestamp, None, 'initiate',bandwidth_mbps, log_message)
+            self.gossip_initiated = False # For multiple tests, need to reset gossip initialization
 
         # Check for duplicate messages
         elif message in self.received_messages:
