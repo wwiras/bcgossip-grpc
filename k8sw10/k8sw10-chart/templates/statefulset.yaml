@@ -1,0 +1,74 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+# ... (Load topology and group pods by bandwidth logic - remains the same) ...
+{{- $topology := .Files.Get "topology/topology.json" | fromJson }}
+{{- $statefulsets := dict }}
+{{- range $node := $topology.nodes }}
+{{- $podName := $node.id }}
+{{- $egressBandwidth := $node.bandwidth }}
+{{- $bandwidthLimit := "20M" }}
+{{- if le $egressBandwidth 5 }}
+{{- $bandwidthLimit = "5M" }}
+{{- else if le $egressBandwidth 10 }}
+{{- $bandwidthLimit = "10M" }}
+{{- end }}
+{{- if not (hasKey $statefulsets $bandwidthLimit) }}
+{{- $_ := set $statefulsets $bandwidthLimit (list) }}
+{{- end }}
+{{- $statefulsets = set $statefulsets $bandwidthLimit (append ($statefulsets. $bandwidthLimit) (dict "podName" $podName "egressBandwidth" $bandwidthLimit)) }}
+{{- end }}
+
+{{- range $bandwidthLimit, $pods := $statefulsets }}
+---
+{{/* Include the python-role template */}}
+{{- include "python-role.template" . | indent 0 }}
+
+{{/* Include the bcgossip-svc template */}}
+{{- include "bcgossip-svc.template" . | indent 0 }}
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $.Release.Name }}-{{ $bandwidthLimit }}
+spec:
+  serviceName: "bcgossip-svc"
+  replicas: {{ len $pods }}
+  selector:
+    matchLabels:
+      app: bcgossip-{{ $bandwidthLimit }}
+  template:
+    metadata:
+      labels:
+        app: bcgossip-{{ $bandwidthLimit }}
+        run: bcgossip  # Add this label to match the service selector
+      annotations:
+        kubernetes.io/egress-bandwidth: {{ $bandwidthLimit }}
+    spec:
+      containers:
+        - name: gossip-node
+          image: wwiras/gpbc10:v1
+          ports:
+            - containerPort: 5050
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: BANDWIDTH_LIMIT  # Add environment variable for ingress bandwidth
+              value: { { $bandwidthLimit } }  # Set the bandwidth limit using env
+            - name: NODES # Add environment variable for total replicas
+              value: { { len $pods } }  # Set total replicas using env
+          volumeMounts:
+          - name: data
+            mountPath: /data
+      volumes:
+      - name: data
+        emptyDir: {}
+  podManagementPolicy: Parallel
+  {{- range $index, $pod := $pods }}
+  - metadata:
+      name: {{ $pod.podName }}
+  {{- end }}
+{{- end }}
