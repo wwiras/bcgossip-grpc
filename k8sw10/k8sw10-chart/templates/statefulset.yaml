@@ -1,3 +1,5 @@
+apiVersion: apps/v1
+kind: StatefulSet
 
 {{/* Include the python-role template */}}
 {{- include "python-role.template" . | indent 0 }}
@@ -9,7 +11,7 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Release.Name }}-statefulset-{{ .Values.bandwidth }}
+  name: {{ .Release.Name }}-statefulset-1M
 spec:
   serviceName: "bcgossip-svc"
   replicas: {{ .Values.replicas }}
@@ -22,7 +24,7 @@ spec:
         app: bcgossip-1M
         run: bcgossip
       annotations:
-        kubernetes.io/egress-bandwidth: {{ .Values.bandwidth }}
+        kubernetes.io/egress-bandwidth: 1M
     spec:
       containers:
         - name: gossip-node
