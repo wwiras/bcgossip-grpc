@@ -32,14 +32,14 @@ spec:
           ports:
             - containerPort: 5050
           env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
             - name: BANDWIDTH
               value: {{  .Values.bandwidth  }}
             - name: NODES
               value: {{  .Values.totalNodes  }}
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           volumeMounts:
           - name: data
             mountPath: /data
