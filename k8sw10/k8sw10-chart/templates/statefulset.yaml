@@ -11,7 +11,7 @@ kind: StatefulSet
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Release.Name }}-statefulset-1M
+  name: {{ .Release.Name }}-statefulset-{{  .Values.speed  }}
 spec:
   serviceName: "bcgossip-svc"
   replicas: {{ .Values.replicas }}
@@ -33,7 +33,7 @@ spec:
             - containerPort: 5050
           env:
             - name: BANDWIDTH
-              value: {{  .Values.bandwidth  }}
+              value: {{  .Values.speed  }}
             - name: NODES
               value: {{  .Values.totalNodes  }}
             - name: POD_NAME
