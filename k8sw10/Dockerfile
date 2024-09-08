@@ -12,7 +12,7 @@ RUN apt-get install -y iputils-ping dnsutils iproute2 iperf3
 RUN pip3 install --no-cache-dir grpcio grpcio-tools kubernetes iperf3 grpcio-reflection
 
 # Copy your application source code
-COPY src /app
+COPY . /app
 
 # Expose the port the app runs on (if applicable)
 EXPOSE 5050
