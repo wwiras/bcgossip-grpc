@@ -1,5 +1,3 @@
-apiVersion: apps/v1
-kind: StatefulSet
 
 {{/* Include the python-role template */}}
 {{- include "python-role.template" . | indent 0 }}
