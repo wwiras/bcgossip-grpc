@@ -16,7 +16,7 @@ kind: StatefulSet
 {{- if not (hasKey $statefulsets $bandwidthLimit) }}
 {{- $_ := set $statefulsets $bandwidthLimit (list) }}
 {{- end }}
-{{- $statefulsets = set $statefulsets $bandwidthLimit (append ($statefulsets. $bandwidthLimit) (dict "podName" $podName "egressBandwidth" $bandwidthLimit)) }}
+{{- $statefulsets = set $statefulsets $bandwidthLimit (append (index $statefulsets $bandwidthLimit) (dict "podName" $podName "egressBandwidth" $bandwidthLimit)) }}
 {{- end }}
 
 {{- range $bandwidthLimit, $pods := $statefulsets }}
