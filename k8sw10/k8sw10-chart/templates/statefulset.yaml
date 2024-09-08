@@ -48,7 +48,7 @@ spec:
     spec:
       containers:
         - name: gossip-node
-          image: wwiras/gpbc10:v1
+          image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
           ports:
             - containerPort: 5050
           env:
@@ -57,9 +57,9 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: BANDWIDTH_LIMIT  # Add environment variable for ingress bandwidth
-              value: { { $bandwidthLimit } }  # Set the bandwidth limit using env
+              value: {{ .Values.bandwidthLimit }}  # Set the bandwidth limit using env
             - name: NODES # Add environment variable for total replicas
-              value: { { len $pods } }  # Set total replicas using env
+              value: {{ .Values.totalNodes }} # Set total replicas using topology values
           volumeMounts:
           - name: data
             mountPath: /data
