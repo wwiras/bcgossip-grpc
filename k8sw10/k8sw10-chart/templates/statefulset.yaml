@@ -37,9 +37,9 @@ spec:
                 fieldRef:
                   fieldPath: metadata.name
             - name: BANDWIDTH
-              value: {{ .Values.bandwidth }}
+              value: {{  .Values.bandwidth  }}
             - name: NODES
-              value: {{ .Values.totalNodes }}
+              value: {{  .Values.totalNodes  }}
           volumeMounts:
           - name: data
             mountPath: /data
