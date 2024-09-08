@@ -1,0 +1,6 @@
+apiVersion: v2
+name: bcgossip-grpc  # Choose a suitable name for your chart
+description: A Helm chart for deploying a gossip simulator with bandwidth limitations
+type: application
+version: 0.1.0
+appVersion: "1.0"
