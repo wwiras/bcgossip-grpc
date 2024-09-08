@@ -1,28 +1,6 @@
-
 apiVersion: apps/v1
 kind: StatefulSet
-# ... (Load topology and group pods by bandwidth logic - remains the same) ...
-{{- $topology := .Files.Get "topology/topology.json" | fromJson }}
-{{- $statefulsets := dict }}
-{{- range $node := $topology.nodes }}
-{{- $podName := $node.id }}
-{{- $egressBandwidth := $node.bandwidth }}
-{{- $bandwidthLimit := "20M" }}
-{{- if le $egressBandwidth 5 }}
-{{- $bandwidthLimit = "5M" }}
-{{- else if le $egressBandwidth 10 }}
-{{- $bandwidthLimit = "10M" }}
-{{- end }}
-{{- if not (hasKey $statefulsets $bandwidthLimit) }}
-{{- $_ := set $statefulsets $bandwidthLimit (list) }}
-{{- end }}
-{{- $statefulsets = set $statefulsets $bandwidthLimit (append (index $statefulsets $bandwidthLimit) (dict "podName" $podName "egressBandwidth" $bandwidthLimit)) }}
-{{- end }}
 
-{{ print "StatefulSets by Bandwidth:" $statefulsets }}
-
-{{- range $bandwidthLimit, $pods := $statefulsets }}
----
 {{/* Include the python-role template */}}
 {{- include "python-role.template" . | indent 0 }}
 
@@ -33,20 +11,20 @@ kind: StatefulSet
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ $.Release.Name }}-{{ $bandwidthLimit }}
+  name: {{ .Release.Name }}-statefulset-{{ .Values.bandwidth }}
 spec:
   serviceName: "bcgossip-svc"
-  replicas: {{ len $pods }}
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: bcgossip-{{ $bandwidthLimit }}
+      app: bcgossip-1M
   template:
     metadata:
       labels:
-        app: bcgossip-{{ $bandwidthLimit }}
-        run: bcgossip  # Add this label to match the service selector
+        app: bcgossip-1M
+        run: bcgossip
       annotations:
-        kubernetes.io/egress-bandwidth: {{ $bandwidthLimit }}
+        kubernetes.io/egress-bandwidth: {{ .Values.bandwidth }}
     spec:
       containers:
         - name: gossip-node
@@ -58,10 +36,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-            - name: BANDWIDTH  # Add environment variable for ingress bandwidth
-              value: {{ .Values.bandwidth }}  # Set the bandwidth limit using env
-            - name: NODES # Add environment variable for total replicas
-              value: {{ .Values.totalNodes }} # Set total replicas using topology values
+            - name: BANDWIDTH
+              value: {{ .Values.bandwidth }}
+            - name: NODES
+              value: {{ .Values.totalNodes }}
           volumeMounts:
           - name: data
             mountPath: /data
@@ -69,8 +47,7 @@ spec:
       - name: data
         emptyDir: {}
   podManagementPolicy: Parallel
-  {{- range $index, $pod := $pods }}
+  {{- range $index, $node := until (.Values.replicas) }}
   - metadata:
-      name: {{ $pod.podName }}
+      name: {{ $.Release.Name }}-{{ $index }}
   {{- end }}
-{{- end }}

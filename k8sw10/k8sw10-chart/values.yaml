@@ -3,3 +3,4 @@ image:
   name: wwiras/k8sw10
   tag: v1
 totalNodes: 10
+replicas: 10
