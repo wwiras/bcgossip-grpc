@@ -56,8 +56,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
-            - name: BANDWIDTH_LIMIT  # Add environment variable for ingress bandwidth
-              value: {{ .Values.bandwidthLimit }}  # Set the bandwidth limit using env
+            - name: BANDWIDTH  # Add environment variable for ingress bandwidth
+              value: {{ .Values.bandwidth }}  # Set the bandwidth limit using env
             - name: NODES # Add environment variable for total replicas
               value: {{ .Values.totalNodes }} # Set total replicas using topology values
           volumeMounts:

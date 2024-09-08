@@ -1,4 +1,4 @@
-bandwidthLimit: 1M
+bandwidth: 1M
 image:
   name: wwiras/k8sw10
   tag: v1
