@@ -1,6 +1,3 @@
-apiVersion: apps/v1
-kind: StatefulSet
-
 {{/* Include the python-role template */}}
 {{- include "python-role.template" . | indent 0 }}
 
@@ -11,7 +8,7 @@ kind: StatefulSet
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Release.Name }}-statefulset-{{  .Values.speed  }}
+  name: {{ .Release.Name }}-{{  .Values.speed  }}
 spec:
   serviceName: "bcgossip-svc"
   replicas: {{ .Values.replicas }}
