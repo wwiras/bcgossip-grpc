@@ -47,7 +47,7 @@ spec:
       - name: data
         emptyDir: {}
   podManagementPolicy: Parallel
-  {{- range $index, $node := until (.Values.replicas) }}
+  {{- range $index, $node := until ( int .Values.replicas) }}
   - metadata:
       name: {{ $.Release.Name }}-{{ $index }}
   {{- end }}
