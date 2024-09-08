@@ -19,6 +19,8 @@ kind: StatefulSet
 {{- $statefulsets = set $statefulsets $bandwidthLimit (append (index $statefulsets $bandwidthLimit) (dict "podName" $podName "egressBandwidth" $bandwidthLimit)) }}
 {{- end }}
 
+{{ print "StatefulSets by Bandwidth:" $statefulsets }}
+
 {{- range $bandwidthLimit, $pods := $statefulsets }}
 ---
 {{/* Include the python-role template */}}
