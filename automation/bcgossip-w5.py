@@ -166,8 +166,8 @@ def main(num_tests, deployment_folder):
         return False
 
     # Apply service and python role
-    run_command(['kubectl', 'apply', '-f', root_folder + '/svc-bcgossip.yaml'], "svc-bcgossip")
-    run_command(['kubectl', 'apply', '-f', root_folder + '/python-role.yaml'], "python-role")
+    run_command(['kubectl', 'apply', '-f', root_folder + '/service.yaml'], "svc-bcgossip")
+    run_command(['kubectl', 'apply', '-f', root_folder + '/rbac.yaml'], "python-role")
 
     # Getting total replicas from deployment file
     for deployment_file in deployment_files:
@@ -216,8 +216,8 @@ def main(num_tests, deployment_folder):
             print(f"Failed to prepare pods for {deployment_file}.", flush=True)
 
     # Delete service and python role
-    run_command(['kubectl', 'delete', '-f', root_folder + '/svc-bcgossip.yaml'], "svc-bcgossip")
-    run_command(['kubectl', 'delete', '-f', root_folder + '/python-role.yaml'], "python-role")
+    run_command(['kubectl', 'delete', '-f', root_folder + '/service.yaml'], "svc-bcgossip")
+    run_command(['kubectl', 'delete', '-f', root_folder + '/rbac.yaml'], "python-role")
     # return False
 
 if __name__ == '__main__':

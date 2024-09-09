@@ -149,8 +149,8 @@ def main(num_tests, deployment_folder):
         replicas = get_replica_count_from_yaml(deployment_yaml_path)
         print(f"Processing {deployment_file}: Total replicas defined in YAML: {replicas}")
 
-        apply_kubernetes_config(base_dir, 'k8sv2/python-role.yaml')
-        apply_kubernetes_config(base_dir, 'k8sv2/svc-bcgossip.yaml')
+        apply_kubernetes_config(base_dir, 'k8sv2/rbac.yaml')
+        apply_kubernetes_config(base_dir, 'k8sv2/service.yaml')
         apply_kubernetes_config(base_dir, deployment_folder + '/' + deployment_file)
 
         if wait_for_pods_to_be_ready(namespace='default', expected_pods=replicas, timeout=300):

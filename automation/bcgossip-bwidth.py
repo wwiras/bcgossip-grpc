@@ -151,8 +151,8 @@ def main(num_tests, deployment_folder):
         print(f"Processing {deployment_file}: Total replicas defined in YAML: {replicas}")
 
         # Apply configurations
-        apply_kubernetes_config(base_dir, 'k8sv2/python-role.yaml')
-        apply_kubernetes_config(base_dir, 'k8sv2/svc-bcgossip.yaml')
+        apply_kubernetes_config(base_dir, 'k8sv2/rbac.yaml')
+        apply_kubernetes_config(base_dir, 'k8sv2/service.yaml')
         apply_kubernetes_config(base_dir, deployment_folder + '/' + deployment_file)
 
         # Ensure pods are ready before proceeding
