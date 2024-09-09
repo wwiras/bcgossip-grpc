@@ -4,7 +4,7 @@ metadata:
   name: {{ .Release.Name }}
 spec:
   serviceName: "bcgossip-svc"
-  replicas: {{ .Values.replicas }}  # Start with 2 replicas for testing
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       app: bcgossip
@@ -13,12 +13,12 @@ spec:
       labels:
         app: bcgossip
       annotations:
-        kubernetes.io/ingress-bandwidth: {{ .Values.speed }}    # Limit the inbound bandwidth of the pod.
+        kubernetes.io/ingress-bandwidth: {{ .Values.speed }}
         kubernetes.io/egress-bandwidth: {{ .Values.speed }}
     spec:
       containers:
         - name: gossip-node
-          image: {{ .Values.image.name }}:{{ .Values.image.tag }}  # Replace with your Docker image name
+          image: {{ .Values.image.name }}:{{ .Values.image.tag }}
           ports:
             - containerPort: 5050
         - env:
@@ -26,49 +26,3 @@ spec:
               value: {{ .Values.speed }}
             - name: NODES
               value: {{ .Values.totalNodes }}
-
-
-
-{{/*apiVersion: apps/v1*/}}
-{{/*kind: StatefulSet*/}}
-{{/*metadata:*/}}
-{{/*  name: {{ .Release.Name }}-{{  .Values.speed  }}*/}}
-{{/*spec:*/}}
-{{/*  serviceName: "bcgossip-svc"*/}}
-{{/*  replicas: {{ .Values.replicas }}*/}}
-{{/*  selector:*/}}
-{{/*    matchLabels:*/}}
-{{/*      app: bcgossip-1M*/}}
-{{/*  template:*/}}
-{{/*    metadata:*/}}
-{{/*      labels:*/}}
-{{/*        app: bcgossip-1M*/}}
-{{/*        run: bcgossip*/}}
-{{/*      annotations:*/}}
-{{/*        kubernetes.io/egress-bandwidth: 1M*/}}
-{{/*    spec:*/}}
-{{/*      containers:*/}}
-{{/*        - name: gossip-node*/}}
-{{/*          image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"*/}}
-{{/*          ports:*/}}
-{{/*            - containerPort: 5050*/}}
-{{/*          env:*/}}
-{{/*            - name: BANDWIDTH*/}}
-{{/*              value: {{  .Values.speed  }}*/}}
-{{/*            - name: NODES*/}}
-{{/*              value: {{  .Values.totalNodes  }}*/}}
-{{/*            - name: POD_NAME*/}}
-{{/*              valueFrom:*/}}
-{{/*                fieldRef:*/}}
-{{/*                  fieldPath: metadata.name*/}}
-{{/*          volumeMounts:*/}}
-{{/*          - name: data*/}}
-{{/*            mountPath: /data*/}}
-{{/*      volumes:*/}}
-{{/*      - name: data*/}}
-{{/*        emptyDir: {}*/}}
-{{/*  podManagementPolicy: Parallel*/}}
-{{/*  {{- range $index, $node := until ( int .Values.replicas) }}*/}}
-{{/*  - metadata:*/}}
-{{/*      name: {{ $.Release.Name }}-{{ $index }}*/}}
-{{/*  {{- end }}*/}}
