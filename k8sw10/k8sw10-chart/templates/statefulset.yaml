@@ -1,53 +1,74 @@
-
----  # Add separator here
-{{/* Include the python-role template */}}
-{{- include "python-role.template" . | indent 0 }}
-
----  # Add separator here
-{{/* Include the bcgossip-svc template */}}
-{{- include "bcgossip-svc.template" . | indent 0 }}
-
----
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Release.Name }}-{{  .Values.speed  }}
+  name: {{ .Release.Name }}
 spec:
   serviceName: "bcgossip-svc"
-  replicas: {{ .Values.replicas }}
+  replicas: {{ .Values.replicas }}  # Start with 2 replicas for testing
   selector:
     matchLabels:
-      app: bcgossip-1M
+      app: bcgossip
   template:
     metadata:
       labels:
-        app: bcgossip-1M
-        run: bcgossip
+        app: bcgossip
       annotations:
-        kubernetes.io/egress-bandwidth: 1M
+        kubernetes.io/ingress-bandwidth: {{ .Values.speed }}    # Limit the inbound bandwidth of the pod.
+        kubernetes.io/egress-bandwidth: {{ .Values.speed }}
     spec:
       containers:
         - name: gossip-node
-          image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          image: {{ .Values.image.name }}:{{ .Values.image.tag }}  # Replace with your Docker image name
           ports:
             - containerPort: 5050
-          env:
+        - env:
             - name: BANDWIDTH
-              value: {{  .Values.speed  }}
+              value: {{ .Values.speed }}
             - name: NODES
-              value: {{  .Values.totalNodes  }}
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
-          volumeMounts:
-          - name: data
-            mountPath: /data
-      volumes:
-      - name: data
-        emptyDir: {}
-  podManagementPolicy: Parallel
-  {{- range $index, $node := until ( int .Values.replicas) }}
-  - metadata:
-      name: {{ $.Release.Name }}-{{ $index }}
-  {{- end }}
+              value: {{ .Values.totalNodes }}
+
+
+
+{{/*apiVersion: apps/v1*/}}
+{{/*kind: StatefulSet*/}}
+{{/*metadata:*/}}
+{{/*  name: {{ .Release.Name }}-{{  .Values.speed  }}*/}}
+{{/*spec:*/}}
+{{/*  serviceName: "bcgossip-svc"*/}}
+{{/*  replicas: {{ .Values.replicas }}*/}}
+{{/*  selector:*/}}
+{{/*    matchLabels:*/}}
+{{/*      app: bcgossip-1M*/}}
+{{/*  template:*/}}
+{{/*    metadata:*/}}
+{{/*      labels:*/}}
+{{/*        app: bcgossip-1M*/}}
+{{/*        run: bcgossip*/}}
+{{/*      annotations:*/}}
+{{/*        kubernetes.io/egress-bandwidth: 1M*/}}
+{{/*    spec:*/}}
+{{/*      containers:*/}}
+{{/*        - name: gossip-node*/}}
+{{/*          image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"*/}}
+{{/*          ports:*/}}
+{{/*            - containerPort: 5050*/}}
+{{/*          env:*/}}
+{{/*            - name: BANDWIDTH*/}}
+{{/*              value: {{  .Values.speed  }}*/}}
+{{/*            - name: NODES*/}}
+{{/*              value: {{  .Values.totalNodes  }}*/}}
+{{/*            - name: POD_NAME*/}}
+{{/*              valueFrom:*/}}
+{{/*                fieldRef:*/}}
+{{/*                  fieldPath: metadata.name*/}}
+{{/*          volumeMounts:*/}}
+{{/*          - name: data*/}}
+{{/*            mountPath: /data*/}}
+{{/*      volumes:*/}}
+{{/*      - name: data*/}}
+{{/*        emptyDir: {}*/}}
+{{/*  podManagementPolicy: Parallel*/}}
+{{/*  {{- range $index, $node := until ( int .Values.replicas) }}*/}}
+{{/*  - metadata:*/}}
+{{/*      name: {{ $.Release.Name }}-{{ $index }}*/}}
+{{/*  {{- end }}*/}}
