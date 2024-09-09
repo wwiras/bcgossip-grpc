@@ -4,7 +4,7 @@ metadata:
   name: gossip-statefulset
 spec:
   serviceName: "bcgossip-svc"
-  replicas: 10
+  replicas: 10  # Start with 2 replicas for testing
   selector:
     matchLabels:
       app: bcgossip
@@ -13,16 +13,11 @@ spec:
       labels:
         app: bcgossip
       annotations:
-        kubernetes.io/ingress-bandwidth: 1M
+        kubernetes.io/ingress-bandwidth: 1M    # Limit the inbound bandwidth of the pod.
         kubernetes.io/egress-bandwidth: 1M
     spec:
       containers:
         - name: gossip-node
-          image: wwiras/k8sw10:v1
+          image: wwiras/gpbc10:v1  # Replace with your Docker image name
           ports:
             - containerPort: 5050
-        - env:
-            - name: BANDWIDTH
-              value: "1M"
-            - name: NODES
-              value: "10"
