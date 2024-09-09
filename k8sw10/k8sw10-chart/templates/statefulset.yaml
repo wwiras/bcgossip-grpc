@@ -23,6 +23,6 @@ spec:
             - containerPort: 5050
         - env:
             - name: BANDWIDTH
-              value: {{ .Values.speed }}
+              value: "{{ .Values.speed }}"
             - name: NODES
-              value: {{ .Values.totalNodes }}
+              value: "{{ .Values.totalNodes }}"
