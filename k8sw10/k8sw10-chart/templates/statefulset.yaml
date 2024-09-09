@@ -1,6 +1,9 @@
+
+---  # Add separator here
 {{/* Include the python-role template */}}
 {{- include "python-role.template" . | indent 0 }}
 
+---  # Add separator here
 {{/* Include the bcgossip-svc template */}}
 {{- include "bcgossip-svc.template" . | indent 0 }}
 
