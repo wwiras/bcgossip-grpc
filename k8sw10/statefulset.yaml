@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: gossip-statefulset
+spec:
+  serviceName: "bcgossip-svc"
+  replicas: 10
+  selector:
+    matchLabels:
+      app: bcgossip
+  template:
+    metadata:
+      labels:
+        app: bcgossip
+      annotations:
+        kubernetes.io/ingress-bandwidth: 1M
+        kubernetes.io/egress-bandwidth: 1M
+    spec:
+      containers:
+        - name: gossip-node
+          image: wwiras/k8sw10:v1
+          ports:
+            - containerPort: 5050
+        - env:
+            - name: BANDWIDTH
+              value: "1M"
+            - name: NODES
+              value: "10"
