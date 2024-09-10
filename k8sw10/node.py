@@ -106,12 +106,12 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             node["bandwidth"] for node in self.topology["nodes"] if node["id"] == self.pod_name
         )
 
-        if own_egress_bandwidth_str is None:
+        if own_egress_bandwidth is None:
             print(f"No bandwidth information found for self. Using default bandwidth.", flush=True)
             own_egress_bandwidth = 1.0
         else:
             # Remove "M" and convert to float
-            own_egress_bandwidth = float(own_egress_bandwidth_str.rstrip('M'))
+            own_egress_bandwidth = float(own_egress_bandwidth.rstrip('M'))
 
         for neighbor_pod_name in self.neighbor_pod_names:
             if neighbor_pod_name != sender_id:
