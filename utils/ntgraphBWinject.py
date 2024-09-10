@@ -26,7 +26,7 @@ def modify_topology(input_filename, bwidth=None):
     else:
         bandwidth_options = [1, 3, 5, 10]
         for node in topology['nodes']:
-            node['bandwidth'] = random.choice(bandwidth_options)
+            node['bandwidth'] = str(random.choice(bandwidth_options))+"M"
 
     # Generate a 5-character UUID
     uuid_str = str(uuid.uuid4()).replace('-', '')[:5]
