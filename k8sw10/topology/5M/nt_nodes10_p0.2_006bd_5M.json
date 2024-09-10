@@ -4,43 +4,43 @@
   "graph": {},
   "nodes": [
     {
-      "bandwidth": 3,
+      "bandwidth": "5M",
       "id": "gossip-statefulset-0"
     },
     {
-      "bandwidth": 10,
+      "bandwidth": "5M",
       "id": "gossip-statefulset-1"
     },
     {
-      "bandwidth": 1,
+      "bandwidth": "5M",
       "id": "gossip-statefulset-2"
     },
     {
-      "bandwidth": 5,
+      "bandwidth": "5M",
       "id": "gossip-statefulset-3"
     },
     {
-      "bandwidth": 1,
+      "bandwidth": "5M",
       "id": "gossip-statefulset-4"
     },
     {
-      "bandwidth": 3,
+      "bandwidth": "5M",
       "id": "gossip-statefulset-5"
     },
     {
-      "bandwidth": 10,
+      "bandwidth": "5M",
       "id": "gossip-statefulset-6"
     },
     {
-      "bandwidth": 3,
+      "bandwidth": "5M",
       "id": "gossip-statefulset-7"
     },
     {
-      "bandwidth": 5,
+      "bandwidth": "5M",
       "id": "gossip-statefulset-8"
     },
     {
-      "bandwidth": 5,
+      "bandwidth": "5M",
       "id": "gossip-statefulset-9"
     }
   ],
