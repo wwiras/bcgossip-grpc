@@ -100,7 +100,20 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         return gossip_pb2.Acknowledgment(details=f"{self.pod_name}({self.host}) processed message: '{message}'")
 
     def gossip_message(self, message, sender_id, received_timestamp):
-        for neighbor_pod_name, bandwidth_mbps in self.neighbor_pod_names:
+
+        # Get own egress bandwidth from topology
+        own_egress_bandwidth = next(
+            node["bandwidth"] for node in self.topology["nodes"] if node["id"] == self.pod_name
+        )
+
+        if own_egress_bandwidth_str is None:
+            print(f"No bandwidth information found for self. Using default bandwidth.", flush=True)
+            own_egress_bandwidth = 1.0
+        else:
+            # Remove "M" and convert to float
+            own_egress_bandwidth = float(own_egress_bandwidth_str.rstrip('M'))
+
+        for neighbor_pod_name in self.neighbor_pod_names:
             if neighbor_pod_name != sender_id:
                 neighbor_ip = self.get_pod_ip(neighbor_pod_name)
                 target = f"{neighbor_ip}:5050"
@@ -112,10 +125,10 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                             message=message,
                             sender_id=self.pod_name,
                             timestamp=received_timestamp,
-                            bandwidth_mbps=bandwidth_mbps
+                            bandwidth_mbps=own_egress_bandwidth  # Use own egress bandwidth
                         ))
                         print(
-                            f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip}) with bandwidth limit {bandwidth_mbps} Mbps",
+                            f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip}) with bandwidth limit {own_egress_bandwidth} Mbps",
                             flush=True)
                     except grpc.RpcError as e:
                         print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
@@ -128,9 +141,9 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         neighbors = []
         for link in self.topology['links']:
             if link['source'] == node_id:
-                neighbors.append((link['target'], link['bandwidth']))
+                neighbors.append(link['target'])
             elif link['target'] == node_id:
-                neighbors.append((link['source'], link['bandwidth']))
+                neighbors.append(link['source'])
         return neighbors
 
     def _log_event(self, message, sender_id, received_timestamp,
