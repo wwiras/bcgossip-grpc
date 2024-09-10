@@ -1,6 +1,6 @@
 apiVersion: apps/v1
 kind: StatefulSet
-{{- $topology := .Files.Get "topology/topology.json" | fromJson }}
+{{- $topology := .Files.Get "topology.json" | fromJson }}
 
 {{ print "$topology:" $topology }}
 {{- $statefulsets := dict }}
