@@ -1,6 +1,6 @@
 speed: "1M"
 image:
   name: wwiras/gpbc10
-  tag: v1
+  tag: v2
 totalNodes: "10"
 replicas: 10
