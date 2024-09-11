@@ -1,19 +1,33 @@
 apiVersion: apps/v1
 kind: StatefulSet
-{{- $topology := .Files.Get "topology.json" | fromJson }}
 
-{{ print "$topology:" $topology }}
+{{- /* Load topology data from the specified file */}}
+{{- $topology := .Files.Get "topology/topology.json" | fromJson }}
+
+{{- /* Create a dictionary to group StatefulSets by bandwidth */}}
 {{- $statefulsets := dict }}
+
+{{- /* Iterate over nodes in the topology */}}
 {{- range $node := $topology.nodes }}
-{{- $podName := $node.id }}
-{{- $egressBandwidth := $node.bandwidth }}
-{{- if not (hasKey $statefulsets $egressBandwidth) }}
-{{- $_ := set $statefulsets $egressBandwidth (list) }}
-{{- end }}
-{{- $statefulsets = set $statefulsets $egressBandwidth (append (index $statefulsets $egressBandwidth) (dict "podName" $podName "egressBandwidth" $egressBandwidth)) }}
+  {{- $podName := $node.id }}
+  {{- $egressBandwidth := $node.bandwidth }}
+
+  {{- /* Categorize pods into bandwidth groups */}}
+  {{- $bandwidthLimit := "20M" }}
+  {{- if le $egressBandwidth 5 }}
+  {{- $bandwidthLimit = "5M" }}
+  {{- else if le $egressBandwidth 10 }}
+  {{- $bandwidthLimit = "10M" }}
+  {{- end }}
+
+  {{- /* Add pod to the corresponding bandwidth group */}}
+  {{- if not (hasKey $statefulsets $bandwidthLimit) }}
+  {{- $_ := set $statefulsets $bandwidthLimit (list) }}
+  {{- end }}
+  {{- $statefulsets = set $statefulsets $bandwidthLimit (append (index $statefulsets $bandwidthLimit) (dict "podName" $podName "egressBandwidth" $bandwidthLimit)) }}
 {{- end }}
 
-{{ print "StatefulSets by Bandwidth:" $statefulsets }}
+{{ print "StatefulSets by Bandwidth:" $statefulsets }}  # Debugging output
 
 {{- range $egressBandwidth, $pods := $statefulsets }}
 
@@ -46,10 +60,14 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            {{- if .Values.bandwidth }} # Conditionally include BANDWIDTH if defined in values.yaml
             - name: BANDWIDTH
-              value: {{ $egressBandwidth }}
+              value: {{ .Values.bandwidth }}
+            {{- end }}
+            {{- if .Values.totalNodes }} # Conditionally include NODES if defined in values.yaml
             - name: NODES
               value: {{ .Values.totalNodes }}
+            {{- end }}
           volumeMounts:
           - name: data
             mountPath: /data
