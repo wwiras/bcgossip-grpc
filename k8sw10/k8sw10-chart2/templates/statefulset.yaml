@@ -1,40 +1,20 @@
 apiVersion: apps/v1
 kind: StatefulSet
-{{- $topology := .Files.Get "nt_nodes10_p0.2_61bd2_1M.json" | fromJson }}
-
-{{ print "$topology:" $topology }}
-{{- $statefulsets := dict }}
-{{- range $node := $topology.nodes }}
-{{- $podName := $node.id }}
-{{- $egressBandwidth := $node.bandwidth }}
-{{- if not (hasKey $statefulsets $egressBandwidth) }}
-{{- $_ := set $statefulsets $egressBandwidth (list) }}
-{{- end }}
-{{- $statefulsets = set $statefulsets $egressBandwidth (append (index $statefulsets $egressBandwidth) (dict "podName" $podName "egressBandwidth" $egressBandwidth)) }}
-{{- end }}
-
-{{ print "StatefulSets by Bandwidth:" $statefulsets }}
-
-{{- range $egressBandwidth, $pods := $statefulsets }}
-
----
-apiVersion: apps/v1
-kind: StatefulSet
 metadata:
-  name: {{ $.Release.Name }}-{{ $egressBandwidth }}
+  name: gossip-statefulset
 spec:
   serviceName: "bcgossip-svc"
-  replicas: {{ len $pods }}
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: bcgossip-{{ $egressBandwidth }}
+      app: bcgossip
   template:
     metadata:
       labels:
-        app: bcgossip-{{ $egressBandwidth }}
-        run: bcgossip
+        app: bcgossip
       annotations:
-        kubernetes.io/egress-bandwidth: {{ $egressBandwidth }}
+        kubernetes.io/ingress-bandwidth: {{ .Values.speed }}
+        kubernetes.io/egress-bandwidth: {{ .Values.speed }}
     spec:
       containers:
         - name: gossip-node
@@ -42,23 +22,7 @@ spec:
           ports:
             - containerPort: 5050
           env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.name
             - name: BANDWIDTH
-              value: {{ $egressBandwidth }}
+              value: "{{ .Values.speed }}"
             - name: NODES
-              value: {{ .Values.totalNodes }}
-          volumeMounts:
-          - name: data
-            mountPath: /data
-      volumes:
-      - name: data
-        emptyDir: {}
-  podManagementPolicy: Parallel
-  {{- range $index, $pod := $pods }}
-  - metadata:
-      name: {{ $pod.podName }}
-  {{- end }}
-{{- end }}
+              value: "{{ .Values.totalNodes }}"
