@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 
 {{- /* Load topology data from the specified file */}}
-{{- $topology := .Files.Get "topology/topology.json" | fromJson }}
+{{- $topology := .Files.Get "topology.json" | fromJson }}
 
 {{- /* Create a dictionary to group StatefulSets by bandwidth */}}
 {{- $statefulsets := dict }}
