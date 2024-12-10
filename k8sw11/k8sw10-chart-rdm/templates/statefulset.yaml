@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: StatefulSet
+
+{{- /* Load topology data from the specified file */}}
+{{- $topology := .Files.Get "topology.json" | fromJson }}
+
+{{- /* Create a dictionary to group StatefulSets by bandwidth */}}
+{{- $statefulsets := dict }}
+
+{{- /* Iterate over nodes in the topology */}}
+{{- range $node := $topology.nodes }}
+  {{- $podName := $node.id }}
+  {{- $egressBandwidth := $node.bandwidth }}
+
+  {{- /* Categorize pods into bandwidth groups */}}
+  {{- $bandwidthLimit := "20M" }}
+  {{- if le $egressBandwidth 5 }}
+  {{- $bandwidthLimit = "5M" }}
+  {{- else if le $egressBandwidth 10 }}
+  {{- $bandwidthLimit = "10M" }}
+  {{- end }}
+
+  {{- /* Add pod to the corresponding bandwidth group */}}
+  {{- if not (hasKey $statefulsets $bandwidthLimit) }}
+  {{- $_ := set $statefulsets $bandwidthLimit (list) }}
+  {{- end }}
+  {{- $statefulsets = set $statefulsets $bandwidthLimit (append (index $statefulsets $bandwidthLimit) (dict "podName" $podName "egressBandwidth" $bandwidthLimit)) }}
+{{- end }}
+
+{{ print "StatefulSets by Bandwidth:" $statefulsets }}  # Debugging output
+
+{{- range $egressBandwidth, $pods := $statefulsets }}
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ $.Release.Name }}-{{ $egressBandwidth }}
+spec:
+  serviceName: "bcgossip-svc"
+  replicas: {{ len $pods }}
+  selector:
+    matchLabels:
+      app: bcgossip-{{ $egressBandwidth }}
+  template:
+    metadata:
+      labels:
+        app: bcgossip-{{ $egressBandwidth }}
+        run: bcgossip
+      annotations:
+        kubernetes.io/egress-bandwidth: {{ $egressBandwidth }}
+    spec:
+      containers:
+        - name: gossip-node
+          image: "{{ .Values.image.name }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: 5050
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            {{- if .Values.bandwidth }} # Conditionally include BANDWIDTH if defined in values.yaml
+            - name: BANDWIDTH
+              value: {{ .Values.bandwidth }}
+            {{- end }}
+            {{- if .Values.totalNodes }} # Conditionally include NODES if defined in values.yaml
+            - name: NODES
+              value: {{ .Values.totalNodes }}
+            {{- end }}
+          volumeMounts:
+          - name: data
+            mountPath: /data
+      volumes:
+      - name: data
+        emptyDir: {}
+  podManagementPolicy: Parallel
+  {{- range $index, $pod := $pods }}
+  - metadata:
+      name: {{ $pod.podName }}
+  {{- end }}
+{{- end }}

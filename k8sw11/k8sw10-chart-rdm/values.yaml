@@ -1,0 +1,6 @@
+speed: "RM"
+image:
+  name: wwiras/k8sw10
+  tag: v6
+totalNodes: "10"
+replicas: 10

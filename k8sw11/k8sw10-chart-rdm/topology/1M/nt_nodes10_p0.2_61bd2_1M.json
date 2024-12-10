@@ -1,0 +1,109 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "bandwidth": "1M",
+      "id": "gossip-statefulset-0"
+    },
+    {
+      "bandwidth": "1M",
+      "id": "gossip-statefulset-1"
+    },
+    {
+      "bandwidth": "1M",
+      "id": "gossip-statefulset-2"
+    },
+    {
+      "bandwidth": "1M",
+      "id": "gossip-statefulset-3"
+    },
+    {
+      "bandwidth": "1M",
+      "id": "gossip-statefulset-4"
+    },
+    {
+      "bandwidth": "1M",
+      "id": "gossip-statefulset-5"
+    },
+    {
+      "bandwidth": "1M",
+      "id": "gossip-statefulset-6"
+    },
+    {
+      "bandwidth": "1M",
+      "id": "gossip-statefulset-7"
+    },
+    {
+      "bandwidth": "1M",
+      "id": "gossip-statefulset-8"
+    },
+    {
+      "bandwidth": "1M",
+      "id": "gossip-statefulset-9"
+    }
+  ],
+  "links": [
+    {
+      "source": "gossip-statefulset-0",
+      "target": "gossip-statefulset-1"
+    },
+    {
+      "source": "gossip-statefulset-0",
+      "target": "gossip-statefulset-4"
+    },
+    {
+      "source": "gossip-statefulset-0",
+      "target": "gossip-statefulset-7"
+    },
+    {
+      "source": "gossip-statefulset-0",
+      "target": "gossip-statefulset-9"
+    },
+    {
+      "source": "gossip-statefulset-1",
+      "target": "gossip-statefulset-2"
+    },
+    {
+      "source": "gossip-statefulset-2",
+      "target": "gossip-statefulset-3"
+    },
+    {
+      "source": "gossip-statefulset-2",
+      "target": "gossip-statefulset-5"
+    },
+    {
+      "source": "gossip-statefulset-2",
+      "target": "gossip-statefulset-8"
+    },
+    {
+      "source": "gossip-statefulset-2",
+      "target": "gossip-statefulset-9"
+    },
+    {
+      "source": "gossip-statefulset-3",
+      "target": "gossip-statefulset-4"
+    },
+    {
+      "source": "gossip-statefulset-3",
+      "target": "gossip-statefulset-5"
+    },
+    {
+      "source": "gossip-statefulset-4",
+      "target": "gossip-statefulset-6"
+    },
+    {
+      "source": "gossip-statefulset-4",
+      "target": "gossip-statefulset-8"
+    },
+    {
+      "source": "gossip-statefulset-7",
+      "target": "gossip-statefulset-8"
+    },
+    {
+      "source": "gossip-statefulset-7",
+      "target": "gossip-statefulset-9"
+    }
+  ]
+}
