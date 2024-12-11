@@ -12,6 +12,9 @@ spec:
     metadata:
       labels:
         app: bcgossip
+      annotations:
+        kubernetes.io/ingress-bandwidth: {{ .Values.speed }}
+        kubernetes.io/egress-bandwidth: {{ .Values.speed }}
     spec:
       containers:
         - name: gossip-node
@@ -19,7 +22,7 @@ spec:
           ports:
             - containerPort: 5050
           env:
+            - name: BANDWIDTH
+              value: "{{ .Values.speed }}"
             - name: NODES
               value: "{{ .Values.totalNodes }}"
-            - name: LATENCY
-              value: "{{ .Values.latency }}"

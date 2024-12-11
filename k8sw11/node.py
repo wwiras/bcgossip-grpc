@@ -25,12 +25,12 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.service_name = service_name
 
         # Load the topology from the "topology" folder
-        self.topology = self.get_topology(os.environ['NODES'], "k8sw10-chart-rdm/topology/" + os.environ['BANDWIDTH'])
+        self.topology = self.get_topology(os.environ['NODES'], "topology/" + os.environ['LATENCY'])
 
-        # Find neighbors based on the topology (without measuring latency yet)
-        self.neighbor_pod_names = self._find_neighbors(self.pod_name)
-        print(f"{self.pod_name}({self.host}) neighbors: {self.neighbor_pod_names}", flush=True)
-        # os.environ['NEIGHBOR_POD_NAMES'] = self.neighbor_pod_names
+        # Find neighbors based on the topology (with latency)
+        self.neighbor_pods = self._find_neighbors(self.pod_name)
+        print(f"{self.pod_name}({self.host}) neighbors: {self.neighbor_pods}", flush=True)
+        # os.environ['NEIGHBOR_POD_NAMES'] = self.neighbor_pods
 
         self.received_messages = set()
 
@@ -72,7 +72,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
     def SendMessage(self, request, context):
         message = request.message
         sender_id = request.sender_id
-        bandwidth_mbps = request.bandwidth_mbps
+        latency_ms = request.latency_ms
         received_timestamp = time.time_ns()
 
         # Check for message initiation and set the initial timestamp
@@ -80,20 +80,20 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             self.gossip_initiated = True
             self.initial_gossip_timestamp = received_timestamp
             log_message = f"Gossip initiated by {self.pod_name}({self.host}) at {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(received_timestamp / 1e9))}"
-            self._log_event(message, sender_id, received_timestamp, None, 'initiate',bandwidth_mbps, log_message)
+            self._log_event(message, sender_id, received_timestamp, None, 'initiate',latency_ms, log_message)
             self.gossip_initiated = False # For multiple tests, need to reset gossip initialization
 
         # Check for duplicate messages
         elif message in self.received_messages:
             log_message = f"{self.pod_name}({self.host}) ignoring duplicate message: '{message}' from {sender_id}"
-            self._log_event(message, sender_id, received_timestamp, None, 'duplicate',bandwidth_mbps, log_message)
+            self._log_event(message, sender_id, received_timestamp, None, 'duplicate',latency_ms, log_message)
             return gossip_pb2.Acknowledgment(details=f"Duplicate message ignored by {self.pod_name}({self.host})")
 
         else:
             self.received_messages.add(message)
             propagation_time = (received_timestamp - request.timestamp) / 1e6
             log_message = f"{self.pod_name}({self.host}) received: '{message}' from {sender_id} in {propagation_time:.2f} ms"
-            self._log_event(message, sender_id, received_timestamp, propagation_time, 'received', bandwidth_mbps, log_message)
+            self._log_event(message, sender_id, received_timestamp, propagation_time, 'received', latency_ms, log_message)
 
         # Gossip to neighbors (only if the message is new)
         self.gossip_message(message, self.pod_name, received_timestamp)
@@ -102,21 +102,33 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
     def gossip_message(self, message, sender_id, received_timestamp):
 
         # Get own egress bandwidth from topology
-        own_egress_bandwidth_tmp = next(
-            node["bandwidth"] for node in self.topology["nodes"] if node["id"] == self.pod_name
-        )
+        # own_egress_bandwidth_tmp = next(
+        #     node["bandwidth"] for node in self.topology["nodes"] if node["id"] == self.pod_name
+        # )
 
-        if own_egress_bandwidth_tmp is None:
-            print(f"No bandwidth information found for self. Using default bandwidth.", flush=True)
-            own_egress_bandwidth = 1.0
-        else:
+        # if own_egress_bandwidth_tmp is None:
+        #     print(f"No bandwidth information found for self. Using default bandwidth.", flush=True)
+        #     own_egress_bandwidth = 1.0
+        # else:
             # Remove "M" and convert to float
-            own_egress_bandwidth = float(own_egress_bandwidth_tmp.rstrip('M'))
+            # own_egress_bandwidth = float(own_egress_bandwidth_tmp.rstrip('M'))
 
-        for neighbor_pod_name in self.neighbor_pod_names:
+        #Get the latency for each link
+        # latency_tmp = next(
+        #     node["latency"] for node in self.topology["nodes"] if node["id"] == self.pod_name
+        # )
+
+
+        for neighbor_pod_name, neighbor_latency in self.neighbor_pods:
             if neighbor_pod_name != sender_id:
                 neighbor_ip = self.get_pod_ip(neighbor_pod_name)
                 target = f"{neighbor_ip}:5050"
+
+                # Record the send timestamp
+                send_timestamp = time.time()
+
+                # Introduce latency here
+                time.sleep(int(neighbor_latency)/1000)
 
                 with grpc.insecure_channel(target) as channel:
                     try:
@@ -125,7 +137,8 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                             message=message,
                             sender_id=self.pod_name,
                             timestamp=received_timestamp,
-                            bandwidth_mbps=own_egress_bandwidth  # Use own egress bandwidth
+                            # latency_ms=own_egress_bandwidth  # Use own egress bandwidth
+                            latency_ms = neighbor_latency  # Use own egress bandwidth
                         ))
                         print(
                             f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip}) with bandwidth limit {own_egress_bandwidth} Mbps",
@@ -136,18 +149,18 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
     def _find_neighbors(self, node_id):
         """
         Identifies the neighbors of the given node based on the topology,
-        including the bandwidth of the connection.
+        including the latency of the connection.
         """
         neighbors = []
         for link in self.topology['links']:
             if link['source'] == node_id:
-                neighbors.append(link['target'])
+                neighbors.append((link['target'], link['latency']))  # Add neighbor and latency as a tuple
             elif link['target'] == node_id:
-                neighbors.append(link['source'])
+                neighbors.append((link['source'], link['latency']))  # Add neighbor and latency as a tuple
         return neighbors
 
     def _log_event(self, message, sender_id, received_timestamp,
-                   propagation_time, event_type, bandwidth_mbps, log_message):
+                   propagation_time, event_type, latency_ms, log_message):
         """Logs the gossip event as structured JSON data."""
         event_data = {
             'message': message,
@@ -155,7 +168,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             'receiver_id': self.pod_name,
             'received_timestamp': received_timestamp,
             'propagation_time': propagation_time,
-            'bandwidth_mbps': bandwidth_mbps,
+            'latency_ms': latency_ms,
             'event_type': event_type,
             'detail': log_message
         }

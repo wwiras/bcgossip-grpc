@@ -31,7 +31,7 @@ def send_message_to_self(message):
             message=message,
             sender_id=pod_name,
             timestamp=time.time_ns(),
-            bandwidth_mbps=0.00
+            latency_ms=0.00
         ))
         print(f"Received acknowledgment: {response.details}", flush=True)
 
