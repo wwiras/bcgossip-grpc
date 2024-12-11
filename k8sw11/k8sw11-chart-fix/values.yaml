@@ -1,4 +1,4 @@
-latency: 100
+latency: 100ms
 image:
   name: wwiras/k8sw11
   tag: v1
