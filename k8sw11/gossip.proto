@@ -6,7 +6,7 @@ message GossipMessage {
   string message = 1;
   string sender_id = 2;
   int64 timestamp = 3;
-  float latency_ms = 4;  // Add the bandwidth field (in Mbps)
+  float latency_ms = 4;  // Add the latency field (in Mbps)
 }
 
 message Acknowledgment {
