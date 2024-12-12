@@ -69,6 +69,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         pod = v1.read_namespaced_pod(name=pod_name, namespace=namespace)
         return pod.status.pod_ip
 
+    # Receiving message
     def SendMessage(self, request, context):
         message = request.message
         sender_id = request.sender_id
@@ -96,36 +97,22 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             self._log_event(message, sender_id, received_timestamp, propagation_time, 'received', latency_ms, log_message)
 
         # Gossip to neighbors (only if the message is new)
-        self.gossip_message(message, self.pod_name, received_timestamp)
+        self.gossip_message(message, self.pod_name)
+        # self.gossip_message(message, self.pod_name, received_timestamp)
         return gossip_pb2.Acknowledgment(details=f"{self.pod_name}({self.host}) processed message: '{message}'")
 
-    def gossip_message(self, message, sender_id, received_timestamp):
+    # Propagating / distributing message
+    def gossip_message(self, message, sender_id):
+    # def gossip_message(self, message, sender_id, received_timestamp):
 
-        # Get own egress bandwidth from topology
-        # own_egress_bandwidth_tmp = next(
-        #     node["bandwidth"] for node in self.topology["nodes"] if node["id"] == self.pod_name
-        # )
-
-        # if own_egress_bandwidth_tmp is None:
-        #     print(f"No bandwidth information found for self. Using default bandwidth.", flush=True)
-        #     own_egress_bandwidth = 1.0
-        # else:
-            # Remove "M" and convert to float
-            # own_egress_bandwidth = float(own_egress_bandwidth_tmp.rstrip('M'))
-
-        #Get the latency for each link
-        # latency_tmp = next(
-        #     node["latency"] for node in self.topology["nodes"] if node["id"] == self.pod_name
-        # )
-
-
+        # Get the neighbor and its latency
         for neighbor_pod_name, neighbor_latency in self.neighbor_pods:
             if neighbor_pod_name != sender_id:
                 neighbor_ip = self.get_pod_ip(neighbor_pod_name)
                 target = f"{neighbor_ip}:5050"
 
                 # Record the send timestamp
-                send_timestamp = time.time()
+                send_timestamp = time.time_ns()
 
                 # Introduce latency here
                 time.sleep(int(neighbor_latency)/1000)
@@ -136,12 +123,11 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                         stub.SendMessage(gossip_pb2.GossipMessage(
                             message=message,
                             sender_id=self.pod_name,
-                            timestamp=received_timestamp,
-                            # latency_ms=own_egress_bandwidth  # Use own egress bandwidth
-                            latency_ms = neighbor_latency  # Use own egress bandwidth
+                            timestamp=send_timestamp,
+                            latency_ms = neighbor_latency  # neighbor latency in miliseconds
                         ))
                         print(
-                            f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip}) with bandwidth limit {own_egress_bandwidth} Mbps",
+                            f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip}) with latency {latency_ms} ms",
                             flush=True)
                     except grpc.RpcError as e:
                         print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
