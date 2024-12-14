@@ -27,7 +27,7 @@ def send_message_to_self(message):
 
     with grpc.insecure_channel(target) as channel:
         stub = gossip_pb2_grpc.GossipServiceStub(channel)
-        print(f"Sending message to self ({pod_name}, {pod_ip}): '{message}' with latency={target_latency}", flush=True)
+        print(f"Sending message to self ({pod_name}, {pod_ip}): '{message}' with latency={target_latency} ms", flush=True)
         response = stub.SendMessage(gossip_pb2.GossipMessage(
             message=message,
             sender_id=pod_name,

@@ -78,13 +78,13 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             self.initial_gossip_timestamp = received_timestamp
             log_message = (f"Gossip initiated by {self.pod_name}({self.host}) at "
                            f"{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(received_timestamp / 1e9))}"
-                           f"with latency {received_latency} ms")
+                           f"with latency {received_latency}ms")
             self._log_event(message, sender_id, received_timestamp, None,received_latency, 'initiate', log_message)
 
         # Check for duplicate messages
         elif message in self.received_messages:
             log_message = (f"{self.pod_name}({self.host}) ignoring duplicate message: '{message}' "
-                           f"from {sender_id} with latency={received_latency} ms")
+                           f"from {sender_id} with latency={received_latency}ms")
             self._log_event(message, sender_id, received_timestamp, None,received_latency, 'duplicate', log_message)
             return gossip_pb2.Acknowledgment(details=f"Duplicate message ignored by {self.pod_name}({self.host})")
 
@@ -92,7 +92,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             self.received_messages.add(message)
             propagation_time = (received_timestamp - request.timestamp) / 1e6
             log_message = (f"{self.pod_name}({self.host}) received: '{message}' from {sender_id}"
-                           f" in {propagation_time:.2f} ms with latency={received_latency} ms")
+                           f" in {propagation_time:.2f} ms with latency={received_latency}ms")
             self._log_event(message, sender_id, received_timestamp, propagation_time,received_latency, 'received', log_message)
 
         # Gossip to neighbors (only if the message is new)
