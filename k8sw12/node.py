@@ -41,14 +41,6 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         within the current working directory.
         """
 
-        # Get the StatefulSet replica count using kubectl
-        # command = f"kubectl get statefulset {statefulset_name} -n {namespace} -o jsonpath='{{.spec.replicas}}'"
-        #         # try:
-        #         #     total_replicas = int(subprocess.check_output(command, shell=True).decode('utf-8').strip())
-        #         # except subprocess.CalledProcessError as e:
-        #         #     raise RuntimeError(f"Error getting StatefulSet replicas using kubectl: {e}")
-
-
         # Get the current working directory
         current_directory = os.getcwd()
 
