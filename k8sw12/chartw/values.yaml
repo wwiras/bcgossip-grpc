@@ -1,0 +1,7 @@
+replicas: 10
+#latency: 100ms
+bandwidth: 1M
+image:
+  name: wwiras/gpbc10
+  tag: v1
+totalNodes: "10"
