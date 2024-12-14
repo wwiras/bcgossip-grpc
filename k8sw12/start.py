@@ -32,7 +32,7 @@ def send_message_to_self(message):
             message=message,
             sender_id=pod_name,
             timestamp=time.time_ns(),
-            latency=target_latency
+            latency_ms=target_latency
         ))
         print(f"Received acknowledgment: {response.details}", flush=True)
 

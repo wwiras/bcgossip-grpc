@@ -70,7 +70,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         message = request.message
         sender_id = request.sender_id
         received_timestamp = time.time_ns()
-        received_latency = request.latency
+        received_latency = request.latency_ms
 
         # Check for message initiation and set the initial timestamp
         if sender_id == self.pod_name and not self.gossip_initiated:
@@ -112,7 +112,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                             message=message,
                             sender_id=self.pod_name,
                             timestamp=received_timestamp,
-                            latency=target_latency
+                            latency_ms=target_latency
                         ))
                         print(
                             f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip})",
@@ -131,7 +131,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         return neighbors
 
 
-    def _log_event(self, message, sender_id, received_timestamp, propagation_time, event_type, log_message):
+    def _log_event(self, message, sender_id, received_timestamp, propagation_time, latency_ms, event_type, log_message):
         """Logs the gossip event as structured JSON data."""
         event_data = {
             'message': message,
@@ -139,6 +139,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             'receiver_id': self.pod_name,
             'received_timestamp': received_timestamp,
             'propagation_time': propagation_time,
+            'latency_ms': latency_ms,
             'event_type': event_type,
             'detail': log_message
         }
