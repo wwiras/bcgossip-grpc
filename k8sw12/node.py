@@ -33,6 +33,9 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # but not from the real network
         self.neighbor_pods = self._find_neighbors(self.pod_name)
         print(f"{self.pod_name}({self.host}) neighbors: {self.neighbor_pods}", flush=True)
+        # Print the neighbors and their latencies
+        for neighbor, latency in self.neighbor_pods :
+            print(f"Neighbor: {neighbor}, Latency: {latency}", flush=True)
 
         self.received_messages = set()
 
