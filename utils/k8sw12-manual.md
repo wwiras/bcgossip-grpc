@@ -1,5 +1,5 @@
 # Run helm chart in k8s
-````
+```
 helm install gossip-statefulset k8sw10-chart/ --values k8sw10-chart/values.yaml --debug --set speed=10M --set image.tag=v4
 helm install gossip-statefulset chartw/ --values chartw/values.yaml --debug
 helm install gossip-statefulset chartw/ --values k8sw10-chart/values.yaml --debug --set image.name=k8sw12 --set image.tag=v1
@@ -9,29 +9,30 @@ helm install gossip-statefulset chartw/ --values chartw/values.yaml --debug
 ```
 
 
-# run docker in k8s
+# Run docker in k8s
 ```
 docker build -t wwiras/k8sw12:v1 .
 docker push wwiras/k8sw12:v1
 ```
 
 
-# logs in k8s
+# Get logs in k8s
 ```
 kubectl logs gossip-statefulset-0
 ```
 
-# accessing the terminal (old command)
+# Accessing the terminal (old command)
 ```
 kubectl exec -it gossip-statefulset-0 sh
 ```
 
-# accessing the terminal (new command)
+# Accessing the terminal (new command)
 ```
 kubectl exec -it gossip-statefulset-0 -- sh
 ```
 
 # Google BigQuery Commmand
+This is as for Dec 15, 2024
 ```
 SELECT jsonPayload.sender_id,jsonPayload.receiver_id, jsonPayload.message, jsonPayload.event_type , jsonPayload.received_timestamp, jsonPayload.propagation_time,jsonPayload.latency_ms, jsonPayload.detail 
 FROM `bcgossip-proj.gossip_simulation.stdout` 
