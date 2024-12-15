@@ -25,17 +25,10 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # Load the topology from the "topology" folder
         self.topology = self.get_topology(os.environ['NODES'], "topology")
 
-        # Find neighbors based on the topology (without measuring latency yet)
-        # self.neighbor_pod_names = self._find_neighbors(self.pod_name)
-        # print(f"{self.pod_name}({self.host}) neighbors: {self.neighbor_pod_names}", flush=True)
-
         # Find neighbors based on the topology (with latency)
         # but not from the real network
         self.neighbor_pods = self._find_neighbors(self.pod_name)
         print(f"{self.pod_name}({self.host}) neighbors: {self.neighbor_pods}", flush=True)
-        # Print the neighbors and their latencies
-        for neighbor, latency in self.neighbor_pods :
-            print(f"Neighbor: {neighbor}, Latency: {latency}", flush=True)
 
         self.received_messages = set()
 
@@ -124,16 +117,6 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
     # latency value. Formula: time.sleep(latency_ms/1000)
     def gossip_message(self, message, sender_id):
 
-        # First, check whether the latency is random or fixed for all
-        # Random is determined by the predetermined latency_ms value
-        # (from helm values). If latency_ms==0, it is
-        # random latency option (from topology info),
-        # while fix is otherwise (latency_ms>0)
-        if (os.environ['LATENCY']>0):
-            latency_ms = int(os.environ['LATENCY'])
-        else:
-            latency_ms = 0
-
         # Get the neighbor and its latency
         for neighbor_pod_name, neighbor_latency in self.neighbor_pods:
             if neighbor_pod_name != sender_id:
@@ -144,9 +127,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 send_timestamp = time.time_ns()
 
                 # Introduce latency here
-                if latency_ms == 0:
-                    latency_ms = neighbor_latency
-                time.sleep(int(latency_ms) / 1000)
+                time.sleep(int(neighbor_latency) / 1000)
 
                 with grpc.insecure_channel(target) as channel:
                     try:
@@ -155,35 +136,14 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                             message=message,
                             sender_id=self.pod_name,
                             timestamp=send_timestamp,
-                            latency_ms=latency_ms  # neighbor latency in miliseconds
+                            latency_ms=neighbor_latency  # neighbor latency in miliseconds
                         ))
                         print(
                             f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip}) "
-                            f"with latency {latency_ms} ms",
+                            f"with latency {neighbor_latency} ms",
                             flush=True)
                     except grpc.RpcError as e:
                         print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
-
-        # for neighbor_pod_name in self.neighbor_pod_names:
-        #     if neighbor_pod_name != sender_id:
-        #         neighbor_ip = self.get_pod_ip(neighbor_pod_name)
-        #         target = f"{neighbor_ip}:5050"
-        #         target_latency = 20.0
-        #         with grpc.insecure_channel(target) as channel:
-        #             try:
-        #                 stub = gossip_pb2_grpc.GossipServiceStub(channel)
-        #                 stub.SendMessage(gossip_pb2.GossipMessage(
-        #                     message=message,
-        #                     sender_id=self.pod_name,
-        #                     timestamp=received_timestamp,
-        #                     latency_ms=target_latency
-        #                 ))
-        #                 print(
-        #                     f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} "
-        #                     f"({neighbor_ip}) wit latency: {target_latency}",
-        #                     flush=True)
-        #             except grpc.RpcError as e:
-        #                 print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
 
 
     def _find_neighbors(self, node_id):
@@ -191,12 +151,32 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         Identifies the neighbors of the given node based on the topology,
         including the latency of the connection.
         """
+
+        """
+        Check whether the latency is random or fixed for all
+        Random is determined by the predetermined latency_ms value
+        (from helm values). If latency_ms==0, it is
+        random latency option (from topology info),
+        while fix is otherwise (latency_ms>0)
+        """
+        if (int(os.environ['LATENCY']) > 0):
+            latency_ms = int(os.environ['LATENCY'])
+        else:
+            latency_ms = 0
+
         neighbors = []
         for link in self.topology['links']:
             if link['source'] == node_id:
-                neighbors.append((link['target'], link['latency']))  # Add neighbor and latency as a tuple
+                if latency_ms > 0:
+                    neighbors.append((link['target'], latency_ms))  # Add neighbor and latency as a tuple (from values)
+                else:
+                    neighbors.append((link['target'], link['latency']))  # Add neighbor and latency as a tuple (from topology)
             elif link['target'] == node_id:
-                neighbors.append((link['source'], link['latency']))  # Add neighbor and latency as a tuple
+                if latency_ms > 0:
+                    neighbors.append((link['source'], latency_ms))  # Add neighbor and latency as a tuple (from values)
+                else:
+                    neighbors.append((link['source'], link['latency']))  # Add neighbor and latency as a tuple
+
         return neighbors
 
 
