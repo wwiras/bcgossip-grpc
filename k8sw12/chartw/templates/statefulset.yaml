@@ -4,7 +4,7 @@ metadata:
   name: gossip-statefulset
 spec:
   serviceName: "bcgossip-svc"
-  replicas: {{ .Values.replicas }}  # Start with 2 replicas for testing
+  replicas: {{ .Values.totalNodes }}  # Start with 2 replicas for testing
   selector:
     matchLabels:
       app: bcgossip
@@ -12,12 +12,17 @@ spec:
     metadata:
       labels:
         app: bcgossip
-      annotations:
-        kubernetes.io/ingress-bandwidth: {{ .Values.bandwidth }}    # Limit the inbound bandwidth of the pod.
-        kubernetes.io/egress-bandwidth: {{ .Values.bandwidth }}
+#      annotations:
+#        kubernetes.io/ingress-bandwidth: {{ .Values.bandwidth }}    # Limit the inbound bandwidth of the pod.
+#        kubernetes.io/egress-bandwidth: {{ .Values.bandwidth }}
     spec:
       containers:
         - name: gossip-node
           image: {{ .Values.image.name }}:{{ .Values.image.tag }}
           ports:
             - containerPort: 5050
+          env:
+            - name: NODES
+              value: {{ .Values.totalNodes }}
+            - name: LATENCY
+              value: {{ .Values.latency_ms }}
