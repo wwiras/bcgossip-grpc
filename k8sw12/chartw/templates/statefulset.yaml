@@ -23,6 +23,6 @@ spec:
             - containerPort: 5050
           env:
             - name: NODES
-              value: {{ .Values.totalNodes }}
+              value: "{{ .Values.totalNodes }}"
             - name: LATENCY
-              value: {{ .Values.latency_ms }}
+              value: "{{ .Values.latency_ms }}"
