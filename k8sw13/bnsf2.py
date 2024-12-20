@@ -44,24 +44,50 @@ class BNSF:
         print(f'distance matrix: \n {self.distance_matrix}',flush=True)
 
         # 2. Initialize clusters with each node as a separate cluster
-        clusters_start = []
-        # clusters = [[node['id']] for node in self.nodes]
-        for node in self.nodes:
-            clusters_start.append([node['id']])
+        init_clusters = [[node['id']] for node in self.nodes]
+
+        # 3. Create a mapping from node ID to index
+        node_id_to_index = {node['id']: i for i, node in enumerate(self.nodes)}
+        print(f'node_id_to_index: \n {node_id_to_index}', flush=True)
 
         # 3. Merge clusters iteratively
-        clusters = clusters_start
-        # while len(clusters) > self.num_clusters:
-        #     distances = []
-            # for i in range(len(clusters)):
-            #     for j in range(i + 1, len(clusters)):
-                    # dist = compute_distance(clusters[i], clusters[j], AE, node_to_index)
-                    # distances.append((dist, i, j))
-                    # print(f'clusters[i]:  {clusters[i]}')
-                    # print(f'clusters[j]:  {clusters[j]}')
 
+        # a. Cluster initialization
+        clusters = init_clusters.copy()
+
+        # b. Looping till required number of cluster achieved
+        # while len(clusters) > self.num_clusters:
+
+        # b. Find closest clusters:
+        distance_matrix = self.distance_matrix
         for i in range(len(clusters)):
             for j in range(i + 1, len(clusters)):
+
+
+                # Create a sub-matrix of distances between nodes in the two clusters
+                # sub_matrix = distance_matrix[
+                #     np.ix_([node_id_to_index[n] for n in clusters[i]],
+                #            [node_id_to_index[n] for n in clusters[j]])
+                # ]
+                # dist = np.max(sub_matrix)  # Find the maximum distance (complete linkage)
+                # print(f'dist :  {dist}')
+
+                # print(f'sub_matrix:  {sub_matrix}', flush=True)
+
+                # flat_index = np.argmin(sub_matrix)
+                # Convert the flat index to row and column indices
+                # row_index, col_index = np.unravel_index(flat_index, sub_matrix.shape)
+                # print(f"minimum value from sub_matrix({row_index}, {col_index}): {sub_matrix[row_index, col_index]}")
+
+
+                # cluster_i = clusters[i]
+                # cluster_j = clusters[j]
+                # distances = [
+                #     self.distance_matrix[int(a.split('-')[-1]), int(b.split('-')[-1])]
+                #     for a in cluster_i
+                #     for b in cluster_j
+                # ]
+                # print(f'distances :  {distances}')
                 print(f'clusters:  {clusters}')
                 print(f'clusters[i]:  {clusters[i]}')
                 print(f'clusters[j]:  {clusters[j]}')
@@ -84,7 +110,7 @@ class BNSF:
                 break
 
 
-        return clusters_start
+        return clusters
         # return self.distance_matrix
 
 
@@ -96,12 +122,9 @@ class BNSF:
             for j in range(i + 1, num_nodes):
                 source_id = self.nodes[i]['id']
                 target_id = self.nodes[j]['id']
-                # latency = next((link['latency'] for link in self.links if
-                #                 (link['source'] == source_id and link['target'] == target_id) or (
-                #                         link['source'] == target_id and link['target'] == source_id)), np.inf)
                 latency = next((link['latency'] for link in self.links if
                                 (link['source'] == source_id and link['target'] == target_id) or (
-                                        link['source'] == target_id and link['target'] == source_id)), float('inf'))
+                                        link['source'] == target_id and link['target'] == source_id)), np.inf)
                 dm[i, j] = dm[j, i] = latency
 
         self.distance_matrix = dm
