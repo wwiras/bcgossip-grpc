@@ -109,8 +109,8 @@ data = {
 graph = create_graph_from_json(data)
 
 # 2. Cluster the nodes
-# num_clusters = 3
-num_clusters = 2
+num_clusters = 3
+# num_clusters = 2
 clusters = cluster_nodes(graph, num_clusters)
 print(f"clusters : \n {clusters}")
 
