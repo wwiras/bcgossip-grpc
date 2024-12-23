@@ -1,8 +1,12 @@
+# The latest kmeans playground
+# It will be taking n of clusters (default is 3)
+# and will output cluster(s)
+
 import networkx as nx
 from sklearn.cluster import KMeans
 import random
 import time
-import matplotlib.pyplot as plt  # Import matplotlib for plotting
+import matplotlib.pyplot as plt
 
 # Load your JSON data
 data = {
@@ -48,10 +52,8 @@ def create_graph_from_json(data):
 def cluster_nodes(graph, num_clusters):
     """Clusters nodes using k-means on shortest path distances."""
     distance_matrix = dict(nx.all_pairs_dijkstra_path_length(graph))
-    # print(f"distance_matrix : \n {distance_matrix}")
     distances = [[distance_matrix[n1][n2] for n2 in graph.nodes] for n1 in graph.nodes]
-    # print(f"distances : \n {distances}")
-    kmeans = KMeans(n_clusters=num_clusters, random_state=0)
+    kmeans = KMeans(n_clusters=num_clusters, random_state=0, n_init="auto")
     kmeans.fit(distances)
     return kmeans.labels_
 
@@ -59,16 +61,15 @@ def gossip_protocol(graph, clusters, message):
     """Simulates gossip protocol with intra- and inter-cluster phases."""
     nodes = list(graph.nodes)
     num_nodes = len(nodes)
-    infected = set()  # Keep track of nodes that have received the message
-    total_messages_sent = 0  # Track the total number of messages sent
-    start_time = time.time()  # Record the start time
+    infected = set()
+    total_messages_sent = 0
+    start_time = time.time()
 
-    # Intra-cluster gossip
     for cluster_id in range(max(clusters) + 1):
         cluster_nodes = [node for i, node in enumerate(nodes) if clusters[i] == cluster_id]
-        if not cluster_nodes:  # Handle empty clusters
+        if not cluster_nodes:
             continue
-        initial_infected = random.choice(cluster_nodes)  # Start with a random node in the cluster
+        initial_infected = random.choice(cluster_nodes)
         infected.add(initial_infected)
         current_infected = [initial_infected]
         while len(current_infected) > 0:
@@ -82,7 +83,6 @@ def gossip_protocol(graph, clusters, message):
                         total_messages_sent += 1
             current_infected = new_infected
 
-    # Inter-cluster gossip (simplified)
     while len(infected) < num_nodes:
         infected_node = random.choice(list(infected))
         neighbors = list(graph.neighbors(infected_node))
@@ -92,19 +92,14 @@ def gossip_protocol(graph, clusters, message):
                 total_messages_sent += 1
                 break
 
-    end_time = time.time()  # Record the end time
+    end_time = time.time()
     propagation_time = end_time - start_time
-    propagation_time_ms = (end_time - start_time) * 1000  # Convert to milliseconds
+    propagation_time_ms = (end_time - start_time) * 1000
 
     print(f"Propagation time: {propagation_time:.4f} seconds")
     print(f"Propagation time: {propagation_time_ms:.2f} milliseconds")
     redundancy = (total_messages_sent - num_nodes) / num_nodes if num_nodes > 0 else 0
     print(f"Message Redundancy: {redundancy:.2f}")
-
-    # --- Print neighbors ---
-    # for node in nodes:
-    #     neighbors = list(graph.neighbors(node))
-    #     print(f"Node: {node}, Neighbors: {neighbors}")
 
     for node in graph.nodes:
         neighbors = graph.neighbors(node)
@@ -112,26 +107,46 @@ def gossip_protocol(graph, clusters, message):
         for neighbor in neighbors:
             latency = graph[node][neighbor]['weight']
             n.append([neighbor, latency])
-            # neighbor['latency'] = latency
-            # print(f"Node: {node}, Neighbor: {neighbor}, Latency: {latency}")
         print(f"Node: {node}, Neighbor: {n}")
 
-    # --- Main execution ---
-
-
-# 1. Create the graph
+# Create the graph
 graph = create_graph_from_json(data)
 
-# 2. Cluster the nodes
+# Cluster the nodes
 num_clusters = 3
-# num_clusters = 2
 clusters = cluster_nodes(graph, num_clusters)
 print(f"clusters : \n {clusters}")
 
-# 3. Simulate the gossip protocol
+# Simulate the gossip protocol
 message = "Hello from the gossip protocol!"
 gossip_protocol(graph, clusters, message)
 
-# --- Visualize the clusters ---
-nx.draw(graph, with_labels=True, node_color=clusters, cmap=plt.cm.viridis)
+# --- Visualize the clusters with edge weights (latency) ---
+
+# Get edge weights for visualization
+edge_weights = nx.get_edge_attributes(graph, 'weight')
+
+# Draw the graph
+plt.figure(figsize=(10, 8))  # Set figure size for better visibility
+
+# Use a spring layout or another suitable layout algorithm
+pos = nx.spring_layout(graph, seed=42)  # You can use other layouts like nx.spectral_layout, nx.shell_layout, etc.
+
+# Draw nodes with colors based on cluster assignment
+nx.draw_networkx_nodes(graph, pos, node_color=clusters, cmap=plt.cm.viridis, node_size=500)
+
+# Draw node labels
+nx.draw_networkx_labels(graph, pos)
+
+# Draw edges with varying widths based on latency
+edges = graph.edges()
+# Scale edge widths for better visualization (thicker lines for higher latency)
+edge_widths = [edge_weights[edge] / max(edge_weights.values()) * 5 for edge in edges]
+nx.draw_networkx_edges(graph, pos, edgelist=edges, width=edge_widths, alpha=0.7)
+
+# Add edge labels for latency
+nx.draw_networkx_edge_labels(graph, pos, edge_labels=edge_weights, font_size=8)
+
+plt.title("Network Graph with Clusters and Latency")
+plt.axis('off')
 plt.show()
