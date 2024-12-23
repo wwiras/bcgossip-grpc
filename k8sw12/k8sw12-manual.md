@@ -1,7 +1,7 @@
 ## Notes on BCGP (BlockChain Gossip Protocol)
 
 ### Introduction
-This k8sw12 is a folder where the basic random algorithm happens. 
+This k8sw12 is a folder where the basic random gossip algorithm happens. 
 It does not have special cluster or algorithm bind in this 
 gossip. Therefore, we are expecting more message 
 duplications and increment of latency due to wasted message sending.
