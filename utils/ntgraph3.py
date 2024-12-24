@@ -33,7 +33,7 @@ def generate_random_graph(num_nodes, probability, latency=None):
     #     "pod-d": 300,  # 300 ms
     #     "pod-e": 500  # 500 ms
     # }
-    latency_options = [10, 100, 300, 500]  # ms for milliseconds (used if latency is None)
+    latency_options = [10, 50, 100, 300]  # ms for milliseconds (used if latency is None)
 
     # Step 1: Ensure every node has at least one neighbor
     for i in range(num_nodes - 1):

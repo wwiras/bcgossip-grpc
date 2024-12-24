@@ -8,20 +8,6 @@ import argparse
 import numpy as np
 from datetime import datetime
 
-"""
-This script (convert_kmeans.py) is used to convert topology from 
-(random gossip) to K-means influenced topology.
-Below are the steps to execute it.
-#1 - Runs the K-means clustering through convert_kmeans.py
-     Accept topology (random gossip) as argument (filename in json format)
-#2 - Convert it to networkx (graph) together with it latency
-#3 - Contruct new clusters (using K-means)
-#4 - convert the clusters to networkx (graph) as new json file 
-Optional
-## Print nodes and its new neighbor (with latency between)
-## Show new cluster topology and latency
-"""
-
 class kMeans:  # Define the class correctly
 
     def __init__(self, filename, num_clusters):
@@ -56,19 +42,6 @@ class kMeans:  # Define the class correctly
 
         return graph
 
-    def cluster_nodes(self):
-        """Clusters nodes using k-means on shortest path distances."""
-        graph = self.graph
-        distance_matrix = dict(nx.all_pairs_dijkstra_path_length(graph))
-
-        # Store the distance matrix
-        self.prev_distance_matrix = distance_matrix
-
-        distances = [[distance_matrix[n1][n2] for n2 in graph.nodes] for n1 in graph.nodes]
-        kmeans = KMeans(n_clusters=self.num_clusters, random_state=0, n_init="auto")
-        kmeans.fit(distances)
-        return kmeans.labels_
-
     def create_latency_matrix(self):
 
         nodes = self.data['nodes']
@@ -83,6 +56,42 @@ class kMeans:  # Define the class correctly
                                         link['source'] == target_id and link['target'] == source_id)), np.inf)
                 dm[i, j] = dm[j, i] = latency
         return dm
+
+    def cluster_nodes(self):
+        """Clusters nodes using k-means on shortest path distances."""
+        ## There is something not right here.
+        ## Please review
+        graph = self.graph
+        distance_matrix = dict(nx.all_pairs_dijkstra_path_length(graph))
+        # print(f"distance_matrix: \n {distance_matrix}")
+
+        path = dict(nx.all_pairs_shortest_path(graph))
+        for key, value in path.items():
+            print(f"key: {key}")
+            print(f"value: {value}")
+
+        distances = [[distance_matrix[n1][n2] for n2 in graph.nodes] for n1 in graph.nodes]
+        print(f"distances: \n {distances}")
+
+        kmeans = KMeans(n_clusters=self.num_clusters, random_state=0, n_init="auto")
+        kmeans.fit(distances)
+
+        # Get cluster labels and centroids
+        labels = kmeans.labels_
+        centroids = kmeans.cluster_centers_
+
+        # Find the closest nodes to the centroids
+        centroid_nodes = []
+        for centroid in centroids:
+            distances_to_centroid = [np.linalg.norm(np.array(row) - centroid) for row in distances]
+            # print(f"distances_to_centroid: \n {distances_to_centroid}")
+            closest_node_index = np.argmin(distances_to_centroid)
+            # print(f"closest_node_index: \n {closest_node_index}")
+            closest_node = list(graph.nodes)[closest_node_index]
+            # print(f"closest_node: \n {closest_node}")
+            centroid_nodes.append(closest_node)
+
+        return labels, centroids, centroid_nodes
 
 
 if __name__ == '__main__':
@@ -103,13 +112,15 @@ if __name__ == '__main__':
     kmeans.latency_matrix = kmeans.create_latency_matrix()
     print(f"kmeans.latency_matrix: \n {kmeans.latency_matrix}")
 
-
     # Step 2 & 3 - Perform clustering
     # clusters = kmeans.cluster_nodes()
     # print(f"Clusters: \n {clusters}")
+    clusters, centroids, centroid_nodes = kmeans.cluster_nodes()
+    print(f"Clusters: \n {clusters}")
+    print(f"Centroids: \n {centroids}")
+    print(f"Centroid Nodes: \n {centroid_nodes}")
 
-    # Access the stored distance matrix (for example)
-    # print(f"Previous Distance Matrix:\n {kmeans.prev_distance_matrix}")
+
 
     # Test getting latency
     # print(f"kmeans.latency_matrix[0,1]: {kmeans.latency_matrix[0,1]}")
