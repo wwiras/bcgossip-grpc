@@ -55,6 +55,8 @@ def cluster_nodes(graph, num_clusters):
     distances = [[distance_matrix[n1][n2] for n2 in graph.nodes] for n1 in graph.nodes]
     kmeans = KMeans(n_clusters=num_clusters, random_state=0, n_init="auto")
     kmeans.fit(distances)
+    centroids = kmeans.cluster_centers_
+    print(f"centroids : \n {centroids}")
     return kmeans.labels_
 
 def gossip_protocol(graph, clusters, message):

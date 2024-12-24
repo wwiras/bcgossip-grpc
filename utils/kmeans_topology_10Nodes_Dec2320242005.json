@@ -1,0 +1,89 @@
+{
+    "directed": false,
+    "multigraph": false,
+    "graph": {},
+    "nodes": [
+        {
+            "id": "gossip-statefulset-0"
+        },
+        {
+            "id": "gossip-statefulset-1"
+        },
+        {
+            "id": "gossip-statefulset-2"
+        },
+        {
+            "id": "gossip-statefulset-3"
+        },
+        {
+            "id": "gossip-statefulset-4"
+        },
+        {
+            "id": "gossip-statefulset-5"
+        },
+        {
+            "id": "gossip-statefulset-6"
+        },
+        {
+            "id": "gossip-statefulset-7"
+        },
+        {
+            "id": "gossip-statefulset-8"
+        },
+        {
+            "id": "gossip-statefulset-9"
+        }
+    ],
+    "links": [
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-2",
+            "latency": 100
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-3",
+            "latency": 50
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-5",
+            "latency": 300
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-5",
+            "latency": 100
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-4",
+            "latency": 50
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-7",
+            "latency": 10
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-9",
+            "latency": 10
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-6",
+            "latency": 10
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-8",
+            "latency": 300
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-8",
+            "latency": 100
+        }
+    ]
+}
