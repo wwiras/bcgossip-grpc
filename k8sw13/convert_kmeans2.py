@@ -30,7 +30,7 @@ class kMeans:  # Define the class correctly
         self.data = []
         self.num_nodes = 0
         self.graph = self.get_prev_graph()  # Build the graph in the constructor
-        self.prev_latency_matrix = None  # Initialize the attribute
+        self.latency_matrix = None  # Initialize the attribute
 
     def get_prev_graph(self):
         """Loads JSON data from a file and creates a NetworkX graph."""
@@ -69,7 +69,7 @@ class kMeans:  # Define the class correctly
         kmeans.fit(distances)
         return kmeans.labels_
 
-    def create_prevlatency_matrix(self):
+    def create_latency_matrix(self):
 
         nodes = self.data['nodes']
         links = self.data['links']
@@ -100,8 +100,9 @@ if __name__ == '__main__':
     print(f"kmeans.num_nodes: {kmeans.num_nodes}")
 
     # Get latency prev matrix
-    kmeans.prev_latency_matrix = kmeans.create_prevlatency_matrix()
-    print(f"kmeans.prev_latency_matrix: \n {kmeans.prev_latency_matrix}")
+    kmeans.latency_matrix = kmeans.create_latency_matrix()
+    print(f"kmeans.latency_matrix: \n {kmeans.latency_matrix}")
+
 
     # Step 2 & 3 - Perform clustering
     # clusters = kmeans.cluster_nodes()
@@ -109,6 +110,16 @@ if __name__ == '__main__':
 
     # Access the stored distance matrix (for example)
     # print(f"Previous Distance Matrix:\n {kmeans.prev_distance_matrix}")
+
+    # Test getting latency
+    # print(f"kmeans.latency_matrix[0,1]: {kmeans.latency_matrix[0,1]}")
+    # if kmeans.latency_matrix[0,1] == np.inf:
+    #     print(f"kmeans.latency_matrix[0,1] is infinity / no connection")
+    # print(f"kmeans.latency_matrix[0,4]: {kmeans.latency_matrix[0,4]}")
+    # print(f"kmeans.latency_matrix[1,1]: {kmeans.latency_matrix[1,1]}")
+    # print(f"np.isinf(kmeans.latency_matrix[0,1]) value is {np.isinf(kmeans.latency_matrix[0,1])}")
+    # print(f"np.isinf(kmeans.latency_matrix[0,4] value is {np.isinf(kmeans.latency_matrix[0,4])}")
+    # print(f"np.isinf(kmeans.latency_matrix[1,1]) value is {np.isinf(kmeans.latency_matrix[1,1])}")
 
 
 
