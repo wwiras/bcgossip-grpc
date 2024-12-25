@@ -146,39 +146,66 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                         print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
 
 
+    # def _find_neighbors(self, node_id):
+    #     """
+    #     Identifies the neighbors of the given node based on the topology,
+    #     including the latency of the connection.
+    #     """
+    #
+    #     """
+    #     Check whether the latency is random or fixed for all
+    #     Random is determined by the predetermined latency_ms value
+    #     (from helm values). If latency_ms==0, it is
+    #     random latency option (from topology info),
+    #     while fix is otherwise (latency_ms>0)
+    #     """
+    #     if (int(os.environ['LATENCY']) > 0):
+    #         latency_ms = int(os.environ['LATENCY'])
+    #     else:
+    #         latency_ms = 0
+    #
+    #     neighbors = []
+    #     for link in self.topology['links']:
+    #         if link['source'] == node_id:
+    #             if latency_ms > 0:
+    #                 neighbors.append((link['target'], latency_ms))  # Add neighbor and latency as a tuple (from values)
+    #             else:
+    #                 neighbors.append((link['target'], link['latency']))  # Add neighbor and latency as a tuple (from topology)
+    #         elif link['target'] == node_id:
+    #             if latency_ms > 0:
+    #                 neighbors.append((link['source'], latency_ms))  # Add neighbor and latency as a tuple (from values)
+    #             else:
+    #                 neighbors.append((link['source'], link['latency']))  # Add neighbor and latency as a tuple
+    #
+    #     return neighbors
+
     def _find_neighbors(self, node_id):
         """
         Identifies the neighbors of the given node based on the topology,
-        including the latency of the connection.
+        including the latency of the connection, sampled from a Student's t-distribution.
         """
 
-        """
-        Check whether the latency is random or fixed for all
-        Random is determined by the predetermined latency_ms value
-        (from helm values). If latency_ms==0, it is
-        random latency option (from topology info),
-        while fix is otherwise (latency_ms>0)
-        """
-        if (int(os.environ['LATENCY']) > 0):
-            latency_ms = int(os.environ['LATENCY'])
-        else:
-            latency_ms = 0
+        # Parameters for Student's t-distribution
+        degrees_of_freedom = 3  # Adjust for desired kurtosis
+        mean_latency = 10  # Adjust for desired average latency
+        std_dev_latency = 2  # Adjust for desired latency spread
 
         neighbors = []
         for link in self.topology['links']:
-            if link['source'] == node_id:
-                if latency_ms > 0:
-                    neighbors.append((link['target'], latency_ms))  # Add neighbor and latency as a tuple (from values)
+            if link['source'] == node_id or link['target'] == node_id:
+                # Sample latency from a Student's t-distribution
+                latency = scipy.stats.t.rvs(df=degrees_of_freedom, loc=mean_latency, scale=std_dev_latency)
+
+                # Ensure latency is non-negative
+                latency = max(0, latency)
+
+                # Add neighbor and latency as a tuple
+                if link['source'] == node_id:
+                    neighbors.append((link['target'], latency))
                 else:
-                    neighbors.append((link['target'], link['latency']))  # Add neighbor and latency as a tuple (from topology)
-            elif link['target'] == node_id:
-                if latency_ms > 0:
-                    neighbors.append((link['source'], latency_ms))  # Add neighbor and latency as a tuple (from values)
-                else:
-                    neighbors.append((link['source'], link['latency']))  # Add neighbor and latency as a tuple
+                    neighbors.append((link['source'], latency))
 
         return neighbors
-
 
     def _log_event(self, message, sender_id, received_timestamp, propagation_time, latency_ms, event_type, log_message):
         """Logs the gossip event as structured JSON data."""
