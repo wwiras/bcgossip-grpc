@@ -23,7 +23,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.service_name = service_name
 
         # Load the topology from the "topology" folder
-        self.topology = self.get_topology(os.environ['NODES'], "topology")
+        self.topology = self.get_topology(os.environ['NODES'], "topology_kmeans")
 
         # Find neighbors based on the topology (with latency)
         # but not from the real network

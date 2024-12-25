@@ -4,7 +4,16 @@
 This k8sw12 is a folder where the basic random gossip algorithm happens. 
 It does not have special cluster or algorithm bind in this 
 gossip. Therefore, we are expecting more message 
-duplications and increment of latency due to wasted message sending.
+duplications and increment of latency due to wasted message sending. 
+We can say that this is the original code of gossip
+that runs successfully.  
+
+
+All codes have been tested and run smoothly. Please do not change anything here.
+Use this code as reference. If you need to modify, please keep a copy
+and work from the copy version. Keep this code intact.
+
+
 
 
 

@@ -114,7 +114,7 @@ if __name__ == '__main__':
 
     # Construct the full file path
     # this from the node of itself
-    filepath = os.path.join('topology', 'nt_nodes10_RM.json')
+    filepath = os.path.join('topology', 'nt_nodes11_RM.json')
     bnsfobj = BNSF(filepath, args.num_clusters)
 
 

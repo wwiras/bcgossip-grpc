@@ -58,7 +58,7 @@ def apply_agglomerative_clustering(nodes, num_clusters):
 
 
 # Construct the full file path
-filepath = os.path.join('topology', 'nt_nodes10_RM.json')
+filepath = os.path.join('topology', 'nt_nodes11_RM.json')
 
 
 # Load data from the JSON file

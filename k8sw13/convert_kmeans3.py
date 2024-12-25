@@ -181,10 +181,10 @@ if __name__ == '__main__':
 
     """
     To run the code and display the topology (display=True):
-    python your_script.py --filename nt_nodes10_RM.json --num_cluster 2 --display
+    python your_script.py --filename nt_nodes11_RM.json --num_cluster 2 --display
     
     To run the code and display the topology (display=False):
-    python your_script.py --filename nt_nodes10_RM.json --num_cluster 2
+    python your_script.py --filename nt_nodes11_RM.json --num_cluster 2
     """
 
     # Get arguments from file input (filename and num_cluster)
