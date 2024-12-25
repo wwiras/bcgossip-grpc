@@ -1,5 +1,4 @@
 latency_ms: 0
-bandwidth: 1M
 image:
   name: wwiras/k8sw13
   tag: v1
