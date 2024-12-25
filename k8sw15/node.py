@@ -154,7 +154,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # Parameters for Student's t-distribution
         degrees_of_freedom = 2  # Adjust for desired kurtosis
         mean_latency = 250  # Adjust for desired average latency
-        std_dev_latency = 100  # Adjust for desired latency spread
+        std_dev_latency = 10  # Adjust for desired latency spread
 
         neighbors = []
         for link in self.topology['links']:
