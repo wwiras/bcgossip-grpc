@@ -127,7 +127,7 @@ class kMeans:  # Define the class correctly
         dt_string = now.strftime("%b%d%Y%H%M")  # Format: Dec2320241946
 
         # Construct the full file path
-        filename = f"kmeans_{self.num_nodes}Nodes_k{self.num_clusters}_{dt_string}.json"
+        filename = f"kmeans_nodes{self.num_nodes}_k{self.num_clusters}_{dt_string}.json"
         file_path = os.path.join(output_dir, filename)
 
         # Convert the graph to a JSON-serializable format

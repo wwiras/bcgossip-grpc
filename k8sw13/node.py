@@ -51,7 +51,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # Find the corresponding topology file
         topology_file = None
         for topology_filename in os.listdir(topology_folder):
-            if topology_filename.startswith(f'nt_nodes{total_replicas}_'):
+            if topology_filename.startswith(f'kmeans_nodes{total_replicas}_'):
                 topology_file = topology_filename
                 break
 
