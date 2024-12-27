@@ -26,9 +26,27 @@ to implement it. This folder also taking into account of non-cluster topology.
 
 
 ### Steps to implement
-1. Build random topology (input: nodes,n) using leptokurtic latency (range 10ms - 100ms)
+1. Build random topology (input: nodes,n) using leptokurtic latency
 2. Build cluster topology (input; k=total_cluster, json_file=from 1.)
 3. Create docker image that will check env variable. If cluster==0, use topology folder 
 and if cluster==1, use kmeans_topology folder 
+
+
+#### Step 1 - Build random topology (input: nodes,n) using leptokurtic latency
+Before initializing gossip, we need to create a topology that will
+gossip with leptokurtic latency (range 2ms - 100ms) and mean of 10ms
+
+```shell
+python playground2.py --nodes 4
+```
+
+This script will create a topology file with the latency required. However,
+we cannot imagine the topology. Below is the script (command) to display
+the topology
+
+```shell
+python ptgraphLT.py --filename nt_nodes10_Dec2820240043.json
+```
+
 
 
