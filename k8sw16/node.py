@@ -180,17 +180,17 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             latency_ms = 0
 
         neighbors = []
-        for link in self.topology['links']:
-            if link['source'] == node_id:
+        for edge in self.topology['edges']:
+            if edge['source'] == node_id:
                 if latency_ms > 0:
-                    neighbors.append((link['target'], latency_ms))  # Add neighbor and latency as a tuple (from values)
+                    neighbors.append((edge['target'], latency_ms))  # Add neighbor and latency as a tuple (from values)
                 else:
-                    neighbors.append((link['target'], link['latency']))  # Add neighbor and latency as a tuple (from topology)
-            elif link['target'] == node_id:
+                    neighbors.append((edge['target'], edge['latency']))  # Add neighbor and latency as a tuple (from topology)
+            elif edge['target'] == node_id:
                 if latency_ms > 0:
-                    neighbors.append((link['source'], latency_ms))  # Add neighbor and latency as a tuple (from values)
+                    neighbors.append((edge['source'], latency_ms))  # Add neighbor and latency as a tuple (from values)
                 else:
-                    neighbors.append((link['source'], link['latency']))  # Add neighbor and latency as a tuple
+                    neighbors.append((edge['source'], edge['latency']))  # Add neighbor and latency as a tuple
 
         return neighbors
 
