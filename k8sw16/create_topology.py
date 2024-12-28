@@ -75,7 +75,8 @@ if __name__ == '__main__':
 
     # Construct the full file path
     output_dir = 'topology'
-    filename = f"nt_nodes{int(args.nodes)}_{dt_string}.json"
+    # filename = f"nt_nodes{int(args.nodes)}_{dt_string}.json"
+    filename = f"nodes{int(args.nodes)}_{dt_string}.json"
     file_path = os.path.join(output_dir, filename)
 
     # Specify the directory to save the JSON file (current directory)

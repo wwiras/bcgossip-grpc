@@ -1,0 +1,246 @@
+{
+    "directed": false,
+    "multigraph": false,
+    "graph": {},
+    "nodes": [
+        "gossip-statefulset-0",
+        "gossip-statefulset-1",
+        "gossip-statefulset-2",
+        "gossip-statefulset-3",
+        "gossip-statefulset-4",
+        "gossip-statefulset-5",
+        "gossip-statefulset-6",
+        "gossip-statefulset-7",
+        "gossip-statefulset-8",
+        "gossip-statefulset-9"
+    ],
+    "edges": [
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-1",
+            "latency": 9
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-2",
+            "latency": 5
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-3",
+            "latency": 3
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-4",
+            "latency": 35
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-5",
+            "latency": 69
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-6",
+            "latency": 3
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-7",
+            "latency": 52
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-8",
+            "latency": 3
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-9",
+            "latency": 30
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-2",
+            "latency": 2
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-3",
+            "latency": 11
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-4",
+            "latency": 9
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-5",
+            "latency": 4
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-6",
+            "latency": 49
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-7",
+            "latency": 5
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-8",
+            "latency": 8
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-9",
+            "latency": 5
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-3",
+            "latency": 69
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-4",
+            "latency": 73
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-5",
+            "latency": 5
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-6",
+            "latency": 6
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-7",
+            "latency": 8
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-8",
+            "latency": 2
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-9",
+            "latency": 4
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-4",
+            "latency": 13
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-5",
+            "latency": 5
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-6",
+            "latency": 9
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-7",
+            "latency": 83
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-8",
+            "latency": 11
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-9",
+            "latency": 37
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-5",
+            "latency": 36
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-6",
+            "latency": 5
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-7",
+            "latency": 91
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-8",
+            "latency": 59
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-9",
+            "latency": 69
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-6",
+            "latency": 46
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-7",
+            "latency": 8
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-8",
+            "latency": 9
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-9",
+            "latency": 80
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-7",
+            "latency": 41
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-8",
+            "latency": 39
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-9",
+            "latency": 37
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-8",
+            "latency": 99
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-9",
+            "latency": 7
+        },
+        {
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-9",
+            "latency": 99
+        }
+    ],
+    "degree": 9,
+    "total_edges": 45
+}

@@ -122,7 +122,7 @@ class kMeans:  # Define the class correctly
         os.makedirs(output_dir, exist_ok=True)
 
         # Construct the full file path
-        filename = f"kmeans_k{self.num_clusters}_{self.filename[3:-5]}.json"
+        filename = f"kmeans_{self.filename[:-5]}_k{self.num_clusters}.json"
         file_path = os.path.join(output_dir, filename)
 
         # Convert the graph to a JSON-serializable format

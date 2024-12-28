@@ -25,7 +25,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # Load the topology from the "topology" or "topology_kmeans" folder
         # if os.environ['CLUSTER'] == 0, choose "topology" folder
         # if os.environ['CLUSTER'] == 1, choose "topology_kmeans" folder
-        if os.environ['CLUSTER'] == 0:
+        if os.environ['CLUSTER'] == '0':
             self.topology = self.get_topology(os.environ['NODES'], "topology")
         else:
             self.topology = self.get_topology(os.environ['NODES'], "topology_kmeans")
@@ -51,17 +51,22 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         current_directory = os.getcwd()
 
         # Construct the full path to the topology folder
-        topology_folder = os.path.join(current_directory, topology_folder)
+        topology_dir = os.path.join(current_directory, topology_folder)
 
         # Find the corresponding topology file
         topology_file = None
-        for topology_filename in os.listdir(topology_folder):
-            if topology_filename.startswith(f'kmeans_nodes{total_replicas}_'):
-                topology_file = topology_filename
-                break
+        for topology_filename in os.listdir(topology_dir):
+            if topology_folder == 'topology':
+                if topology_filename.startswith(f'nodes{total_replicas}_'):
+                    topology_file = topology_filename
+                    break
+            else:
+                if topology_filename.startswith(f'kmeans_nodes{total_replicas}_'):
+                    topology_file = topology_filename
+                    break
 
         if topology_file:
-            with open(os.path.join(topology_folder, topology_file), 'r') as f:
+            with open(os.path.join(topology_dir, topology_file), 'r') as f:
                 return json.load(f)
         else:
             raise FileNotFoundError(f"No topology file found for {total_replicas} nodes.")
