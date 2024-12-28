@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import os, json
 import argparse
 import numpy as np
-from datetime import datetime
 
 class kMeans:  # Define the class correctly
 
@@ -32,9 +31,9 @@ class kMeans:  # Define the class correctly
         # Build graph (existing topology)
         graph = nx.Graph()
         for node in self.data['nodes']:
-            graph.add_node(node['id'])
-        for link in self.data['links']:
-            graph.add_edge(link['source'], link['target'], weight=link['latency'])
+            graph.add_node(node)
+        for edge in self.data['edges']:
+            graph.add_edge(edge['source'], edge['target'], latency=edge['latency'])
 
         self.num_nodes = len(self.data['nodes'])
 
@@ -43,15 +42,15 @@ class kMeans:  # Define the class correctly
     def create_latency_matrix(self):
 
         nodes = self.data['nodes']
-        links = self.data['links']
+        edges = self.data['edges']
         dm = np.zeros((self.num_nodes, self.num_nodes))
         for i in range(self.num_nodes):
             for j in range(i + 1, self.num_nodes):
-                source_id = nodes[i]['id']
-                target_id = nodes[j]['id']
-                latency = next((link['latency'] for link in links if
-                                (link['source'] == source_id and link['target'] == target_id) or (
-                                        link['source'] == target_id and link['target'] == source_id)), np.inf)
+                source_id = nodes[i]
+                target_id = nodes[j]
+                latency = next((edge['latency'] for edge in edges if
+                                (edge['source'] == source_id and edge['target'] == target_id) or (
+                                        edge['source'] == target_id and edge['target'] == source_id)), np.inf)
                 dm[i, j] = dm[j, i] = latency
         return dm
 
@@ -103,7 +102,7 @@ class kMeans:  # Define the class correctly
                     latency = self.latency_matrix[list(self.graph.nodes).index(node1)][
                         list(self.graph.nodes).index(node2)]
                     if latency != np.inf:  # Add edge only if there is a connection
-                        new_graph.add_edge(node1, node2, weight=latency)
+                        new_graph.add_edge(node1, node2, latency=latency)
 
         # --- Centroid connections ---
         for i in range(len(centroid_nodes)):
@@ -112,7 +111,7 @@ class kMeans:  # Define the class correctly
                 node2 = centroid_nodes[j]
                 latency = self.latency_matrix[list(self.graph.nodes).index(node1)][list(self.graph.nodes).index(node2)]
                 if latency != np.inf:  # Add edge only if there is a connection
-                    new_graph.add_edge(node1, node2, weight=latency)
+                    new_graph.add_edge(node1, node2, latency=latency)
 
         return new_graph
 
@@ -122,17 +121,13 @@ class kMeans:  # Define the class correctly
         output_dir = "topology_kmeans"
         os.makedirs(output_dir, exist_ok=True)
 
-        # Get current date and time
-        now = datetime.now()
-        dt_string = now.strftime("%b%d%Y%H%M")  # Format: Dec2320241946
-
         # Construct the full file path
-        filename = f"kmeans_nodes{self.num_nodes}_k{self.num_clusters}_{dt_string}.json"
+        filename = f"kmeans_k{self.num_clusters}_{self.filename[3:-5]}.json"
         file_path = os.path.join(output_dir, filename)
 
         # Convert the graph to a JSON-serializable format
         nodes = [{'id': node} for node in graph.nodes()]
-        links = [{'source': source, 'target': target, 'latency': data['weight']}
+        edges = [{'source': source, 'target': target, 'latency': data['latency']}
                  for source, target, data in graph.edges(data=True)]
 
         # Include 'directed', 'multigraph', and 'graph'
@@ -141,7 +136,7 @@ class kMeans:  # Define the class correctly
             'multigraph': False,
             'graph': {},
             'nodes': nodes,
-            'links': links
+            'edges': edges
         }
 
         # Save the topology
@@ -159,16 +154,20 @@ class kMeans:  # Define the class correctly
 
         # Draw the graph with colored nodes and edge labels
         nx.draw(new_graph, pos, with_labels=True, node_color=node_colors, cmap=plt.cm.viridis)
-        labels = nx.get_edge_attributes(new_graph, 'weight')
+        labels = nx.get_edge_attributes(new_graph, 'latency')
         nx.draw_networkx_edge_labels(new_graph, pos, edge_labels=labels)
-
-        # Highlight centroid nodes with bold labels
-        # labels = {node: node if node not in centroid_nodes else f"**{node}**" for node in new_graph.nodes()}
-        # nx.draw_networkx_labels(new_graph, pos, labels=labels, font_weight='bold')
 
         plt.show()
 
 if __name__ == '__main__':
+
+    """
+        To run the code and display the topology (display=True):
+        python convert_kmeans.py --filename nt_nodes10_Dec2820240043.json --num_cluster 3 --display
+
+        To run the code and display the topology (display=False):
+        python convert_kmeans.py --filename nt_nodes10_Dec2820240043.json --num_cluster 3
+        """
 
     # Get random topology file
     parser = argparse.ArgumentParser(description="Create K-means clustering.")
@@ -179,36 +178,28 @@ if __name__ == '__main__':
     parser.add_argument('--save', action='store_true', help="Save new topology to json(default: False)")
     args = parser.parse_args()
 
-    """
-    To run the code and display the topology (display=True):
-    python your_script.py --filename nt_nodes11_RM.json --num_cluster 2 --display
-    
-    To run the code and display the topology (display=False):
-    python your_script.py --filename nt_nodes11_RM.json --num_cluster 2
-    """
-
     # Get arguments from file input (filename and num_cluster)
-    kmeans = kMeans(args.filename, args.num_cluster)
+    kmeans = kMeans(args.filename, int(args.num_cluster))
     print(f"args.filename: {args.filename}")
     print(f"args.num_cluster: {args.num_cluster}")
-    print(f"save : {args.save}")
-    print(f"display : {args.display}")
-    print(f"kmeans.num_nodes: {kmeans.num_nodes}")
+    # print(f"save : {args.save}")
+    # print(f"display : {args.display}")
+    # print(f"kmeans.num_nodes: {kmeans.num_nodes}")
 
     # latency (distance) matrix preview - optional
-    print(f"kmeans.latency_matrix: \n {kmeans.latency_matrix}")
+    # print(f"kmeans.latency_matrix: \n {kmeans.latency_matrix}")
 
     # Perform clustering
     clusters, centroids, centroid_nodes, cluster_members = kmeans.cluster_nodes()
-    print(f"Clusters: \n {clusters}")
-    print(f"Centroids: \n {centroids}")
-    print(f"Centroid Nodes: \n {centroid_nodes}")
-    print(f"Cluster Members: \n {cluster_members}")
-    print(f"len(cluster_members): \n {len(cluster_members)}")
+    # print(f"Clusters: \n {clusters}")
+    # print(f"Centroids: \n {centroids}")
+    # print(f"Centroid Nodes: \n {centroid_nodes}")
+    # print(f"Cluster Members: \n {cluster_members}")
+    # print(f"len(cluster_members): \n {len(cluster_members)}")
 
     # Create new topology
     new_graph = kmeans.create_new_topology(cluster_members, centroid_nodes)
-    print(f"new_graph: {new_graph}")
+    # print(f"new_graph: {new_graph}")
 
     # Display new topology
     if args.display:

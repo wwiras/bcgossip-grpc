@@ -37,7 +37,7 @@ Before initializing gossip, we need to create a topology that will
 gossip with leptokurtic latency (range 2ms - 100ms) and mean of 10ms
 
 ```shell
-python playground2.py --nodes 4
+python create_topology.py --nodes 10
 ```
 
 This script will create a topology file with the latency required. However,
@@ -45,8 +45,25 @@ we cannot imagine the topology. Below is the script (command) to display
 the topology
 
 ```shell
-python ptgraphLT.py --filename nt_nodes10_Dec2820240043.json
+topology % python ../ptgraphLT.py --filename nt_nodes10_Dec2820240043.json 
 ```
+
+#### Step 2 - Build cluster topology (input; k=total_cluster, json_file=from step 1)
+This is an offline solution for a distribution system. Based on the output from step 1, we will create
+anew topology (or graph network) with k cluster (from the argument of the command). To get track
+on the files generated, we will save the cluster file based on the topology file (from step 1).
+If the input filename is "nt_nodes10_Dec2820240043.json", the output is "kmeans_nodes10_Dec2820240043.json"
+in topology_kmeans folder.
+
+```shell
+# To run the code and display or save new topology (display=True) and (save=True):
+python convert_kmeans.py --filename nt_nodes10_Dec2820240043.json --num_cluster 2 --display --save
+# the output file will kmeans_k2_nodes10_Dec2820240043.json
+    
+#To run the code and ignore display and save new topology (display=False)and (save=False):
+python convert_kmeans.py --filename nt_nodes10_Dec2820240043.json --num_cluster 2
+```
+
 
 
 

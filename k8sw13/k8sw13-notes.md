@@ -48,10 +48,10 @@ python ptgraphLT.py --filename nt_nodes10_p3.0_RL_c1121.json
 2. Read the file with the input and runs kMeans to get new topolgy
 ```shell
 # To run the code and display or save new topology (display=True) and (save=True):
-python convert_kmeans3.py --filename nt_nodes10_p3.0_RL_c1121.json --num_cluster 2 --display --save
+python convert_kmeans.py --filename nt_nodes10_p3.0_RL_c1121.json --num_cluster 2 --display --save
     
 #To run the code and ignore display and save new topology (display=False)and (save=False):
-python convert_kmeans3.py --filename nt_nodes10_p3.0_RL_c1121.json --num_cluster 2
+python convert_kmeans.py --filename nt_nodes10_p3.0_RL_c1121.json --num_cluster 2
 ```
 
 3. Once new topology obtained, run the distributed system 

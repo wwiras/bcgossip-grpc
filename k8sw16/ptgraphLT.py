@@ -15,7 +15,7 @@ def visualize_graph(json_data):
   graph.add_nodes_from(json_data['nodes'])
 
   for edge in json_data['edges']:
-    graph.add_edge(edge['source'], edge['target'], weight=edge['weight'])
+    graph.add_edge(edge['source'], edge['target'], latency=edge['latency'])
 
   # Position nodes using spring layout
   pos = nx.spring_layout(graph)
@@ -24,7 +24,7 @@ def visualize_graph(json_data):
   nx.draw(graph, pos, with_labels=True, node_size=1500, node_color="skyblue", font_size=8)
 
   # Add edge labels for latency
-  labels = nx.get_edge_attributes(graph, 'weight')
+  labels = nx.get_edge_attributes(graph, 'latency')
   nx.draw_networkx_edge_labels(graph, pos, edge_labels=labels)
 
   plt.title("Graph Visualization with Latency")

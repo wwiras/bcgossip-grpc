@@ -34,7 +34,7 @@ def create_complete_graph(n, median_latency=10):
 
   # Add the latencies as edge weights
   for i, (u, v) in enumerate(graph.edges()):
-    graph[u][v]['weight'] = latencies[i]
+    graph[u][v]['latency'] = latencies[i]
 
   # Calculate the degree of each node (which should be n-1)
   d = n - 1
@@ -43,9 +43,9 @@ def create_complete_graph(n, median_latency=10):
   total_edges = n * (n - 1) // 2
 
   # Prepare data for JSON output
-  # nodes = [{'id': node} for node in graph.nodes]
   nodes = ['gossip-statefulset-' + str(i) for i in range(n)]
-  edges = [{'source': 'gossip-statefulset-'+ str(u), 'target': 'gossip-statefulset-'+ str(v), 'weight': graph[u][v]['weight']} for u, v in graph.edges]
+  edges = [{'source': 'gossip-statefulset-' + str(u), 'target': 'gossip-statefulset-' + str(v),
+            'latency': graph[u][v]['latency']} for u, v in graph.edges]
   graph_data = {
       "directed": False,
       "multigraph": False,
