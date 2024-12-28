@@ -66,9 +66,9 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 if topology_filename.startswith(f'kmeans_nodes{total_replicas}_'):
                     topology_file = topology_filename
                     break
-        print(f"topology_dir: {topology_dir}", flush=True)
-        print(f"topology_folder : {topology_folder }", flush=True)
-        print(f"topology_file: {topology_file}", flush=True)
+        # print(f"topology_dir: {topology_dir}", flush=True)
+        # print(f"topology_folder : {topology_folder }", flush=True)
+        # print(f"topology_file: {topology_file}", flush=True)
 
         if topology_file:
             with open(os.path.join(topology_dir, topology_file), 'r') as f:
