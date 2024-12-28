@@ -47,6 +47,8 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         within the current working directory.
         """
 
+
+
         # Get the current working directory
         current_directory = os.getcwd()
 
@@ -56,7 +58,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # Find the corresponding topology file
         topology_file = None
         for topology_filename in os.listdir(topology_dir):
-            if topology_folder == 'topology':
+            if topology_dir == 'topology':
                 if topology_filename.startswith(f'nodes{total_replicas}_'):
                     topology_file = topology_filename
                     break
@@ -64,6 +66,8 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 if topology_filename.startswith(f'kmeans_nodes{total_replicas}_'):
                     topology_file = topology_filename
                     break
+        print(f"topology_dir: {topology_dir}", flush=True)
+        print(f"topology_file: {topology_file}", flush=True)
 
         if topology_file:
             with open(os.path.join(topology_dir, topology_file), 'r') as f:
