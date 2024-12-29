@@ -153,7 +153,7 @@ class Test:
 
                 # Check for "No resources found" in the output
                 # terminating_pods = int(result.stdout.strip())
-                print(f"result {result}",flush=True)
+                # print(f"result {result}",flush=True)
                 if "No resources found" in result.stderr:
                     print(f"No pods found in namespace {namespace}.", flush=True)
                     return True  # Pods are down
@@ -221,8 +221,8 @@ if __name__ == '__main__':
         node = test.getTotalNodes(file)
         print(f"node={node}", flush=True)
 
-        if node == 10 or node == 30:
-
+        # if node == 10 or node == 30:
+        if node == 10:
             if test.wait_for_pods_to_be_down(namespace='default',timeout=300):
 
                     # Apply helm
