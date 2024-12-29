@@ -144,6 +144,7 @@ class Test:
                                         text=True)
 
                 # Check for "No resources found" in the output
+                print(f"result {result}",flush=True)
                 if "No resources found" in result.stdout:
                     print(f"No pods found in namespace {namespace}.", flush=True)
                     return True  # Pods are down
