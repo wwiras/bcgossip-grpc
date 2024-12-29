@@ -6,6 +6,7 @@ import sys
 import traceback
 import time
 import uuid
+import select
 
 class Test:
     def __init__(self,num_test,cluster):
@@ -105,28 +106,6 @@ class Test:
 
     def wait_for_pods_to_be_ready(self,namespace='default', expected_pods=0, timeout=300):
         """
-        Waits for all pods in the specified StatefulSet to be ready.
-        """
-        # start_time = time.time()
-        # get_pods_cmd = f"kubectl get pods -n {namespace} --no-headers | grep Running | wc -l"
-        #
-        # while time.time() - start_time < timeout:
-        #     try:
-        #         result = subprocess.run(get_pods_cmd, shell=True, text=True, capture_output=True, check=True)
-        #         running_pods = int(result.stdout.strip())
-        #
-        #         if running_pods >= expected_pods:
-        #             print(f"All {expected_pods} pods are running in namespace {namespace}.", flush=True)
-        #             return True
-        #
-        #     except subprocess.CalledProcessError as e:
-        #         print(f"Failed to get pod status for namespace {namespace}. Error: {e.stderr}", flush=True)
-        #     time.sleep(10)  # Check every 10 seconds
-        #
-        # print(f"Timeout waiting for all {expected_pods} pods to be running in namespace {namespace}.", flush=True)
-        # return False
-
-        """
                 Waits for all pods in the specified namespace to be down
                 by checking every second until they are terminated or timeout is reached.
         """
@@ -140,13 +119,13 @@ class Test:
                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
                 # Check for "No resources found" in the output
-                print(f"result {result}",flush=True)
+                # print(f"result {result}",flush=True)
                 running_pods = int(result.stdout.strip())
                 if running_pods >= expected_pods:
                     print(f"All {expected_pods} pods are up and running in namespace {namespace}.", flush=True)
                     return True  # Pods are down
                 else:
-                    print(f" {running_pods} Pods are up for now in namespace {namespace}. Waiting...", flush=True)
+                    print(f" {running_pods} pods are up for now in namespace {namespace}. Waiting...", flush=True)
 
             except subprocess.CalledProcessError as e:
                 print(f"Error checking for pods: {e.stderr}", flush=True)
@@ -192,7 +171,6 @@ class Test:
         try:
             session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--', 'sh'], stdin=subprocess.PIPE,
                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            # message = f'{unique_id}-{replicas}Nodes{speed}-{iteration}'
             message = f'{filename[:-5]}-{unique_id}-{iteration}'
             session.stdin.write(f'python3 start.py --message {message}\n')
             session.stdin.flush()
@@ -234,14 +212,6 @@ if __name__ == '__main__':
     # Initiate helm chart and start the test based on nodes
     for i, file in enumerate(test.listOfFiles):
 
-        # Check no k8s cluster is running
-        # result = test.run_command(['kubectl', 'get', 'pod'])
-        # print(f"result={result}", flush=True)
-
-        # If no cluster running, proceed to test
-        # if "No resources found in default namespace.\n" in result:
-        #     print(f"No resources. Can proceed Helm deployment", flush=True)
-
         # Getting filename
         print(f"file={file}", flush=True)
 
@@ -249,44 +219,39 @@ if __name__ == '__main__':
         node = test.getTotalNodes(file)
         print(f"node={node}", flush=True)
 
-        if test.wait_for_pods_to_be_down(namespace='default',timeout=300):
+        if node == 10:
 
-            if node == 10:
+            if test.wait_for_pods_to_be_down(namespace='default',timeout=300):
 
-                # Apply helm
-                # helm install gossip-statefulset chartw/ --values chartw/values.yaml --debug --set image.tag=v5 --set cluster=0
-                result = test.run_command(['helm', 'install', statefulsetname, 'chartw/', '--values',
-                                           'chartw/values.yaml', '--debug', '--set',
-                                           'cluster=' + str(test.cluster)])
-                print(f"Helm {statefulsetname} started...", flush=True)
+                    # Apply helm
+                    # helm install gossip-statefulset chartw/ --values chartw/values.yaml --debug --set image.tag=v5 --set cluster=0
+                    result = test.run_command(['helm', 'install', statefulsetname, 'chartw/', '--values',
+                                               'chartw/values.yaml', '--debug', '--set',
+                                               'cluster=' + str(test.cluster)])
+                    print(f"Helm {statefulsetname} started...", flush=True)
 
-                if test.wait_for_pods_to_be_ready(namespace='default', expected_pods=node, timeout=300):
-                    print(f"{node} Pods are up and running ...", flush=True)
+                    if test.wait_for_pods_to_be_ready(namespace='default', expected_pods=node, timeout=300):
 
-                    # Create unique uuid for this test
-                    unique_id = str(uuid.uuid4())[:4]  # Generate a UUID and take the first 4 characters
+                        # Create unique uuid for this test
+                        unique_id = str(uuid.uuid4())[:4]  # Generate a UUID and take the first 4 characters
 
-                    # Test iteration starts here
-                    for nt in range(1, test.num_test + 1):
+                        # Test iteration starts here
+                        for nt in range(1, test.num_test + 1):
 
-                        # Choosing gossip-statefulset-0 as initiator
-                        # Can change this to random later
-                        pod_name = "gossip-statefulset-0"
-                        print(f"Selected pod for test {nt}: {pod_name}", flush=True)
+                            # Choosing gossip-statefulset-0 as initiator
+                            # Can change this to random later
+                            pod_name = "gossip-statefulset-0"
+                            print(f"Selected pod for test {nt}: {pod_name}", flush=True)
 
-                        # Start accessing the pods and initiate gossip
-                        if test.access_pod_and_initiate_gossip(pod_name, file, unique_id, nt):
-                            print(f"Test {nt} complete for {file}.", flush=True)
-                        else:
-                            print(f"Test {nt} failed for {file}.", flush=True)
-                else:
-                    print(f"Failed to prepare pods for {test.topology_folder}.", flush=True)
+                            # Start accessing the pods and initiate gossip
+                            if test.access_pod_and_initiate_gossip(pod_name, file, unique_id, nt):
+                                print(f"Test {nt} complete for {file}.", flush=True)
+                            else:
+                                print(f"Test {nt} failed for {file}.", flush=True)
+                    else:
+                        print(f"Failed to prepare pods for {test.topology_folder}.", flush=True)
 
-                # Remove helm
-                result = test.run_command(['helm', 'uninstall', statefulsetname])
-                print(f"Helm {statefulsetname} is uninstalled...", flush=True)
-
-    # else:
-    #     print(f"Something wrong here. Can't proceed Helm deployment", flush=True)
-    #     break
+                    # Remove helm
+                    result = test.run_command(['helm', 'uninstall', statefulsetname])
+                    print(f"Helm {statefulsetname} is uninstalled...", flush=True)
 
