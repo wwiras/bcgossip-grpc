@@ -107,27 +107,55 @@ class Test:
         """
         Waits for all pods in the specified StatefulSet to be ready.
         """
+        # start_time = time.time()
+        # get_pods_cmd = f"kubectl get pods -n {namespace} --no-headers | grep Running | wc -l"
+        #
+        # while time.time() - start_time < timeout:
+        #     try:
+        #         result = subprocess.run(get_pods_cmd, shell=True, text=True, capture_output=True, check=True)
+        #         running_pods = int(result.stdout.strip())
+        #
+        #         if running_pods >= expected_pods:
+        #             print(f"All {expected_pods} pods are running in namespace {namespace}.", flush=True)
+        #             return True
+        #
+        #     except subprocess.CalledProcessError as e:
+        #         print(f"Failed to get pod status for namespace {namespace}. Error: {e.stderr}", flush=True)
+        #     time.sleep(10)  # Check every 10 seconds
+        #
+        # print(f"Timeout waiting for all {expected_pods} pods to be running in namespace {namespace}.", flush=True)
+        # return False
+
+        """
+                Waits for all pods in the specified namespace to be down
+                by checking every second until they are terminated or timeout is reached.
+        """
+        print(f"Checking for pods in namespace {namespace}...", flush=True)
         start_time = time.time()
         get_pods_cmd = f"kubectl get pods -n {namespace} --no-headers | grep Running | wc -l"
 
         while time.time() - start_time < timeout:
             try:
-                result = subprocess.run(get_pods_cmd, shell=True, text=True, capture_output=True, check=True)
-                running_pods = int(result.stdout.strip())
+                result = subprocess.run(get_pods_cmd, shell=True,
+                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
+                # Check for "No resources found" in the output
+                print(f"result {result}",flush=True)
+                running_pods = int(result.stdout.strip())
                 if running_pods >= expected_pods:
-                    print(f"All {expected_pods} pods are running in namespace {namespace}.", flush=True)
-                    return True
+                    print(f"All {expected_pods} pods are up and running in namespace {namespace}.", flush=True)
+                    return True  # Pods are down
+                else:
+                    print(f" {running_pods} Pods are up for now in namespace {namespace}. Waiting...", flush=True)
 
             except subprocess.CalledProcessError as e:
-                print(f"Failed to get pod status for namespace {namespace}. Error: {e.stderr}", flush=True)
-            time.sleep(10)  # Check every 10 seconds
+                print(f"Error checking for pods: {e.stderr}", flush=True)
+                return False  # An error occurred
 
-        print(f"Timeout waiting for all {expected_pods} pods to be running in namespace {namespace}.", flush=True)
-        return False
+            time.sleep(1)  # Check every second
 
-    import subprocess
-    import time
+        print(f"Timeout waiting for pods to terminate in namespace {namespace}.", flush=True)
+        return False  # Timeout reached
 
     def wait_for_pods_to_be_down(self,namespace='default', timeout=300):
         """
@@ -140,11 +168,11 @@ class Test:
 
         while time.time() - start_time < timeout:
             try:
-                result = subprocess.run(get_pods_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                        text=True)
+                result = subprocess.run(get_pods_cmd, shell=True,
+                    stdout=subprocess.PIPE, stderr=subprocess.PIPE,text=True)
 
                 # Check for "No resources found" in the output
-                print(f"result {result}",flush=True)
+                # print(f"result {result}",flush=True)
                 if "No resources found" in result.stderr:
                     print(f"No pods found in namespace {namespace}.", flush=True)
                     return True  # Pods are down
