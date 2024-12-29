@@ -11,9 +11,9 @@ class Test:
         # Getting topology folder
         # 0 - for non cluster, 1 - for cluster topology
         if cluster == '0':
-            topology_folder = 'topology'
+            self.topology_folder_only = 'topology'
         else:
-            topology_folder = 'topology_kmeans'
+            self.topology_folder_only = 'topology_kmeans'
 
         # get how many test required
         self.num_test = num_test
@@ -24,11 +24,11 @@ class Test:
         print(f"self.current_directory = {self.current_directory}", flush=True)
 
         # getting folder (random or cluster)
-        self.topology_folder = topology_folder
+        self.topology_folder = os.path.join(self.current_directory, self.topology_folder_only)
         print(f"self.topology_folder = {self.topology_folder}", flush=True)
 
-        # list of nodes to test (from json filename)
-        self.listOfFiles = self.getListofFiles(self,os.path.join(self.current_directory, topology_folder))
+        # list of files to test (from json filename)
+        self.listOfFiles = self.getListofFiles(self.topology_folder)
         print(f"self.listOfFiles = {self.listOfFiles}", flush=True)
 
         # List all files in the directory and filter out subdirectories
@@ -117,7 +117,7 @@ if __name__ == '__main__':
     test = Test(int(args.num_test),args.cluster)
 
     # Initiate helm chart and start the test based on nodes
-    for i,file in enumerate(test.getListofFiles(test.topology_folder)):
+    for i,file in enumerate(test.listOfFiles):
 
         # Get total nodes from a filename
         node = test.getTotalNodes(file)
