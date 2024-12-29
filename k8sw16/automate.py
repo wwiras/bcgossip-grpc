@@ -219,7 +219,7 @@ if __name__ == '__main__':
         node = test.getTotalNodes(file)
         print(f"node={node}", flush=True)
 
-        if node == 10:
+        if node == 10 or node == 30:
 
             if test.wait_for_pods_to_be_down(namespace='default',timeout=300):
 
@@ -249,9 +249,12 @@ if __name__ == '__main__':
                             else:
                                 print(f"Test {nt} failed for {file}.", flush=True)
                     else:
-                        print(f"Failed to prepare pods for {test.topology_folder}.", flush=True)
+                        print(f"Failed to prepare pods for {file}.", flush=True)
+                        continue
 
                     # Remove helm
                     result = test.run_command(['helm', 'uninstall', statefulsetname])
-                    print(f"Helm {statefulsetname} is uninstalled...", flush=True)
+                    print(f"Helm {statefulsetname} will be uninstalled...", flush=True)
+                    if test.wait_for_pods_to_be_down(namespace='default', timeout=300):
+                        print(f"Helm {statefulsetname} uninstalled is completed...", flush=True)
 
