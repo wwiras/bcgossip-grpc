@@ -136,14 +136,14 @@ class Test:
         printing = False
         while time.time() - start_time < timeout:
             try:
-                if printing == False then:
+                if printing == False :
                     printing = True
                     result = subprocess.run(get_pods_cmd, shell=True, text=True, capture_output=True, check=True)
 
-                    # Access the output using result.stdout
-                    if "No resources found" in result.stdout:
-                        print(f"No more pods are running in namespace {namespace}.", flush=True)
-                        return True
+                # Access the output using result.stdout
+                if "No resources found" in result.stdout:
+                    print(f"No more pods are running in namespace {namespace}.", flush=True)
+                    return True
             except subprocess.CalledProcessError as e:
                 print(f"Failed to get pod status for namespace {namespace}. Error: {e.stderr}", flush=True)
             time.sleep(1)  # Check every 10 seconds
