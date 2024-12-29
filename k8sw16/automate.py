@@ -245,7 +245,7 @@ if __name__ == '__main__':
                 result = test.run_command(['helm', 'uninstall', statefulsetname])
                 print(f"Helm {statefulsetname} is uninstalled...", flush=True)
 
-    else:
-        print(f"Something wrong here. Can't proceed Helm deployment", flush=True)
-        break
+    # else:
+    #     print(f"Something wrong here. Can't proceed Helm deployment", flush=True)
+    #     break
 
