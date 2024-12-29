@@ -113,13 +113,8 @@ if __name__ == '__main__':
     # Initiate and Remove cluster based on nodes
     for i,node in enumerate(test.getListofNodes(test.topology_folder)):
 
-        # print(f"index:{i} node:{node}", flush=True)
-        test.run_command(['kubectl', 'version'])
-
         # Apply helm statefulset
-        if i == 0:
-            print(i,flush=True)
+        if node == 10:
+            test.run_command(['kubectl', 'version'])
+            print(node,flush=True)
             break
-
-
-        # break
