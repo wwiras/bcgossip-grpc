@@ -40,21 +40,27 @@ class Test:
         # print(f"folders = {folders}", flush=True)
 
 
-    def getListofNodes(self,directory):
+    def getListofFiles(self,directory):
         """
-        Returns a list of nodes total for a given directory
+        Returns a list of nodes (json files) total for a given directory
         """
         try:
-            listoffiles = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
-            # print(f"listoffiles = {listoffiles}", flush=True)
-            nodes = []
-            for file in listoffiles:
-                match = re.search(r"nodes(\d+)_", file)  # Use regex to find the number
-                if match:
-                    nodes.append(int(match.group(1)))   # Extract the captured number and convert to integer
-            return nodes
+            return [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
         except FileNotFoundError:
             print(f"Directory not found: {directory}",flush=True)
+            return []
+
+    def getTotalNodes(self,filename):
+        """
+        Returns of nodes total for a given filename
+        Example : nodes10_Dec2820242230.json, will return 10
+        """
+        try:
+            match = re.search(r"nodes(\d+)_", filename)  # Use regex to find the number
+            if match:
+                return int(match.group(1))  # Extract the captured number and convert to integer
+        except FileExistsError:
+            print(f"Filename {filename} do not exist", flush=True)
             return []
 
     def run_command(self,command, full_path=None):
@@ -110,11 +116,17 @@ if __name__ == '__main__':
     args = parser.parse_args()
     test = Test(int(args.num_test),args.cluster)
 
-    # Initiate and Remove cluster based on nodes
-    for i,node in enumerate(test.getListofNodes(test.topology_folder)):
+    # Initiate helm chart and start the test based on nodes
+    for i,file in enumerate(test.getListofFiles(test.topology_folder)):
 
-        # Apply helm statefulset
+        # Get total nodes from a filename
+        node = test.getTotalNodes(file)
+
         if node == 10:
-            test.run_command(['kubectl', 'version'])
-            print(node,flush=True)
+            result = test.run_command(['kubectl', 'get','pod'])
+            print(f"result={result}",flush=True)
+            if result == 'No resources found in default namespace.':
+                print(f"No resources. Can proceed Helm deployment",flush=True)
+            else:
+                print(f"Something wrong here. Can't proceed Helm deployment", flush=True)
             break
