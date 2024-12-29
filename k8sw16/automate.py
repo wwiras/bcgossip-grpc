@@ -12,8 +12,10 @@ class Test:
         # 0 - for non cluster, 1 - for cluster topology
         if cluster == '0':
             self.topology_folder_only = 'topology'
+            self.cluster = 0
         else:
             self.topology_folder_only = 'topology_kmeans'
+            self.cluster = 1
 
         # get how many test required
         self.num_test = num_test
@@ -108,6 +110,29 @@ class Test:
             traceback.print_exc()
             sys.exit(1)
 
+    def wait_for_pods_to_be_ready(namespace='default', expected_pods=0, timeout=300):
+        """
+        Waits for all pods in the specified StatefulSet to be ready.
+        """
+        start_time = time.time()
+        get_pods_cmd = f"kubectl get pods -n {namespace} --no-headers | grep Running | wc -l"
+
+        while time.time() - start_time < timeout:
+            try:
+                result = subprocess.run(get_pods_cmd, shell=True, text=True, capture_output=True, check=True)
+                running_pods = int(result.stdout.strip())
+
+                if running_pods >= expected_pods:
+                    print(f"All {expected_pods} pods are running in namespace {namespace}.", flush=True)
+                    return True
+
+            except subprocess.CalledProcessError as e:
+                print(f"Failed to get pod status for namespace {namespace}. Error: {e.stderr}", flush=True)
+            time.sleep(10)  # Check every 10 seconds
+
+        print(f"Timeout waiting for all {expected_pods} pods to be running in namespace {namespace}.", flush=True)
+        return False
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Usage: python automate.py --num_test <number_of_tests> --cluster <total_cluster>")
@@ -127,6 +152,18 @@ if __name__ == '__main__':
             print(f"result={result}",flush=True)
             if "No resources found in default namespace.\n" in result:
                 print(f"No resources. Can proceed Helm deployment",flush=True)
+
+                # Apply helm
+                # helm install gossip-statefulset chartw/ --values chartw/values.yaml --debug --set image.tag=v5 --set cluster=0
+                result = test.run_command(['helm', 'install', 'gossip-statefulset','chartw/','--values',
+                                           'chartw/values.yaml', '--debug', '--set',
+                                           'cluster='+str(test.cluster)])
+
+                if wait_for_pods_to_be_ready(namespace='default', expected_pods=node, timeout=300):
+                    print(f"You are good to go...", flush=True)
+                else:
+                    print(f"Failed to prepare pods for {test.topology_folder}.", flush=True)
+
             else:
                 print(f"Something wrong here. Can't proceed Helm deployment", flush=True)
             break
