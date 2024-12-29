@@ -26,6 +26,8 @@ def main(num_tests, deployment_folder):
     if not deployment_files:
         print("No deployment files found in the directory.")
         return False
+    else:
+        print(f"deployment_files: {deployment_files}.", flush=True)
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
