@@ -151,7 +151,7 @@ class Test:
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,text=True)
 
                 # Check for "No resources found" in the output
-                # print(f"result {result}",flush=True)
+                print(f"result {result}",flush=True)
                 if "No resources found" in result.stderr:
                     print(f"No pods found in namespace {namespace}.", flush=True)
                     return True  # Pods are down
@@ -219,15 +219,16 @@ if __name__ == '__main__':
         node = test.getTotalNodes(file)
         print(f"node={node}", flush=True)
 
-        if node == 10 or node == 30:
+        if node == 10:
 
             if test.wait_for_pods_to_be_down(namespace='default',timeout=300):
 
                     # Apply helm
                     # helm install gossip-statefulset chartw/ --values chartw/values.yaml --debug --set image.tag=v5 --set cluster=0
                     result = test.run_command(['helm', 'install', statefulsetname, 'chartw/', '--values',
-                                               'chartw/values.yaml', '--debug', '--set',
-                                               'cluster=' + str(test.cluster)])
+                                               'chartw/values.yaml', '--debug', '--set','cluster=' + str(test.cluster), '--set',
+                                                'totalNodes=' + str(node)]
+                                              )
                     print(f"Helm {statefulsetname} started...", flush=True)
 
                     if test.wait_for_pods_to_be_ready(namespace='default', expected_pods=node, timeout=300):
