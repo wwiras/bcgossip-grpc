@@ -1,38 +1,26 @@
 import os
-import sys
+import argparse
 
-def main(num_tests, deployment_folder):
-    # base directory of our main gossip folder path
-    base_dir = "/home/wwiras/bcgossip-grpc/"
-    print(f"base_dir = {base_dir}", flush=True)
+class Test:
+    def __init__(self,num_test,test_folder):
 
-    # deployment folder path
-    deployment_path = os.path.join(base_dir, deployment_folder)
-    print(f"deployment_path = {deployment_path}", flush=True)
+        # getting current folder
+        self.current_directory = os.getcwd()
+        print(f"self.current_directory = {self.current_directory}", flush=True)
 
-    # root folder (k8swx folder) path
-    root_folder = "/".join(deployment_path.split("/")[:-2])
-    print(f"root_folder = {root_folder}", flush=True)
+        # Split the path string by the OS-specific separator
+        folders = self.current_directory.split(os.sep)
+        print(f"folders = {folders}", flush=True)
 
-     # Ensure the path provided is actually a directory
-    if not os.path.isdir(deployment_path):
-        print(f"Error: The provided path {deployment_path} is not a directory.", flush=True)
-        sys.exit(1)
-
-    # List all files in the directory and filter out subdirectories
-    deployment_files = [f for f in os.listdir(deployment_path) if os.path.isfile(os.path.join(deployment_path, f))]
-
-    # Check if deployment files found or not
-    if not deployment_files:
-        print("No deployment files found in the directory.")
-        return False
-    else:
-        print(f"deployment_files: {deployment_files}.", flush=True)
+        # getting root folder
+        root_folder = folders[:7]
+        self.root_directory = os.sep.join(root_folder)
+        print(f"self.root_directory = {self.root_directory}", flush=True)
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
-        print("Usage: python bcgossip-k8sw16.py <number_of_tests> <deployment_folder>")
-        sys.exit(1)
-    num_tests = int(sys.argv[1])
-    deployment_folder = sys.argv[2]
-    result = main(num_tests, deployment_folder)
+    parser = argparse.ArgumentParser(description="Usage: python bcgossip-k8sw16.py --num_test <number_of_tests> --folder <deployment_folder>")
+    parser.add_argument('--num_test', required=True, help="Total number of tests to do")
+    parser.add_argument('--folder', required=True, help="Statefulset folder test")
+    args = parser.parse_args()
+    tests = Test()
+
