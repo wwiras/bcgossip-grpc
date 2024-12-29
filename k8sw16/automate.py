@@ -143,7 +143,8 @@ class Test:
         """
         print(f"Checking for pods in namespace {namespace}...", flush=True)
         start_time = time.time()
-        get_pods_cmd = f"kubectl get pods -n {namespace}"
+        # get_pods_cmd = f"kubectl get pods -n {namespace}"
+        get_pods_cmd = f"kubectl get pods -n {namespace} --no-headers | grep Terminating | wc -l"
 
         while time.time() - start_time < timeout:
             try:
@@ -151,12 +152,13 @@ class Test:
                     stdout=subprocess.PIPE, stderr=subprocess.PIPE,text=True)
 
                 # Check for "No resources found" in the output
+                terminating_pods = int(result.stdout.strip())
                 print(f"result {result}",flush=True)
                 if "No resources found" in result.stderr:
                     print(f"No pods found in namespace {namespace}.", flush=True)
                     return True  # Pods are down
                 else:
-                    print(f"Pods still exist in namespace {namespace}. Waiting...", flush=True)
+                    print(f"{terminating_pods} Pods are terminating / Pods still exist in namespace {namespace}. Waiting...", flush=True)
 
             except subprocess.CalledProcessError as e:
                 print(f"Error checking for pods: {e.stderr}", flush=True)
