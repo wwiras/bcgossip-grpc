@@ -159,7 +159,7 @@ if __name__ == '__main__':
                                            'chartw/values.yaml', '--debug', '--set',
                                            'cluster='+str(test.cluster)])
 
-                if wait_for_pods_to_be_ready(namespace='default', expected_pods=node, timeout=300):
+                if test.wait_for_pods_to_be_ready(namespace='default', expected_pods=node, timeout=300):
                     print(f"You are good to go...", flush=True)
                 else:
                     print(f"Failed to prepare pods for {test.topology_folder}.", flush=True)
