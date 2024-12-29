@@ -1,4 +1,5 @@
-
+import os
+import sys
 
 def main(num_tests, deployment_folder):
     # base directory of our main gossip folder path
