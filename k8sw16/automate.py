@@ -126,6 +126,27 @@ class Test:
         print(f"Timeout waiting for all {expected_pods} pods to be running in namespace {namespace}.", flush=True)
         return False
 
+    def wait_for_pods_to_be_down(self,namespace='default', timeout=300):
+        """
+        Waits for all pods in the specified StatefulSet to be ready.
+        """
+        print(f"Checking pods are running or not in namespace {namespace}...", flush=True)
+        start_time = time.time()
+        get_pods_cmd = f"kubectl get pods"
+
+        while time.time() - start_time < timeout:
+            try:
+                result = subprocess.run(get_pods_cmd, shell=True, text=True, capture_output=True, check=True)
+                if "No resources found in default namespace.\n" in result:
+                    print(f"No more pods are running in namespace {namespace}.", flush=True)
+                    return True
+            except subprocess.CalledProcessError as e:
+                print(f"Failed to get pod status for namespace {namespace}. Error: {e.stderr}", flush=True)
+            time.sleep(10)  # Check every 10 seconds
+
+        print(f"Timeout waiting for all {expected_pods} pods to be running in namespace {namespace}.", flush=True)
+        return False
+
     def access_pod_and_initiate_gossip(self,pod_name, filename, unique_id, iteration):
         try:
             session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--', 'sh'], stdin=subprocess.PIPE,
@@ -166,35 +187,36 @@ if __name__ == '__main__':
     args = parser.parse_args()
     test = Test(int(args.num_test),args.cluster)
 
+    # helm name is fixed
+    statefulsetname = 'gossip-statefulset'
 
-    # Check no k8s cluster is running
-    result = test.run_command(['kubectl', 'get', 'pod'])
-    print(f"result={result}", flush=True)
+    # Initiate helm chart and start the test based on nodes
+    for i, file in enumerate(test.listOfFiles):
 
-    # If no cluster running, proceed to test
-    if "No resources found in default namespace.\n" in result:
-        print(f"No resources. Can proceed Helm deployment", flush=True)
+        # Check no k8s cluster is running
+        # result = test.run_command(['kubectl', 'get', 'pod'])
+        # print(f"result={result}", flush=True)
 
-        # helm name is fixed
-        statefulsetname = 'gossip-statefulset'
+        # If no cluster running, proceed to test
+        # if "No resources found in default namespace.\n" in result:
+        #     print(f"No resources. Can proceed Helm deployment", flush=True)
 
-        # Initiate helm chart and start the test based on nodes
-        for i,file in enumerate(test.listOfFiles):
+        # Getting filename
+        print(f"file={file}", flush=True)
 
-            # Get total nodes from a filename
-            node = test.getTotalNodes(file)
+        # Get total nodes from a filename
+        node = test.getTotalNodes(file)
+        print(f"node={node}", flush=True)
+
+        if test.wait_for_pods_to_be_down(namespace='default',timeout=300):
 
             if node == 10:
 
-                # Getting filename
-                nodetempname = file
-                print(f"nodetempname={nodetempname}", flush=True)
-
                 # Apply helm
                 # helm install gossip-statefulset chartw/ --values chartw/values.yaml --debug --set image.tag=v5 --set cluster=0
-                result = test.run_command(['helm', 'install', statefulsetname,'chartw/','--values',
+                result = test.run_command(['helm', 'install', statefulsetname, 'chartw/', '--values',
                                            'chartw/values.yaml', '--debug', '--set',
-                                           'cluster='+str(test.cluster)])
+                                           'cluster=' + str(test.cluster)])
                 print(f"Helm {statefulsetname} started...", flush=True)
 
                 if test.wait_for_pods_to_be_ready(namespace='default', expected_pods=node, timeout=300):
@@ -204,7 +226,7 @@ if __name__ == '__main__':
                     unique_id = str(uuid.uuid4())[:4]  # Generate a UUID and take the first 4 characters
 
                     # Test iteration starts here
-                    for nt in range(1,test.num_test+1):
+                    for nt in range(1, test.num_test + 1):
 
                         # Choosing gossip-statefulset-0 as initiator
                         # Can change this to random later
