@@ -125,7 +125,7 @@ if __name__ == '__main__':
         if node == 10:
             result = test.run_command(['kubectl', 'get','pod'])
             print(f"result={result}",flush=True)
-            if result == 'No resources found in default namespace.':
+            if 'No resources found in default namespace.' in result:
                 print(f"No resources. Can proceed Helm deployment",flush=True)
             else:
                 print(f"Something wrong here. Can't proceed Helm deployment", flush=True)
