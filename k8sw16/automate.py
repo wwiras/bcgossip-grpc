@@ -4,6 +4,7 @@ import re
 import subprocess
 import sys
 import traceback
+import time
 
 class Test:
     def __init__(self,num_test,cluster):
