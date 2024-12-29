@@ -34,15 +34,6 @@ class Test:
         self.listOfFiles = self.getListofFiles(self.topology_folder)
         print(f"self.listOfFiles = {self.listOfFiles}", flush=True)
 
-        # List all files in the directory and filter out subdirectories
-        # deployment_files = [f for f in os.listdir(os.path.join(self.current_directory, topology_folder)) if os.path.isfile(os.path.join(deployment_path, f))]
-        # print(f"deployment_files = {deployment_files}", flush=True)
-
-        # Split the path string by the OS-specific separator
-        # folders = self.current_directory.split(os.sep)
-        # print(f"folders = {folders}", flush=True)
-
-
     def getListofFiles(self,directory):
         """
         Returns a list of nodes (json files) total for a given directory
@@ -149,6 +140,11 @@ if __name__ == '__main__':
         node = test.getTotalNodes(file)
 
         if node == 10:
+
+            # Getting filename
+            nodetempname = file
+            print(f"nodetempname={nodetempname}", flush=True)
+
             result = test.run_command(['kubectl', 'get','pod'])
             print(f"result={result}",flush=True)
             if "No resources found in default namespace.\n" in result:
