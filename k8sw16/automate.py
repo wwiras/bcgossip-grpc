@@ -110,7 +110,7 @@ class Test:
             traceback.print_exc()
             sys.exit(1)
 
-    def wait_for_pods_to_be_ready(namespace='default', expected_pods=0, timeout=300):
+    def wait_for_pods_to_be_ready(self,namespace='default', expected_pods=0, timeout=300):
         """
         Waits for all pods in the specified StatefulSet to be ready.
         """
