@@ -126,30 +126,38 @@ class Test:
         print(f"Timeout waiting for all {expected_pods} pods to be running in namespace {namespace}.", flush=True)
         return False
 
-    def wait_for_pods_to_be_down(self, namespace='default', timeout=300):
+    import subprocess
+    import time
+
+    def wait_for_pods_to_be_down(namespace='default', timeout=300):
         """
-        Waits for all pods in the specified StatefulSet to be down.
+        Waits for all pods in the specified namespace to be down
+        by checking every second until they are terminated or timeout is reached.
         """
-        print(f"Checking pods are running or not in namespace {namespace}...", flush=True)
+        print(f"Checking for pods in namespace {namespace}...", flush=True)
         start_time = time.time()
         get_pods_cmd = f"kubectl get pods -n {namespace}"
-        printing = False
+
         while time.time() - start_time < timeout:
             try:
-                if printing == False :
-                    printing = True
-                    result = subprocess.run(get_pods_cmd, shell=True, text=True, capture_output=True, check=True)
+                result = subprocess.run(get_pods_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                        text=True)
 
-                # Access the output using result.stdout
+                # Check for "No resources found" in the output
                 if "No resources found" in result.stdout:
-                    print(f"No more pods are running in namespace {namespace}.", flush=True)
-                    return True
-            except subprocess.CalledProcessError as e:
-                print(f"Failed to get pod status for namespace {namespace}. Error: {e.stderr}", flush=True)
-            time.sleep(1)  # Check every 10 seconds
+                    print(f"No pods found in namespace {namespace}.", flush=True)
+                    return True  # Pods are down
+                else:
+                    print(f"Pods still exist in namespace {namespace}. Waiting...", flush=True)
 
-        print(f"Timeout waiting for pods to be down in namespace {namespace}.", flush=True)
-        return False
+            except subprocess.CalledProcessError as e:
+                print(f"Error checking for pods: {e.stderr}", flush=True)
+                return False  # An error occurred
+
+            time.sleep(1)  # Check every second
+
+        print(f"Timeout waiting for pods to terminate in namespace {namespace}.", flush=True)
+        return False  # Timeout reached
 
     def access_pod_and_initiate_gossip(self,pod_name, filename, unique_id, iteration):
         try:
