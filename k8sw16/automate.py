@@ -3,6 +3,7 @@ import argparse
 import re
 import subprocess
 import sys
+import traceback
 
 class Test:
     def __init__(self,num_test,cluster):
