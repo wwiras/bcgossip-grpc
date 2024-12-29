@@ -144,7 +144,7 @@ class Test:
                     return True
             except subprocess.CalledProcessError as e:
                 print(f"Failed to get pod status for namespace {namespace}. Error: {e.stderr}", flush=True)
-            time.sleep(10)  # Check every 10 seconds
+            time.sleep(1)  # Check every 10 seconds
 
         print(f"Timeout waiting for pods to be down in namespace {namespace}.", flush=True)
         return False
