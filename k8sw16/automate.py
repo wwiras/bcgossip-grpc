@@ -126,25 +126,27 @@ class Test:
         print(f"Timeout waiting for all {expected_pods} pods to be running in namespace {namespace}.", flush=True)
         return False
 
-    def wait_for_pods_to_be_down(self,namespace='default', timeout=300):
+    def wait_for_pods_to_be_down(self, namespace='default', timeout=300):
         """
-        Waits for all pods in the specified StatefulSet to be ready.
+        Waits for all pods in the specified StatefulSet to be down.
         """
         print(f"Checking pods are running or not in namespace {namespace}...", flush=True)
         start_time = time.time()
-        get_pods_cmd = f"kubectl get pods"
+        get_pods_cmd = f"kubectl get pods -n {namespace}"
 
         while time.time() - start_time < timeout:
             try:
                 result = subprocess.run(get_pods_cmd, shell=True, text=True, capture_output=True, check=True)
-                if "No resources found in default namespace.\n" in result:
+
+                # Access the output using result.stdout
+                if "No resources found" in result.stdout:
                     print(f"No more pods are running in namespace {namespace}.", flush=True)
                     return True
             except subprocess.CalledProcessError as e:
                 print(f"Failed to get pod status for namespace {namespace}. Error: {e.stderr}", flush=True)
             time.sleep(10)  # Check every 10 seconds
 
-        print(f"Timeout waiting for all {expected_pods} pods to be running in namespace {namespace}.", flush=True)
+        print(f"Timeout waiting for pods to be down in namespace {namespace}.", flush=True)
         return False
 
     def access_pod_and_initiate_gossip(self,pod_name, filename, unique_id, iteration):
