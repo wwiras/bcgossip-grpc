@@ -129,7 +129,7 @@ class Test:
     import subprocess
     import time
 
-    def wait_for_pods_to_be_down(namespace='default', timeout=300):
+    def wait_for_pods_to_be_down(self,namespace='default', timeout=300):
         """
         Waits for all pods in the specified namespace to be down
         by checking every second until they are terminated or timeout is reached.
