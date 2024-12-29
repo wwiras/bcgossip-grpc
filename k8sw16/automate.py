@@ -28,8 +28,8 @@ class Test:
         print(f"self.topology_folder = {self.topology_folder}", flush=True)
 
         # list of nodes to test (from json filename)
-        self.nodes = self.getListofNodes(os.path.join(self.current_directory, topology_folder))
-        print(f"self.nodes = {self.nodes}", flush=True)
+        self.listOfFiles = self.getListofFiles(self,os.path.join(self.current_directory, topology_folder))
+        print(f"self.listOfFiles = {self.listOfFiles}", flush=True)
 
         # List all files in the directory and filter out subdirectories
         # deployment_files = [f for f in os.listdir(os.path.join(self.current_directory, topology_folder)) if os.path.isfile(os.path.join(deployment_path, f))]
