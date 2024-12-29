@@ -1,0 +1,2419 @@
+{
+    "directed": false,
+    "multigraph": false,
+    "graph": {},
+    "nodes": [
+        {
+            "id": "gossip-statefulset-0"
+        },
+        {
+            "id": "gossip-statefulset-1"
+        },
+        {
+            "id": "gossip-statefulset-2"
+        },
+        {
+            "id": "gossip-statefulset-3"
+        },
+        {
+            "id": "gossip-statefulset-4"
+        },
+        {
+            "id": "gossip-statefulset-5"
+        },
+        {
+            "id": "gossip-statefulset-6"
+        },
+        {
+            "id": "gossip-statefulset-7"
+        },
+        {
+            "id": "gossip-statefulset-8"
+        },
+        {
+            "id": "gossip-statefulset-9"
+        },
+        {
+            "id": "gossip-statefulset-10"
+        },
+        {
+            "id": "gossip-statefulset-11"
+        },
+        {
+            "id": "gossip-statefulset-12"
+        },
+        {
+            "id": "gossip-statefulset-13"
+        },
+        {
+            "id": "gossip-statefulset-14"
+        },
+        {
+            "id": "gossip-statefulset-15"
+        },
+        {
+            "id": "gossip-statefulset-16"
+        },
+        {
+            "id": "gossip-statefulset-17"
+        },
+        {
+            "id": "gossip-statefulset-18"
+        },
+        {
+            "id": "gossip-statefulset-19"
+        },
+        {
+            "id": "gossip-statefulset-20"
+        },
+        {
+            "id": "gossip-statefulset-21"
+        },
+        {
+            "id": "gossip-statefulset-22"
+        },
+        {
+            "id": "gossip-statefulset-23"
+        },
+        {
+            "id": "gossip-statefulset-24"
+        },
+        {
+            "id": "gossip-statefulset-25"
+        },
+        {
+            "id": "gossip-statefulset-26"
+        },
+        {
+            "id": "gossip-statefulset-27"
+        },
+        {
+            "id": "gossip-statefulset-28"
+        },
+        {
+            "id": "gossip-statefulset-29"
+        },
+        {
+            "id": "gossip-statefulset-30"
+        },
+        {
+            "id": "gossip-statefulset-31"
+        },
+        {
+            "id": "gossip-statefulset-32"
+        },
+        {
+            "id": "gossip-statefulset-33"
+        },
+        {
+            "id": "gossip-statefulset-34"
+        },
+        {
+            "id": "gossip-statefulset-35"
+        },
+        {
+            "id": "gossip-statefulset-36"
+        },
+        {
+            "id": "gossip-statefulset-37"
+        },
+        {
+            "id": "gossip-statefulset-38"
+        },
+        {
+            "id": "gossip-statefulset-39"
+        },
+        {
+            "id": "gossip-statefulset-40"
+        },
+        {
+            "id": "gossip-statefulset-41"
+        },
+        {
+            "id": "gossip-statefulset-42"
+        },
+        {
+            "id": "gossip-statefulset-43"
+        },
+        {
+            "id": "gossip-statefulset-44"
+        },
+        {
+            "id": "gossip-statefulset-45"
+        },
+        {
+            "id": "gossip-statefulset-46"
+        },
+        {
+            "id": "gossip-statefulset-47"
+        },
+        {
+            "id": "gossip-statefulset-48"
+        },
+        {
+            "id": "gossip-statefulset-49"
+        }
+    ],
+    "edges": [
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-4",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-6",
+            "latency": 69.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-9",
+            "latency": 39.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-10",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-13",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-14",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-16",
+            "latency": 26.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-20",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-21",
+            "latency": 50.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-38",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-40",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-41",
+            "latency": 98.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-42",
+            "latency": 62.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-43",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-44",
+            "latency": 77.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-45",
+            "latency": 32.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-46",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-47",
+            "latency": 94.0
+        },
+        {
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-49",
+            "latency": 19.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-2",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-3",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-5",
+            "latency": 35.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-7",
+            "latency": 24.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-8",
+            "latency": 40.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-11",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-12",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-15",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-18",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-19",
+            "latency": 56.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-22",
+            "latency": 47.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-23",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-27",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-28",
+            "latency": 99.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-29",
+            "latency": 87.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-30",
+            "latency": 42.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-31",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-33",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-35",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-37",
+            "latency": 25.0
+        },
+        {
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-48",
+            "latency": 47.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-3",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-5",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-7",
+            "latency": 73.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-8",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-11",
+            "latency": 18.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-12",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-15",
+            "latency": 79.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-18",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-19",
+            "latency": 31.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-22",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-23",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-27",
+            "latency": 17.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-28",
+            "latency": 25.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-29",
+            "latency": 59.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-30",
+            "latency": 91.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-31",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-33",
+            "latency": 41.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-35",
+            "latency": 82.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-37",
+            "latency": 85.0
+        },
+        {
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-48",
+            "latency": 62.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-5",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-7",
+            "latency": 84.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-8",
+            "latency": 87.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-11",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-12",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-15",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-18",
+            "latency": 28.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-19",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-22",
+            "latency": 21.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-23",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-27",
+            "latency": 52.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-28",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-29",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-30",
+            "latency": 36.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-31",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-33",
+            "latency": 60.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-35",
+            "latency": 59.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-37",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-48",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-6",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-9",
+            "latency": 24.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-10",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-13",
+            "latency": 79.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-14",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-16",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-20",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-21",
+            "latency": 62.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-38",
+            "latency": 47.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-40",
+            "latency": 66.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-41",
+            "latency": 26.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-42",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-43",
+            "latency": 11.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-44",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-45",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-46",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-47",
+            "latency": 13.0
+        },
+        {
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-49",
+            "latency": 60.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-7",
+            "latency": 73.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-8",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-11",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-12",
+            "latency": 22.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-15",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-18",
+            "latency": 32.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-19",
+            "latency": 77.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-22",
+            "latency": 80.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-23",
+            "latency": 18.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-27",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-28",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-29",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-30",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-31",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-33",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-35",
+            "latency": 21.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-37",
+            "latency": 27.0
+        },
+        {
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-48",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-9",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-10",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-13",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-14",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-16",
+            "latency": 48.0
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-20",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-21",
+            "latency": 27.0
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-38",
+            "latency": 98.0
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-40",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-41",
+            "latency": 78.0
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-42",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-43",
+            "latency": 70.0
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-44",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-45",
+            "latency": 35.0
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-46",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-47",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-49",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-8",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-11",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-12",
+            "latency": 16.0
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-15",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-18",
+            "latency": 14.0
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-19",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-22",
+            "latency": 61.0
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-23",
+            "latency": 10.0
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-27",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-28",
+            "latency": 38.0
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-29",
+            "latency": 10.0
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-30",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-31",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-33",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-35",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-37",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-48",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-11",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-12",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-15",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-18",
+            "latency": 85.0
+        },
+        {
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-19",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-22",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-23",
+            "latency": 63.0
+        },
+        {
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-27",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-28",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-29",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-30",
+            "latency": 63.0
+        },
+        {
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-31",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-33",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-35",
+            "latency": 57.0
+        },
+        {
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-37",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-48",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-10",
+            "latency": 64.0
+        },
+        {
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-13",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-14",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-16",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-20",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-21",
+            "latency": 17.0
+        },
+        {
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-38",
+            "latency": 32.0
+        },
+        {
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-40",
+            "latency": 21.0
+        },
+        {
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-41",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-42",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-43",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-44",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-45",
+            "latency": 80.0
+        },
+        {
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-46",
+            "latency": 73.0
+        },
+        {
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-47",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-49",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-13",
+            "latency": 91.0
+        },
+        {
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-14",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-16",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-20",
+            "latency": 25.0
+        },
+        {
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-21",
+            "latency": 41.0
+        },
+        {
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-38",
+            "latency": 58.0
+        },
+        {
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-40",
+            "latency": 44.0
+        },
+        {
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-41",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-42",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-43",
+            "latency": 19.0
+        },
+        {
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-44",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-45",
+            "latency": 63.0
+        },
+        {
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-46",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-47",
+            "latency": 18.0
+        },
+        {
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-49",
+            "latency": 66.0
+        },
+        {
+            "source": "gossip-statefulset-11",
+            "target": "gossip-statefulset-12",
+            "latency": 67.0
+        },
+        {
+            "source": "gossip-statefulset-11",
+            "target": "gossip-statefulset-15",
+            "latency": 34.0
+        },
+        {
+            "source": "gossip-statefulset-11",
+            "target": "gossip-statefulset-18",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-11",
+            "target": "gossip-statefulset-19",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-11",
+            "target": "gossip-statefulset-22",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-11",
+            "target": "gossip-statefulset-23",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-11",
+            "target": "gossip-statefulset-27",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-11",
+            "target": "gossip-statefulset-28",
+            "latency": 73.0
+        },
+        {
+            "source": "gossip-statefulset-11",
+            "target": "gossip-statefulset-29",
+            "latency": 61.0
+        },
+        {
+            "source": "gossip-statefulset-11",
+            "target": "gossip-statefulset-30",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-11",
+            "target": "gossip-statefulset-31",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-11",
+            "target": "gossip-statefulset-33",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-11",
+            "target": "gossip-statefulset-35",
+            "latency": 76.0
+        },
+        {
+            "source": "gossip-statefulset-11",
+            "target": "gossip-statefulset-37",
+            "latency": 37.0
+        },
+        {
+            "source": "gossip-statefulset-11",
+            "target": "gossip-statefulset-48",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-12",
+            "target": "gossip-statefulset-15",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-12",
+            "target": "gossip-statefulset-18",
+            "latency": 63.0
+        },
+        {
+            "source": "gossip-statefulset-12",
+            "target": "gossip-statefulset-19",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-12",
+            "target": "gossip-statefulset-22",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-12",
+            "target": "gossip-statefulset-23",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-12",
+            "target": "gossip-statefulset-27",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-12",
+            "target": "gossip-statefulset-28",
+            "latency": 59.0
+        },
+        {
+            "source": "gossip-statefulset-12",
+            "target": "gossip-statefulset-29",
+            "latency": 72.0
+        },
+        {
+            "source": "gossip-statefulset-12",
+            "target": "gossip-statefulset-30",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-12",
+            "target": "gossip-statefulset-31",
+            "latency": 64.0
+        },
+        {
+            "source": "gossip-statefulset-12",
+            "target": "gossip-statefulset-33",
+            "latency": 32.0
+        },
+        {
+            "source": "gossip-statefulset-12",
+            "target": "gossip-statefulset-35",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-12",
+            "target": "gossip-statefulset-37",
+            "latency": 49.0
+        },
+        {
+            "source": "gossip-statefulset-12",
+            "target": "gossip-statefulset-48",
+            "latency": 59.0
+        },
+        {
+            "source": "gossip-statefulset-13",
+            "target": "gossip-statefulset-14",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-13",
+            "target": "gossip-statefulset-16",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-13",
+            "target": "gossip-statefulset-20",
+            "latency": 36.0
+        },
+        {
+            "source": "gossip-statefulset-13",
+            "target": "gossip-statefulset-21",
+            "latency": 11.0
+        },
+        {
+            "source": "gossip-statefulset-13",
+            "target": "gossip-statefulset-38",
+            "latency": 97.0
+        },
+        {
+            "source": "gossip-statefulset-13",
+            "target": "gossip-statefulset-40",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-13",
+            "target": "gossip-statefulset-41",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-13",
+            "target": "gossip-statefulset-42",
+            "latency": 73.0
+        },
+        {
+            "source": "gossip-statefulset-13",
+            "target": "gossip-statefulset-43",
+            "latency": 80.0
+        },
+        {
+            "source": "gossip-statefulset-13",
+            "target": "gossip-statefulset-44",
+            "latency": 72.0
+        },
+        {
+            "source": "gossip-statefulset-13",
+            "target": "gossip-statefulset-45",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-13",
+            "target": "gossip-statefulset-46",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-13",
+            "target": "gossip-statefulset-47",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-13",
+            "target": "gossip-statefulset-49",
+            "latency": 81.0
+        },
+        {
+            "source": "gossip-statefulset-14",
+            "target": "gossip-statefulset-16",
+            "latency": 70.0
+        },
+        {
+            "source": "gossip-statefulset-14",
+            "target": "gossip-statefulset-20",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-14",
+            "target": "gossip-statefulset-21",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-14",
+            "target": "gossip-statefulset-38",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-14",
+            "target": "gossip-statefulset-40",
+            "latency": 43.0
+        },
+        {
+            "source": "gossip-statefulset-14",
+            "target": "gossip-statefulset-41",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-14",
+            "target": "gossip-statefulset-42",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-14",
+            "target": "gossip-statefulset-43",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-14",
+            "target": "gossip-statefulset-44",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-14",
+            "target": "gossip-statefulset-45",
+            "latency": 87.0
+        },
+        {
+            "source": "gossip-statefulset-14",
+            "target": "gossip-statefulset-46",
+            "latency": 56.0
+        },
+        {
+            "source": "gossip-statefulset-14",
+            "target": "gossip-statefulset-47",
+            "latency": 64.0
+        },
+        {
+            "source": "gossip-statefulset-14",
+            "target": "gossip-statefulset-49",
+            "latency": 44.0
+        },
+        {
+            "source": "gossip-statefulset-15",
+            "target": "gossip-statefulset-18",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-15",
+            "target": "gossip-statefulset-19",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-15",
+            "target": "gossip-statefulset-22",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-15",
+            "target": "gossip-statefulset-23",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-15",
+            "target": "gossip-statefulset-27",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-15",
+            "target": "gossip-statefulset-28",
+            "latency": 47.0
+        },
+        {
+            "source": "gossip-statefulset-15",
+            "target": "gossip-statefulset-29",
+            "latency": 65.0
+        },
+        {
+            "source": "gossip-statefulset-15",
+            "target": "gossip-statefulset-30",
+            "latency": 22.0
+        },
+        {
+            "source": "gossip-statefulset-15",
+            "target": "gossip-statefulset-31",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-15",
+            "target": "gossip-statefulset-33",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-15",
+            "target": "gossip-statefulset-35",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-15",
+            "target": "gossip-statefulset-37",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-15",
+            "target": "gossip-statefulset-48",
+            "latency": 80.0
+        },
+        {
+            "source": "gossip-statefulset-16",
+            "target": "gossip-statefulset-20",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-16",
+            "target": "gossip-statefulset-21",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-16",
+            "target": "gossip-statefulset-38",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-16",
+            "target": "gossip-statefulset-40",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-16",
+            "target": "gossip-statefulset-41",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-16",
+            "target": "gossip-statefulset-42",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-16",
+            "target": "gossip-statefulset-43",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-16",
+            "target": "gossip-statefulset-44",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-16",
+            "target": "gossip-statefulset-45",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-16",
+            "target": "gossip-statefulset-46",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-16",
+            "target": "gossip-statefulset-47",
+            "latency": 44.0
+        },
+        {
+            "source": "gossip-statefulset-16",
+            "target": "gossip-statefulset-49",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-17",
+            "target": "gossip-statefulset-24",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-17",
+            "target": "gossip-statefulset-25",
+            "latency": 47.0
+        },
+        {
+            "source": "gossip-statefulset-17",
+            "target": "gossip-statefulset-26",
+            "latency": 47.0
+        },
+        {
+            "source": "gossip-statefulset-17",
+            "target": "gossip-statefulset-32",
+            "latency": 29.0
+        },
+        {
+            "source": "gossip-statefulset-17",
+            "target": "gossip-statefulset-34",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-17",
+            "target": "gossip-statefulset-36",
+            "latency": 89.0
+        },
+        {
+            "source": "gossip-statefulset-17",
+            "target": "gossip-statefulset-39",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-18",
+            "target": "gossip-statefulset-19",
+            "latency": 42.0
+        },
+        {
+            "source": "gossip-statefulset-18",
+            "target": "gossip-statefulset-22",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-18",
+            "target": "gossip-statefulset-23",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-18",
+            "target": "gossip-statefulset-27",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-18",
+            "target": "gossip-statefulset-28",
+            "latency": 73.0
+        },
+        {
+            "source": "gossip-statefulset-18",
+            "target": "gossip-statefulset-29",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-18",
+            "target": "gossip-statefulset-30",
+            "latency": 72.0
+        },
+        {
+            "source": "gossip-statefulset-18",
+            "target": "gossip-statefulset-31",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-18",
+            "target": "gossip-statefulset-33",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-18",
+            "target": "gossip-statefulset-35",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-18",
+            "target": "gossip-statefulset-37",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-18",
+            "target": "gossip-statefulset-48",
+            "latency": 63.0
+        },
+        {
+            "source": "gossip-statefulset-19",
+            "target": "gossip-statefulset-22",
+            "latency": 93.0
+        },
+        {
+            "source": "gossip-statefulset-19",
+            "target": "gossip-statefulset-23",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-19",
+            "target": "gossip-statefulset-27",
+            "latency": 81.0
+        },
+        {
+            "source": "gossip-statefulset-19",
+            "target": "gossip-statefulset-28",
+            "latency": 79.0
+        },
+        {
+            "source": "gossip-statefulset-19",
+            "target": "gossip-statefulset-29",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-19",
+            "target": "gossip-statefulset-30",
+            "latency": 86.0
+        },
+        {
+            "source": "gossip-statefulset-19",
+            "target": "gossip-statefulset-31",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-19",
+            "target": "gossip-statefulset-33",
+            "latency": 59.0
+        },
+        {
+            "source": "gossip-statefulset-19",
+            "target": "gossip-statefulset-35",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-19",
+            "target": "gossip-statefulset-37",
+            "latency": 72.0
+        },
+        {
+            "source": "gossip-statefulset-19",
+            "target": "gossip-statefulset-48",
+            "latency": 88.0
+        },
+        {
+            "source": "gossip-statefulset-20",
+            "target": "gossip-statefulset-21",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-20",
+            "target": "gossip-statefulset-38",
+            "latency": 69.0
+        },
+        {
+            "source": "gossip-statefulset-20",
+            "target": "gossip-statefulset-40",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-20",
+            "target": "gossip-statefulset-41",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-20",
+            "target": "gossip-statefulset-42",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-20",
+            "target": "gossip-statefulset-43",
+            "latency": 41.0
+        },
+        {
+            "source": "gossip-statefulset-20",
+            "target": "gossip-statefulset-44",
+            "latency": 33.0
+        },
+        {
+            "source": "gossip-statefulset-20",
+            "target": "gossip-statefulset-45",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-20",
+            "target": "gossip-statefulset-46",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-20",
+            "target": "gossip-statefulset-47",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-20",
+            "target": "gossip-statefulset-49",
+            "latency": 65.0
+        },
+        {
+            "source": "gossip-statefulset-21",
+            "target": "gossip-statefulset-38",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-21",
+            "target": "gossip-statefulset-40",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-21",
+            "target": "gossip-statefulset-41",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-21",
+            "target": "gossip-statefulset-42",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-21",
+            "target": "gossip-statefulset-43",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-21",
+            "target": "gossip-statefulset-44",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-21",
+            "target": "gossip-statefulset-45",
+            "latency": 22.0
+        },
+        {
+            "source": "gossip-statefulset-21",
+            "target": "gossip-statefulset-46",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-21",
+            "target": "gossip-statefulset-47",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-21",
+            "target": "gossip-statefulset-49",
+            "latency": 14.0
+        },
+        {
+            "source": "gossip-statefulset-22",
+            "target": "gossip-statefulset-23",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-22",
+            "target": "gossip-statefulset-27",
+            "latency": 99.0
+        },
+        {
+            "source": "gossip-statefulset-22",
+            "target": "gossip-statefulset-28",
+            "latency": 38.0
+        },
+        {
+            "source": "gossip-statefulset-22",
+            "target": "gossip-statefulset-29",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-22",
+            "target": "gossip-statefulset-30",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-22",
+            "target": "gossip-statefulset-31",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-22",
+            "target": "gossip-statefulset-33",
+            "latency": 60.0
+        },
+        {
+            "source": "gossip-statefulset-22",
+            "target": "gossip-statefulset-35",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-22",
+            "target": "gossip-statefulset-37",
+            "latency": 71.0
+        },
+        {
+            "source": "gossip-statefulset-22",
+            "target": "gossip-statefulset-48",
+            "latency": 69.0
+        },
+        {
+            "source": "gossip-statefulset-23",
+            "target": "gossip-statefulset-27",
+            "latency": 57.0
+        },
+        {
+            "source": "gossip-statefulset-23",
+            "target": "gossip-statefulset-28",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-23",
+            "target": "gossip-statefulset-29",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-23",
+            "target": "gossip-statefulset-30",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-23",
+            "target": "gossip-statefulset-31",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-23",
+            "target": "gossip-statefulset-33",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-23",
+            "target": "gossip-statefulset-35",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-23",
+            "target": "gossip-statefulset-37",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-23",
+            "target": "gossip-statefulset-48",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-24",
+            "target": "gossip-statefulset-25",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-24",
+            "target": "gossip-statefulset-26",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-24",
+            "target": "gossip-statefulset-32",
+            "latency": 26.0
+        },
+        {
+            "source": "gossip-statefulset-24",
+            "target": "gossip-statefulset-34",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-24",
+            "target": "gossip-statefulset-36",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-24",
+            "target": "gossip-statefulset-39",
+            "latency": 70.0
+        },
+        {
+            "source": "gossip-statefulset-24",
+            "target": "gossip-statefulset-27",
+            "latency": 12.0
+        },
+        {
+            "source": "gossip-statefulset-24",
+            "target": "gossip-statefulset-42",
+            "latency": 31.0
+        },
+        {
+            "source": "gossip-statefulset-25",
+            "target": "gossip-statefulset-26",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-25",
+            "target": "gossip-statefulset-32",
+            "latency": 88.0
+        },
+        {
+            "source": "gossip-statefulset-25",
+            "target": "gossip-statefulset-34",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-25",
+            "target": "gossip-statefulset-36",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-25",
+            "target": "gossip-statefulset-39",
+            "latency": 82.0
+        },
+        {
+            "source": "gossip-statefulset-26",
+            "target": "gossip-statefulset-32",
+            "latency": 20.0
+        },
+        {
+            "source": "gossip-statefulset-26",
+            "target": "gossip-statefulset-34",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-26",
+            "target": "gossip-statefulset-36",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-26",
+            "target": "gossip-statefulset-39",
+            "latency": 47.0
+        },
+        {
+            "source": "gossip-statefulset-27",
+            "target": "gossip-statefulset-28",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-27",
+            "target": "gossip-statefulset-29",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-27",
+            "target": "gossip-statefulset-30",
+            "latency": 39.0
+        },
+        {
+            "source": "gossip-statefulset-27",
+            "target": "gossip-statefulset-31",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-27",
+            "target": "gossip-statefulset-33",
+            "latency": 42.0
+        },
+        {
+            "source": "gossip-statefulset-27",
+            "target": "gossip-statefulset-35",
+            "latency": 45.0
+        },
+        {
+            "source": "gossip-statefulset-27",
+            "target": "gossip-statefulset-37",
+            "latency": 60.0
+        },
+        {
+            "source": "gossip-statefulset-27",
+            "target": "gossip-statefulset-48",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-27",
+            "target": "gossip-statefulset-42",
+            "latency": 58.0
+        },
+        {
+            "source": "gossip-statefulset-28",
+            "target": "gossip-statefulset-29",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-28",
+            "target": "gossip-statefulset-30",
+            "latency": 76.0
+        },
+        {
+            "source": "gossip-statefulset-28",
+            "target": "gossip-statefulset-31",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-28",
+            "target": "gossip-statefulset-33",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-28",
+            "target": "gossip-statefulset-35",
+            "latency": 49.0
+        },
+        {
+            "source": "gossip-statefulset-28",
+            "target": "gossip-statefulset-37",
+            "latency": 23.0
+        },
+        {
+            "source": "gossip-statefulset-28",
+            "target": "gossip-statefulset-48",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-29",
+            "target": "gossip-statefulset-30",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-29",
+            "target": "gossip-statefulset-31",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-29",
+            "target": "gossip-statefulset-33",
+            "latency": 93.0
+        },
+        {
+            "source": "gossip-statefulset-29",
+            "target": "gossip-statefulset-35",
+            "latency": 68.0
+        },
+        {
+            "source": "gossip-statefulset-29",
+            "target": "gossip-statefulset-37",
+            "latency": 32.0
+        },
+        {
+            "source": "gossip-statefulset-29",
+            "target": "gossip-statefulset-48",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-30",
+            "target": "gossip-statefulset-31",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-30",
+            "target": "gossip-statefulset-33",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-30",
+            "target": "gossip-statefulset-35",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-30",
+            "target": "gossip-statefulset-37",
+            "latency": 97.0
+        },
+        {
+            "source": "gossip-statefulset-30",
+            "target": "gossip-statefulset-48",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-31",
+            "target": "gossip-statefulset-33",
+            "latency": 19.0
+        },
+        {
+            "source": "gossip-statefulset-31",
+            "target": "gossip-statefulset-35",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-31",
+            "target": "gossip-statefulset-37",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-31",
+            "target": "gossip-statefulset-48",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-32",
+            "target": "gossip-statefulset-34",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-32",
+            "target": "gossip-statefulset-36",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-32",
+            "target": "gossip-statefulset-39",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-33",
+            "target": "gossip-statefulset-35",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-33",
+            "target": "gossip-statefulset-37",
+            "latency": 22.0
+        },
+        {
+            "source": "gossip-statefulset-33",
+            "target": "gossip-statefulset-48",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-34",
+            "target": "gossip-statefulset-36",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-34",
+            "target": "gossip-statefulset-39",
+            "latency": 68.0
+        },
+        {
+            "source": "gossip-statefulset-35",
+            "target": "gossip-statefulset-37",
+            "latency": 57.0
+        },
+        {
+            "source": "gossip-statefulset-35",
+            "target": "gossip-statefulset-48",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-36",
+            "target": "gossip-statefulset-39",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-37",
+            "target": "gossip-statefulset-48",
+            "latency": 92.0
+        },
+        {
+            "source": "gossip-statefulset-38",
+            "target": "gossip-statefulset-40",
+            "latency": 60.0
+        },
+        {
+            "source": "gossip-statefulset-38",
+            "target": "gossip-statefulset-41",
+            "latency": 7.0
+        },
+        {
+            "source": "gossip-statefulset-38",
+            "target": "gossip-statefulset-42",
+            "latency": 39.0
+        },
+        {
+            "source": "gossip-statefulset-38",
+            "target": "gossip-statefulset-43",
+            "latency": 37.0
+        },
+        {
+            "source": "gossip-statefulset-38",
+            "target": "gossip-statefulset-44",
+            "latency": 27.0
+        },
+        {
+            "source": "gossip-statefulset-38",
+            "target": "gossip-statefulset-45",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-38",
+            "target": "gossip-statefulset-46",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-38",
+            "target": "gossip-statefulset-47",
+            "latency": 81.0
+        },
+        {
+            "source": "gossip-statefulset-38",
+            "target": "gossip-statefulset-49",
+            "latency": 88.0
+        },
+        {
+            "source": "gossip-statefulset-40",
+            "target": "gossip-statefulset-41",
+            "latency": 21.0
+        },
+        {
+            "source": "gossip-statefulset-40",
+            "target": "gossip-statefulset-42",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-40",
+            "target": "gossip-statefulset-43",
+            "latency": 12.0
+        },
+        {
+            "source": "gossip-statefulset-40",
+            "target": "gossip-statefulset-44",
+            "latency": 2.0
+        },
+        {
+            "source": "gossip-statefulset-40",
+            "target": "gossip-statefulset-45",
+            "latency": 33.0
+        },
+        {
+            "source": "gossip-statefulset-40",
+            "target": "gossip-statefulset-46",
+            "latency": 48.0
+        },
+        {
+            "source": "gossip-statefulset-40",
+            "target": "gossip-statefulset-47",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-40",
+            "target": "gossip-statefulset-49",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-41",
+            "target": "gossip-statefulset-42",
+            "latency": 42.0
+        },
+        {
+            "source": "gossip-statefulset-41",
+            "target": "gossip-statefulset-43",
+            "latency": 25.0
+        },
+        {
+            "source": "gossip-statefulset-41",
+            "target": "gossip-statefulset-44",
+            "latency": 45.0
+        },
+        {
+            "source": "gossip-statefulset-41",
+            "target": "gossip-statefulset-45",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-41",
+            "target": "gossip-statefulset-46",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-41",
+            "target": "gossip-statefulset-47",
+            "latency": 6.0
+        },
+        {
+            "source": "gossip-statefulset-41",
+            "target": "gossip-statefulset-49",
+            "latency": 9.0
+        },
+        {
+            "source": "gossip-statefulset-42",
+            "target": "gossip-statefulset-43",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-42",
+            "target": "gossip-statefulset-44",
+            "latency": 3.0
+        },
+        {
+            "source": "gossip-statefulset-42",
+            "target": "gossip-statefulset-45",
+            "latency": 35.0
+        },
+        {
+            "source": "gossip-statefulset-42",
+            "target": "gossip-statefulset-46",
+            "latency": 17.0
+        },
+        {
+            "source": "gossip-statefulset-42",
+            "target": "gossip-statefulset-47",
+            "latency": 29.0
+        },
+        {
+            "source": "gossip-statefulset-42",
+            "target": "gossip-statefulset-49",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-43",
+            "target": "gossip-statefulset-44",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-43",
+            "target": "gossip-statefulset-45",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-43",
+            "target": "gossip-statefulset-46",
+            "latency": 87.0
+        },
+        {
+            "source": "gossip-statefulset-43",
+            "target": "gossip-statefulset-47",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-43",
+            "target": "gossip-statefulset-49",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-44",
+            "target": "gossip-statefulset-45",
+            "latency": 45.0
+        },
+        {
+            "source": "gossip-statefulset-44",
+            "target": "gossip-statefulset-46",
+            "latency": 32.0
+        },
+        {
+            "source": "gossip-statefulset-44",
+            "target": "gossip-statefulset-47",
+            "latency": 72.0
+        },
+        {
+            "source": "gossip-statefulset-44",
+            "target": "gossip-statefulset-49",
+            "latency": 78.0
+        },
+        {
+            "source": "gossip-statefulset-45",
+            "target": "gossip-statefulset-46",
+            "latency": 8.0
+        },
+        {
+            "source": "gossip-statefulset-45",
+            "target": "gossip-statefulset-47",
+            "latency": 26.0
+        },
+        {
+            "source": "gossip-statefulset-45",
+            "target": "gossip-statefulset-49",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-46",
+            "target": "gossip-statefulset-47",
+            "latency": 4.0
+        },
+        {
+            "source": "gossip-statefulset-46",
+            "target": "gossip-statefulset-49",
+            "latency": 5.0
+        },
+        {
+            "source": "gossip-statefulset-47",
+            "target": "gossip-statefulset-49",
+            "latency": 5.0
+        }
+    ]
+}
