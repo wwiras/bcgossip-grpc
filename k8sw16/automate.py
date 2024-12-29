@@ -231,7 +231,7 @@ if __name__ == '__main__':
                                                'chartw/values.yaml', '--debug', '--set','cluster=' + str(test.cluster), '--set',
                                                 'totalNodes=' + str(node)]
                                               )
-                    print(f"Helm {statefulsetname} started...", flush=True)
+                    print(f"Helm {statefulsetname}: {file} started...", flush=True)
 
                     if test.wait_for_pods_to_be_ready(namespace='default', expected_pods=node, timeout=300):
 
@@ -259,5 +259,5 @@ if __name__ == '__main__':
                     result = test.run_command(['helm', 'uninstall', statefulsetname])
                     print(f"Helm {statefulsetname} will be uninstalled...", flush=True)
                     if test.wait_for_pods_to_be_down(namespace='default', timeout=300):
-                        print(f"Helm {statefulsetname} uninstalled is completed...", flush=True)
+                        print(f"Helm {statefulsetname}: {file} uninstalled is completed...", flush=True)
 
