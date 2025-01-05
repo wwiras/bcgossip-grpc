@@ -5,6 +5,7 @@ from itertools import combinations
 import random
 import os
 from datetime import datetime
+import argparse
 
 def construct_BA_network(number_of_nodes, parameter):
     # Construct Barabási – Albert(BA) model topology
@@ -88,7 +89,7 @@ def display_graph(graph, title="Network Graph"):
   plt.title(title)
   plt.show()
 
-def save_topology_to_json(graph, type="BA"):
+def save_topology_to_json(graph, others, type="BA"):
     """
     Saves the network topology to a JSON file.
 
@@ -101,7 +102,7 @@ def save_topology_to_json(graph, type="BA"):
     now = datetime.now()
     # dt_string = now.strftime("%b%d%Y%H%M")  # Format: Dec2320241946
     dt_string = now.strftime("%b%d%Y%H%M%S")  # Format: Dec232024194653
-    filename = f"nodes{len(graph)}_{dt_string}_{type}.json"
+    filename = f"nodes{len(graph)}_{dt_string}_{type}{others}.json"
 
     # Create directory if it doesn't exist
     output_dir = "topology"
@@ -114,31 +115,48 @@ def save_topology_to_json(graph, type="BA"):
         json.dump(graph_data, f, indent=4)
     print(f"Topology saved to {filename}")
 
-
-# Using BA Model
-number_of_nodes = 8
-parameter = 3
-graph = construct_BA_network(number_of_nodes, parameter)
-print(f"ba graph = {graph}")
-
-
-# Using BE Model
-# number_of_nodes = 8
-# probability_of_edges = 0.5
-# graph = construct_ER_network(number_of_nodes, probability_of_edges)
-# print(f"er_graph = {graph}")
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Send a message to self (the current pod).")
+    parser.add_argument('--nodes', required=True, help="Total number of nodes for the topology")
+    parser.add_argument('--others', required=True, help="Total number of probability (ER) or parameter (BA)")
+    parser.add_argument('--model', required=True, help="Total number of nodes for the topology")
+    # Add the optional argument with a default value of False
+    parser.add_argument('--display', action='store_true', help="Display new topology (default: False)")
+    parser.add_argument('--save', action='store_true', help="Save new topology to json(default: False)")
+    args = parser.parse_args()
 
 
-# Assuming you have a graph called 'ba_graph' (as in your previous code)
-display_graph(graph, "Barabási–Albert Network")
-# display_graph(graph, "Erdös – Rényi(ER) Network")
+    if args.model== "BA":
 
-# Save the topology to a JSON file
-save_topology_to_json(graph)
-# save_topology_to_json(graph, "ER")
+        # Using BA Model
+        number_of_nodes = int(args.nodes)
+        parameter = int(args.others)
+        graph = construct_BA_network(number_of_nodes, parameter)
 
-# Iterate and print the graph content
-iterate_and_print_graph(graph)
+        # Assuming you have a graph called 'ba_graph' (as in your previous code)
+        if args.display:
+            display_graph(graph, "Barabási–Albert Network")
+
+        if args.save:
+            # Save the topology to a JSON file
+            save_topology_to_json(graph,parameter)
+
+    else:
+
+        # Using ER Model
+        number_of_nodes = int(args.nodes)
+        probability_of_edges = float(args.others) # 0.5
+        graph = construct_ER_network(number_of_nodes, probability_of_edges)
+
+        if args.display:
+            display_graph(graph, "Erdös – Rényi(ER) Network")
+
+        if args.save:
+        # Save the topology to a JSON file
+            save_topology_to_json(graph, probability_of_edges, "ER")
+
+    # Iterate and print the graph content
+    iterate_and_print_graph(graph)
 
 
 

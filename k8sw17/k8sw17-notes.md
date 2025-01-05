@@ -1,8 +1,11 @@
-## Notes on BCGP (BlockChain Gossip Protocol) - k8sw16
+## Notes on DONS simulator - k8sw17
 
 ### Introduction
-This k8sw16 is a folder where the random gossip algorithm happens
-with the construction of k-Means cluster. Options for kMeans clustering.
+This purpose of k8sw17 folder is to create a simulator that will
+imitate the simulation of "An Efficient Blockchain Neighbor Selection 
+Framework Based on Agglomerative Clustering" paper. Basically, the based
+of the network is based on DONS simulator 
+(https://www.sciencedirect.com/science/article/pii/S0167739X2100491X)
 
 #### Online KMeans Clustering
 Consider this as "live" version. This is where the kMeans clustering is 
@@ -27,21 +30,26 @@ to implement it. This folder also taking into account of non-cluster topology.
 
 ### Steps to implement
 
-#### Step 1 - Build random topology (input: nodes,n) using leptokurtic latency
+#### Step 1 - Build random topology (input: nodes,n) using BA or ER model
+BA = Barabási–Albert Network
+ER = Erdös – Rényi(ER) Network
 Before initializing gossip, we need to create a topology that will
-gossip with leptokurtic latency (range 2ms - 100ms) and mean of 10ms
+gossip with BA or ER model latency (range 1ms - 100ms). Make sure
+you provide save and display options (optional)
 
 ```shell
-python create_topology.py --nodes 10
+# For BA model
+python network_constructor.py --nodes 7 --model BA --others 3 --save 
 ```
-
-This script will create a topology file with the latency required. However,
-we cannot imagine the topology. Below is the script (command) to display
-the topology
 
 ```shell
-topology % python ../ptgraphLT.py --filename nodes10_Dec2820240043.json 
+# For ER model
+python network_constructor.py --nodes 7 --model ER --others 0.5 --display
 ```
+
+This script will create a topology file (in topology folder) or 
+display the topology based on the options provided.
+
 
 #### Step 2 - Build cluster topology (input; k=total_cluster, json_file=from step 1)
 This is an offline solution for a distribution system. Based on the output from step 1, we will create

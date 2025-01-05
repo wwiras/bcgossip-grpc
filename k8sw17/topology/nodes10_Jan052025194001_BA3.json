@@ -28,83 +28,119 @@
         },
         {
             "id": "gossip-statefulset-8"
+        },
+        {
+            "id": "gossip-statefulset-9"
+        },
+        {
+            "id": "gossip-statefulset-10"
         }
     ],
     "edges": [
         {
-            "weight": 89,
+            "weight": 86,
             "source": "gossip-statefulset-1",
             "target": "gossip-statefulset-2"
         },
         {
-            "weight": 1,
+            "weight": 88,
             "source": "gossip-statefulset-1",
             "target": "gossip-statefulset-3"
         },
         {
-            "weight": 49,
+            "weight": 14,
             "source": "gossip-statefulset-1",
             "target": "gossip-statefulset-4"
         },
         {
-            "weight": 19,
+            "weight": 96,
             "source": "gossip-statefulset-1",
             "target": "gossip-statefulset-5"
+        },
+        {
+            "weight": 18,
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-6"
+        },
+        {
+            "weight": 37,
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-7"
         },
         {
             "weight": 59,
             "source": "gossip-statefulset-1",
-            "target": "gossip-statefulset-6"
-        },
-        {
-            "weight": 78,
-            "source": "gossip-statefulset-1",
-            "target": "gossip-statefulset-7"
-        },
-        {
-            "weight": 98,
-            "source": "gossip-statefulset-1",
             "target": "gossip-statefulset-8"
         },
         {
-            "weight": 78,
-            "source": "gossip-statefulset-2",
-            "target": "gossip-statefulset-5"
-        },
-        {
-            "weight": 46,
-            "source": "gossip-statefulset-2",
-            "target": "gossip-statefulset-6"
-        },
-        {
-            "weight": 14,
-            "source": "gossip-statefulset-2",
-            "target": "gossip-statefulset-7"
-        },
-        {
-            "weight": 40,
-            "source": "gossip-statefulset-2",
-            "target": "gossip-statefulset-8"
-        },
-        {
-            "weight": 60,
+            "weight": 13,
             "source": "gossip-statefulset-3",
             "target": "gossip-statefulset-5"
         },
         {
-            "weight": 8,
+            "weight": 6,
             "source": "gossip-statefulset-3",
             "target": "gossip-statefulset-6"
         },
         {
-            "weight": 5,
+            "weight": 17,
             "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-7"
+        },
+        {
+            "weight": 43,
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-9"
+        },
+        {
+            "weight": 28,
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-5"
+        },
+        {
+            "weight": 34,
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-6"
+        },
+        {
+            "weight": 11,
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-7"
+        },
+        {
+            "weight": 89,
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-9"
+        },
+        {
+            "weight": 97,
+            "source": "gossip-statefulset-6",
             "target": "gossip-statefulset-8"
         },
         {
-            "weight": 72,
-            "source": "gossip-statefulset-5",
-            "target": "gossip-statefulset-7"
+            "weight": 50,
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-8"
+        },
+        {
+            "weight": 28,
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-9"
+        },
+        {
+            "weight": 33,
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-10"
+        },
+        {
+            "weight": 49,
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-10"
+        },
+        {
+            "weight": 25,
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-10"
         }
     ]
 }

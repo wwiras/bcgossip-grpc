@@ -1,0 +1,156 @@
+{
+    "directed": false,
+    "multigraph": false,
+    "graph": {
+        "name": "Erd\u00f6s \u2013 R\u00e9nyi(ER)"
+    },
+    "nodes": [
+        {
+            "id": "gossip-statefulset-0"
+        },
+        {
+            "id": "gossip-statefulset-1"
+        },
+        {
+            "id": "gossip-statefulset-2"
+        },
+        {
+            "id": "gossip-statefulset-3"
+        },
+        {
+            "id": "gossip-statefulset-4"
+        },
+        {
+            "id": "gossip-statefulset-5"
+        },
+        {
+            "id": "gossip-statefulset-6"
+        },
+        {
+            "id": "gossip-statefulset-7"
+        },
+        {
+            "id": "gossip-statefulset-8"
+        },
+        {
+            "id": "gossip-statefulset-9"
+        }
+    ],
+    "edges": [
+        {
+            "weight": 3,
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-1"
+        },
+        {
+            "weight": 92,
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-2"
+        },
+        {
+            "weight": 64,
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-4"
+        },
+        {
+            "weight": 77,
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-6"
+        },
+        {
+            "weight": 76,
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-7"
+        },
+        {
+            "weight": 51,
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-9"
+        },
+        {
+            "weight": 100,
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-2"
+        },
+        {
+            "weight": 28,
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-3"
+        },
+        {
+            "weight": 83,
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-5"
+        },
+        {
+            "weight": 39,
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-7"
+        },
+        {
+            "weight": 91,
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-8"
+        },
+        {
+            "weight": 97,
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-4"
+        },
+        {
+            "weight": 2,
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-8"
+        },
+        {
+            "weight": 15,
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-9"
+        },
+        {
+            "weight": 89,
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-4"
+        },
+        {
+            "weight": 82,
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-6"
+        },
+        {
+            "weight": 28,
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-8"
+        },
+        {
+            "weight": 90,
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-9"
+        },
+        {
+            "weight": 98,
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-5"
+        },
+        {
+            "weight": 95,
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-7"
+        },
+        {
+            "weight": 18,
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-8"
+        },
+        {
+            "weight": 59,
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-7"
+        },
+        {
+            "weight": 65,
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-8"
+        }
+    ]
+}
