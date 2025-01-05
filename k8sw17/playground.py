@@ -2,8 +2,6 @@ import networkx as nx
 import json
 import random
 import argparse
-import os
-from datetime import datetime
 
 def create_complete_graph(n, median_latency=10):
   """
@@ -34,7 +32,7 @@ def create_complete_graph(n, median_latency=10):
 
   # Add the latencies as edge weights
   for i, (u, v) in enumerate(graph.edges()):
-    graph[u][v]['latency'] = latencies[i]
+    graph[u][v]['weight'] = latencies[i]
 
   # Calculate the degree of each node (which should be n-1)
   d = n - 1
@@ -43,13 +41,9 @@ def create_complete_graph(n, median_latency=10):
   total_edges = n * (n - 1) // 2
 
   # Prepare data for JSON output
-  nodes = ['gossip-statefulset-' + str(i) for i in range(n)]
-  edges = [{'source': 'gossip-statefulset-' + str(u), 'target': 'gossip-statefulset-' + str(v),
-            'latency': graph[u][v]['latency']} for u, v in graph.edges]
+  nodes = [{'id': node} for node in graph.nodes]
+  edges = [{'source': u, 'target': v, 'weight': graph[u][v]['weight']} for u, v in graph.edges]
   graph_data = {
-      "directed": False,
-      "multigraph": False,
-      "graph": {},
       "nodes": nodes,
       "edges": edges,
       "degree": d,
@@ -57,7 +51,7 @@ def create_complete_graph(n, median_latency=10):
   }
 
   # Convert graph data to JSON string
-  json_output = json.dumps(graph_data, indent=4)
+  json_output = json.dumps(graph_data, indent=2)
 
   return graph, json_output
 
@@ -69,26 +63,5 @@ if __name__ == '__main__':
     # Create the graph and get the JSON output
     graph, json_output = create_complete_graph(int(args.nodes))
 
-    # Get current date and time
-    now = datetime.now()
-    dt_string = now.strftime("%b%d%Y%H%M")  # Format: Dec2320241946
-
-
-    # Construct the full file path
-    output_dir = 'topology'
-    # filename = f"nt_nodes{int(args.nodes)}_{dt_string}.json"
-    filename = f"nodes{int(args.nodes)}_{dt_string}.json"
-    file_path = os.path.join(output_dir, filename)
-
-    # Specify the directory to save the JSON file (current directory)
-    os.makedirs(output_dir, exist_ok=True)  # Create the directory if it doesn't exist
-    filename = os.path.join(output_dir, filename)
-
     # Print the JSON output
-    # print(json_output)
-
-    # Save the JSON output to a file
-    with open(filename, 'w') as f:
-        f.write(json_output)
-
-    print(f"Topology saved to {filename}")
+    print(json_output)

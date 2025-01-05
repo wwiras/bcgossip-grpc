@@ -73,7 +73,6 @@ if __name__ == '__main__':
     now = datetime.now()
     dt_string = now.strftime("%b%d%Y%H%M")  # Format: Dec2320241946
 
-
     # Construct the full file path
     output_dir = 'topology'
     # filename = f"nt_nodes{int(args.nodes)}_{dt_string}.json"
