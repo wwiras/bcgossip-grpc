@@ -49,7 +49,7 @@ class Test:
     def getTotalNodes(self,filename):
         """
         Returns of nodes total for a given filename
-        Example : nodes10_Dec2820242230.json, will return 10
+        Example : nodes11_Dec2820242230.json, will return 10
         """
         try:
             match = re.search(r"nodes(\d+)_", filename)  # Use regex to find the number

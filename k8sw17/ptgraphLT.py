@@ -1,34 +1,32 @@
-import json
 import networkx as nx
 import matplotlib.pyplot as plt
+import json
 import argparse
 
-def visualize_graph(json_data):
-  """
-  Visualizes a graph from a JSON object with latency information.
+def display_graph_from_json(filename):
+    """
+    Displays a graph with edge weights from a JSON file.
 
-  Args:
-    json_data: A JSON object containing graph data with 'nodes' and 'edges' (including 'weight').
-  """
+    Args:
+        filename: The path to the JSON file containing the graph data.
+    """
 
-  graph = nx.Graph()
-  graph.add_nodes_from(json_data['nodes'])
+    with open(filename, 'r') as f:
+        data = json.load(f)
 
-  for edge in json_data['edges']:
-    graph.add_edge(edge['source'], edge['target'], latency=edge['latency'])
+    graph = nx.Graph()
+    for node in data['nodes']:
+        graph.add_node(node['id'])
+    for edge in data['edges']:  # Use 'edges' instead of 'links'
+        graph.add_edge(edge['source'], edge['target'], weight=edge['weight'])
 
-  # Position nodes using spring layout
-  pos = nx.spring_layout(graph)
+    pos = nx.spring_layout(graph)  # You can choose a different layout if you prefer
+    nx.draw(graph, pos, with_labels=True)
 
-  # Draw the graph
-  nx.draw(graph, pos, with_labels=True, node_size=1500, node_color="skyblue", font_size=8)
+    labels = nx.get_edge_attributes(graph, 'weight')
+    nx.draw_networkx_edge_labels(graph, pos, edge_labels=labels)
 
-  # Add edge labels for latency
-  labels = nx.get_edge_attributes(graph, 'latency')
-  nx.draw_networkx_edge_labels(graph, pos, edge_labels=labels)
-
-  plt.title("Graph Visualization with Latency")
-  plt.show()
+    plt.show()
 
 if __name__ == '__main__':
   # Parse command-line arguments
@@ -36,9 +34,6 @@ if __name__ == '__main__':
   parser.add_argument('--filename', type=str, required=True, help='The name of the JSON file containing the network topology.')
   args = parser.parse_args()
 
-  # Load the JSON data from the specified file
-  with open(args.filename, 'r') as f:
-    json_data = json.load(f)
 
   # Visualize the graph
-  visualize_graph(json_data)
+  display_graph_from_json(args.filename)

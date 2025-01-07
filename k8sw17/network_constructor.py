@@ -8,35 +8,54 @@ from datetime import datetime
 import argparse
 
 def construct_BA_network(number_of_nodes, parameter):
-    # Construct Barabási – Albert(BA) model topology
-    network = nx.barabasi_albert_graph(number_of_nodes, parameter)
-    network.name = 'Barabási – Albert(BA)'
 
-    # Rename nodes
-    mapping = {i: f"gossip-statefulset-{i + 1}" for i in range(number_of_nodes)}
-    network = nx.relabel_nodes(network, mapping)
+    connected=False
+    # make sure all nodes are connected.
+    # if not connected, we will recreate the BA graph model
+    while connected==False:
+        # Construct Barabási – Albert(BA) model topology
+        network = nx.barabasi_albert_graph(number_of_nodes, parameter)
+        network.name = 'Barabási – Albert(BA)'
 
-    # Registered network graph with its neighbor
-    # and its weight (latency)
-    for u, v in combinations(network, 2):
-        if network.has_edge(u, v) and 'weight' not in network.edges[u, v]:
-            network.edges[u, v]['weight'] = random.randint(1, 100)
+        # Rename nodes
+        # mapping = {i: f"gossip-statefulset-{i + 1}" for i in range(number_of_nodes)}
+        mapping = {i: f"gossip-statefulset-{i}" for i in range(number_of_nodes)}
+        network = nx.relabel_nodes(network, mapping)
+
+        # Registered network graph with its neighbor
+        # and its weight (latency)
+        for u, v in combinations(network, 2):
+            if network.has_edge(u, v) and 'weight' not in network.edges[u, v]:
+                network.edges[u, v]['weight'] = random.randint(1, 100)
+
+        # check if all nodes connected or not
+        if nx.is_connected(network):
+            connected=True
 
     return network
 
 def construct_ER_network(number_of_nodes, probability_of_edges):
-    network = nx.Graph()
-    network.name = 'Erdös – Rényi(ER)'
 
-    # Creating nodes
-    for i in range(number_of_nodes):
-        network.add_node(f"gossip-statefulset-{i}")
+    connected = False
+    # make sure all nodes are connected.
+    # if not connected, we will recreate the BA graph model
+    while connected == False:
+        network = nx.Graph()
+        network.name = 'Erdös – Rényi(ER)'
 
-    # Add node edges
-    for u, v in combinations(network, 2):
-        if random.random() < probability_of_edges:
-            if u != v:
-                network.add_edge(u, v, weight=random.randint(1, 100))
+        # Creating nodes
+        for i in range(number_of_nodes):
+            network.add_node(f"gossip-statefulset-{i}")
+
+        # Add node edges
+        for u, v in combinations(network, 2):
+            if random.random() < probability_of_edges:
+                if u != v:
+                    network.add_edge(u, v, weight=random.randint(1, 100))
+
+        # check if all nodes connected or not
+        if nx.is_connected(network):
+            connected = True
 
     return network
 
@@ -109,7 +128,9 @@ def save_topology_to_json(graph, others, type="BA"):
     os.makedirs(output_dir, exist_ok=True)
 
     # prepare topology in json format
-    graph_data = nx.node_link_data(graph, edges="edges")  # Use "edges" for forward compatibility
+    # Successfully installed networkx-3.4.2
+    # Use "edges" for forward compatibility
+    graph_data = nx.node_link_data(graph, edges="edges")
     file_path = os.path.join(output_dir, filename)
     with open(file_path, 'w') as f:
         json.dump(graph_data, f, indent=4)
