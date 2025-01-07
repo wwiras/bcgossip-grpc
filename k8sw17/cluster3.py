@@ -23,7 +23,7 @@ current_directory = os.getcwd()
 topology_folder = os.path.join(current_directory, "topology")
 
 # Load data from the JSON file
-with open(os.path.join(topology_folder, "nodes10_Jan062025154931_ER0.4.json"), 'r') as f:  # Use self.filename
+with open(os.path.join(topology_folder, "nodes11_Jan062025154931_ER0.4.json"), 'r') as f:  # Use self.filename
     data = json.load(f)
 
 # Build graph (existing topology)

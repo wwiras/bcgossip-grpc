@@ -5,15 +5,24 @@ import os, json
 import argparse
 import numpy as np
 
+
 class kMeans:  # Define the class correctly
 
     def __init__(self, filename, num_clusters):
+
         self.filename = filename
         self.num_clusters = num_clusters
         self.data = []
         self.num_nodes = 0
+        self.distance_matrix = dict()
+        self.distances = []
         self.graph = self.get_prev_graph()  # Build the graph in the constructor
-        self.weight_matrix = self.create_weight_matrix()  # Initialize distance (latency) matrix
+        self.prev_weight_matrix = self.create_prev_weight_matrix() # Actual weight from prev graph
+        self.create_weight_distances()  # Initialize distance (latency) matrix
+        self.newgraph = nx.Graph() # Preparing new graph platform
+        self.centroids_nodes = []
+        self.clusters_members = []
+        self.clusters = []
 
     def get_prev_graph(self):
         """Loads JSON data from a file and creates a NetworkX graph."""
@@ -41,7 +50,7 @@ class kMeans:  # Define the class correctly
 
         return graph
 
-    def create_weight_matrix(self):
+    def create_prev_weight_matrix(self):
 
         nodes = self.data['nodes']
         edges = self.data['edges']
@@ -56,13 +65,36 @@ class kMeans:  # Define the class correctly
                 dm[i, j] = dm[j, i] = weight
         return dm
 
-    def cluster_nodes(self):
-        """Clusters nodes using k-means on shortest path distances."""
-        graph = self.graph
+    def create_weight_distances(self):
+        """Calculates best distances between the all nodes in the graph."""
+        # 1. Calculate shortest path distances
+        self.distance_matrix = dict(nx.all_pairs_dijkstra_path_length(self.graph))
+        # print(f"self.distance_matrix:\n {self.distance_matrix}")
+        self.distances = [[self.distance_matrix[n1][n2] for n2 in self.graph.nodes] for n1 in self.graph.nodes]
+        # print(f"self.distances:\n {self.distances}")
 
-        # start kmeans here from weight matrix
+    def get_kmeans_cluster(self):
+        """
+        Clusters a graph using k-means based on shortest path distances.
+
+        Args:
+            KMeans object
+            self.graph: A NetworkX graph object.
+            self.num_clusters: The desired number of clusters.
+
+        Returns:
+            A list of cluster assignments for each node in the graph.
+        """
+
+        # 1. Calculate shortest path distances
+        # distance_matrix = dict(nx.all_pairs_dijkstra_path_length(self.graph))
+        # print(f"distance_matrix:\n {distance_matrix}")
+        # distances = [[distance_matrix[n1][n2] for n2 in self.graph.nodes] for n1 in self.graph.nodes]
+        # print(f"distances:\n {distances}")
+
+        # 2. Apply K-means clustering
         kmeans = KMeans(n_clusters=self.num_clusters, random_state=0, n_init="auto")
-        kmeans.fit(self.weight_matrix)
+        kmeans.fit(self.distances)
 
         # Get cluster labels and centroids
         labels = kmeans.labels_
@@ -71,53 +103,112 @@ class kMeans:  # Define the class correctly
         # Find the closest nodes to the centroids
         centroid_nodes = []
         for centroid in centroids:
-            distances_to_centroid = [np.linalg.norm(np.array(row) - centroid) for row in self.weight_matrix]
+            # distances_to_centroid = [np.linalg.norm(np.array(row) - centroid) for row in self.weight_matrix]
+            distances_to_centroid = [np.linalg.norm(np.array(row) - centroid) for row in self.distances]
             # print(f"distances_to_centroid: \n {distances_to_centroid}")
             closest_node_index = np.argmin(distances_to_centroid)
             # print(f"closest_node_index: \n {closest_node_index}")
-            closest_node = list(graph.nodes)[closest_node_index]
+            closest_node = list(self.graph.nodes)[closest_node_index]
             # print(f"closest_node: \n {closest_node}")
             centroid_nodes.append(closest_node)
 
         # Create a list to store the nodes in each cluster
         cluster_members = [[] for _ in range(self.num_clusters)]
         for i, label in enumerate(labels):
-            cluster_members[label].append(list(graph.nodes)[i])
+            cluster_members[label].append(list(self.graph.nodes)[i])
 
-        return labels, centroids, centroid_nodes, cluster_members
+        self.cluster_members = cluster_members
+        self.centroid_nodes = centroid_nodes
+        self.clusters = labels
 
-    def create_new_topology(self, cluster_members, centroid_nodes):
-        """Creates a new topology with intra-cluster and centroid connections."""
+        # return labels, centroids, centroid_nodes, cluster_members
+        # return labels
 
-        new_graph = nx.Graph()
-        # Add nodes to the new graph
-        for node in self.graph.nodes:
-            new_graph.add_node(node)
+    def create_cluster_graph(self):
 
-        # --- Intra-cluster connections ---
-        for cluster_id in range(self.num_clusters):
-            nodes_in_cluster = cluster_members[cluster_id]
-            for i in range(len(nodes_in_cluster)):
-                for j in range(i + 1, len(nodes_in_cluster)):
-                    node1 = nodes_in_cluster[i]
-                    node2 = nodes_in_cluster[j]
-                    weight = self.weight_matrix[list(self.graph.nodes).index(node1)][
-                        list(self.graph.nodes).index(node2)]
-                    if weight != np.inf:  # Add edge only if there is a connection
-                        new_graph.add_edge(node1, node2, weight=weight)
+        # Create nodes based on each cluster
+        # print(f"self.cluster_members: {self.cluster_members}")
+        # print(f"len(self.cluster_members): {len(self.cluster_members)}")
+        for clusterid, nodes in enumerate(self.cluster_members):
+            # print(f"clusterid:{clusterid},{nodes}")
+            # Add nodes to new graph
+            for node in nodes:
+                self.newgraph.add_node(node)
 
-        # --- Centroid connections ---
-        for i in range(len(centroid_nodes)):
-            for j in range(i + 1, len(centroid_nodes)):
-                node1 = centroid_nodes[i]
-                node2 = centroid_nodes[j]
-                weight = self.weight_matrix[list(self.graph.nodes).index(node1)][list(self.graph.nodes).index(node2)]
-                if weight != np.inf:  # Add edge only if there is a connection
-                    new_graph.add_edge(node1, node2, weight=weight)
+            # Add edges to new graph nodes with weight
+            # if self cluster by itself no need to add edges
+            if len(nodes) > 1:
+                for n1 in nodes:
+                    for n2 in nodes:
+                        # ignore same nodes
+                        if n1 == n2:
+                            continue
+                        else:
+                            # Get edge data between nodes from previous graph
+                            edge_data = self.graph.get_edge_data(n1, n2)
+                            # if there is edge data from prev graph, get edge data
+                            if edge_data is not None:
+                                # if edge data not exist in new graph, add edge data
+                                if not self.newgraph.get_edge_data(n1, n2):
+                                    self.newgraph.add_edge(n1, n2,weight=edge_data['weight'])
+                                    # print(f"New edge data between {n1} and {n2}: {edge_data} is added to new graph")
+            # print(f"self.newgraph:{self.newgraph}")
+        # print(f"nx.is_connected(self.newgraph) ? : {nx.is_connected(self.newgraph)}")
 
-        return new_graph
+    def create_cluster_connectors(self):
+        all_connected = False
+        for cen in self.centroid_nodes:
+            for cen_others in self.centroid_nodes:
+                if not all_connected:
+                    if cen is not cen_others:
 
-    def save_new_topology(self, graph):
+                        # Get shortest path (with node sequence)
+                        shortest_path = nx.shortest_path(self.graph, source=cen, target=cen_others, weight='weight')
+                        # print(f"nx.shortest_path(self.graph, source={cen}, target={cen_others}, weight='weight') \n {shortest_path}")
+
+                        # Crawl or iterate through the shortest path
+                        # Iterate up to the second-to-last element
+                        for i in range(len(shortest_path ) - 1):
+                            current_node = shortest_path [i]
+                            next_node = shortest_path [i + 1]
+                            # print(f'self.newgraph.get_edge_data({current_node}, {next_node}):{self.newgraph.get_edge_data(current_node, next_node)}')
+
+                            # Check whether there is connection between
+                            # two nodes in the path (crawler)
+                            # If no edge (None). So add edge
+                            if self.newgraph.get_edge_data(current_node, next_node) is None:
+                                edge_data = self.graph.get_edge_data(current_node, next_node)
+                                self.newgraph.add_edge(current_node, next_node, weight=edge_data['weight'])
+                                # print(f'self.newgraph.get_edge_data({current_node},{next_node}):{self.newgraph.get_edge_data(current_node,next_node)}')
+
+                                # Check new graph whether all nodes are connected
+                                if nx.is_connected(self.newgraph):
+                                    all_connected = True
+                                    break
+        return all_connected
+    def display_new_topology(self):
+        """Displays the new topology with colored clusters and centroid indicators."""
+        # Create a dictionary to map node to cluster
+        node_to_cluster = {}
+        for cluster_id, members in enumerate(self.cluster_members):
+            for node in members:
+                node_to_cluster[node] = cluster_id
+        # print(f'node_to_cluster:\n {node_to_cluster}')
+
+        # Get a list of node colors based on cluster assignment
+        node_colors = [node_to_cluster[node] for node in self.newgraph.nodes()]
+
+        # Get positions for nodes using a spring layout
+        pos = nx.spring_layout(self.newgraph)
+
+        # Draw the graph with colored nodes and edge labels
+        nx.draw(self.newgraph, pos, with_labels=True, node_color=node_colors, cmap=plt.cm.viridis)
+        labels = nx.get_edge_attributes(self.newgraph, 'weight')
+        nx.draw_networkx_edge_labels(self.newgraph, pos, edge_labels=labels)
+
+        plt.show()
+
+    def save_new_topology(self):
         """Saves the topology to a JSON file with date and time in the filename."""
         # Create directory if it doesn't exist
         output_dir = "topology_kmeans"
@@ -127,10 +218,11 @@ class kMeans:  # Define the class correctly
         filename = f"kmeans_{self.filename[:-5]}_k{self.num_clusters}.json"
         file_path = os.path.join(output_dir, filename)
 
-        # Convert the graph to a JSON-serializable format
-        nodes = [{'id': node} for node in graph.nodes()]
+        # Convert the graph to a JSON-serializable format with cluster labels
+        nodes = [{'id': node, 'cluster': int(self.clusters[i])} for i, node in enumerate(self.graph.nodes())]
+        # print(f"nodes={nodes}")
         edges = [{'source': source, 'target': target, 'weight': data['weight']}
-                 for source, target, data in graph.edges(data=True)]
+                 for source, target, data in self.newgraph.edges(data=True)]
 
         # Include 'directed', 'multigraph', and 'graph'
         graph_data = {
@@ -145,68 +237,54 @@ class kMeans:  # Define the class correctly
         with open(file_path, 'w') as f:
             json.dump(graph_data, f, indent=4)
 
-    def display_new_topology(self, new_graph, clusters, centroid_nodes):
-        """Displays the new topology with colored clusters and centroid indicators."""
+## Main code
 
-        # Get a list of node colors based on cluster assignment
-        node_colors = [clusters[list(self.graph.nodes).index(node)] for node in new_graph.nodes()]
+# Get random topology file
+parser = argparse.ArgumentParser(description="Create K-means clustering.")
+parser.add_argument('--filename', required=True, help="Topology filename (Random gossip)")
+parser.add_argument('--num_cluster', required=True, type=int, help="Number of clusters to build")
+# Add the optional argument with a default value of False
+parser.add_argument('--display', action='store_true', help="Display new topology (default: False)")
+parser.add_argument('--save', action='store_true', help="Save new topology to json(default: False)")
+args = parser.parse_args()
 
-        # Get positions for nodes using a spring layout
-        pos = nx.spring_layout(new_graph)
 
-        # Draw the graph with colored nodes and edge labels
-        nx.draw(new_graph, pos, with_labels=True, node_color=node_colors, cmap=plt.cm.viridis)
-        labels = nx.get_edge_attributes(new_graph, 'weight')
-        nx.draw_networkx_edge_labels(new_graph, pos, edge_labels=labels)
+### Below is the steps to create clusters from a ER or BA network model
 
-        plt.show()
+# 1. Get arguments from file input (filename and num_cluster) - info first
+kmeans = kMeans(args.filename, int(args.num_cluster))
+print(f"args.filename: {args.filename}")
+print(f"args.num_cluster: {args.num_cluster}")
+# print(f"save : {args.save}")
+# print(f"display : {args.display}")
+# print(f"kmeans.num_nodes: {kmeans.num_nodes}")
 
-if __name__ == '__main__':
+# 2. Perform clustering / divides to cluster
+kmeans.get_kmeans_cluster()
+print(f"kmeans.clusters: \n {kmeans.clusters[0]}")
+# print(f"Centroids: \n {centroids}")
+# print(f"Centroid Nodes: \n {kmeans.centroid_nodes}")
+print(f"Cluster Members: \n {kmeans.cluster_members}")
+print(f"len(cluster_members): \n {len(kmeans.cluster_members)}")
 
-    """
-        To run the code and display the topology (display=True):
-        python convert_kmeans.py --filename nt_nodes10_Dec2820240043.json --num_cluster 3 --display
+# 3. Create new graphs (or groups) for the clusters created
+kmeans.create_cluster_graph()
 
-        To run the code and display the topology (display=False):
-        python convert_kmeans.py --filename nt_nodes10_Dec2820240043.json --num_cluster 3
-        """
+# 4. Connecting all clusters
+if kmeans.create_cluster_connectors():
+    # print(f"kmeans.newgraph:{kmeans.newgraph}")
+    print("Creating connectors is successful")
+    print(f"nx.is_connected(kmeans.newgraph) ? : {nx.is_connected(kmeans.newgraph)}")
+else:
+    print("Fail creating connectors")
+    print(f"nx.is_connected(kmeans.newgraph) ? : {nx.is_connected(kmeans.newgraph)}")
 
-    # Get random topology file
-    parser = argparse.ArgumentParser(description="Create K-means clustering.")
-    parser.add_argument('--filename', required=True, help="Topology filename (Random gossip)")
-    parser.add_argument('--num_cluster', required=True, type=int, help="Number of clusters to build")
-    # Add the optional argument with a default value of False
-    parser.add_argument('--display', action='store_true', help="Display new topology (default: False)")
-    parser.add_argument('--save', action='store_true', help="Save new topology to json(default: False)")
-    args = parser.parse_args()
+## Options to display or save
+# display kmeans cluster new topology
+if args.display:
+    kmeans.display_new_topology()
 
-    # Get arguments from file input (filename and num_cluster)
-    kmeans = kMeans(args.filename, int(args.num_cluster))
-    print(f"args.filename: {args.filename}")
-    print(f"args.num_cluster: {args.num_cluster}")
-    # print(f"save : {args.save}")
-    # print(f"display : {args.display}")
-    # print(f"kmeans.num_nodes: {kmeans.num_nodes}")
+# save kmeans topology
+if args.save:
+    kmeans.save_new_topology()
 
-    # latency (distance) matrix preview - optional
-    print(f"kmeans.weight_matrix: \n {kmeans.weight_matrix}")
-
-    # Perform clustering
-    clusters, centroids, centroid_nodes, cluster_members = kmeans.cluster_nodes()
-    print(f"Clusters: \n {clusters}")
-    print(f"Centroids: \n {centroids}")
-    print(f"Centroid Nodes: \n {centroid_nodes}")
-    print(f"Cluster Members: \n {cluster_members}")
-    print(f"len(cluster_members): \n {len(cluster_members)}")
-
-    # Create new topology
-    # new_graph = kmeans.create_new_topology(cluster_members, centroid_nodes)
-    # print(f"new_graph: {new_graph}")
-
-    # Display new topology
-    # if args.display:
-    #     kmeans.display_new_topology(new_graph, clusters, centroid_nodes)
-
-    # Save new topology
-    # if args.save:
-    #     kmeans.save_new_topology(new_graph)

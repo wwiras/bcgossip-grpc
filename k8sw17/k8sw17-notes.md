@@ -67,12 +67,12 @@ python convert_kmeans.py --filename nodes10_Dec2820240043.json --num_cluster 2 -
 python convert_kmeans.py --filename nodes10_Dec2820240043.json --num_cluster 2
 ```
 
-#### Step 3 - Buidl docker image (k8sw16) and run cluster options
+#### Step 3 - Buidl docker image (k8sw17) and run cluster options
 
 Build docker images based on the k8sw16 script. 
 ```
-docker build -t wwiras/k8sw16:v1 .
-docker push wwiras/k8sw16:v1
+docker build -t wwiras/k8sw17:v1 .
+docker push wwiras/k8sw17:v1
 ```
 
 But this time statefulset.yaml template will add with **CLUSTER** environment variable. The logic is:-

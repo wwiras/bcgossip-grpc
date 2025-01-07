@@ -177,7 +177,7 @@ if __name__ == '__main__':
             save_topology_to_json(graph, probability_of_edges, "ER")
 
     # Iterate and print the graph content
-    iterate_and_print_graph(graph)
+    # iterate_and_print_graph(graph)
 
 
 
