@@ -187,7 +187,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         Date and time : 8 Jan 2024 at 12:37 pm
         """
 
-        latency_option = f'{os.environ['LATENCY_OPTION']}'
+        latency_option = f"{os.environ['LATENCY_OPTION']}"
 
         neighbors = []
         for edge in self.topology['edges']:
