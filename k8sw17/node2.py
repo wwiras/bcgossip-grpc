@@ -26,17 +26,9 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # if os.environ['CLUSTER'] == 0, choose "topology" folder
         # if os.environ['CLUSTER'] == 1, choose "topology_kmeans" folder
         if os.environ['CLUSTER'] == '0':
-            topology_folder = "topology"
+            self.topology = self.get_topology(os.environ['NODES'], "topology")
         else:
-            topology_folder = "topology_kmeans"
-
-        # Load the topology based on model network required
-        # BA = Barabási–Albert Network Model
-        # ER = Erdös – Rényi(ER) Network Model
-        topology_model = os.environ['MODEL']
-
-        # get topology based on model, cluster (or other cluster) and total number of nodes
-        self.topology = self.get_topology(os.environ['NODES'], topology_folder, topology_model)
+            self.topology = self.get_topology(os.environ['NODES'], "topology_kmeans")
 
         # Find neighbors based on the topology (with latency)
         # but not from the real network
@@ -48,12 +40,14 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.gossip_initiated = False
         self.initial_gossip_timestamp = None
 
-    def get_topology(self, total_replicas, topology_folder, model, statefulset_name="gossip-statefulset",  namespace="default"):
+    def get_topology(self, total_replicas, topology_folder, statefulset_name="gossip-statefulset",  namespace="default"):
         """
         Retrieves the number of replicas for the specified StatefulSet using kubectl
         and finds the corresponding topology file in the 'topology' subfolder
         within the current working directory.
         """
+
+
 
         # Get the current working directory
         current_directory = os.getcwd()
@@ -61,25 +55,20 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # Construct the full path to the topology folder
         topology_dir = os.path.join(current_directory, topology_folder)
 
-        # select search (keywords) based on non-cluster or other cluster types
-        # it will be more than one cluster here
-        if os.environ['CLUSTER'] == '0':
-            search_str = f'nodes{total_replicas}_'
-        else:
-            search_str = f'kmeans_nodes{total_replicas}_'
-
         # Find the corresponding topology file
         topology_file = None
         for topology_filename in os.listdir(topology_dir):
-            if topology_filename.startswith(search_str):
-                if model in topology_filename:
+            if topology_folder == 'topology':
+                if topology_filename.startswith(f'nodes{total_replicas}_'):
                     topology_file = topology_filename
                     break
-
-        print(f"model: {model}", flush=True)
-        print(f"topology_dir: {topology_dir}", flush=True)
-        print(f"topology_folder : {topology_folder }", flush=True)
-        print(f"topology_file: {topology_file}", flush=True)
+            else:
+                if topology_filename.startswith(f'kmeans_nodes{total_replicas}_'):
+                    topology_file = topology_filename
+                    break
+        # print(f"topology_dir: {topology_dir}", flush=True)
+        # print(f"topology_folder : {topology_folder }", flush=True)
+        # print(f"topology_file: {topology_file}", flush=True)
 
         if topology_file:
             with open(os.path.join(topology_dir, topology_file), 'r') as f:

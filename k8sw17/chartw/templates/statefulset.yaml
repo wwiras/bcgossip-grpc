@@ -28,3 +28,5 @@ spec:
               value: "{{ .Values.latency_ms }}"
             - name: CLUSTER
               value: "{{ .Values.cluster }}"
+            - name: MODEL
+              value: "{{ .Values.model }}"

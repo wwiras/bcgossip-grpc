@@ -1,6 +1,7 @@
 latency_ms: 0
 image:
-  name: wwiras/k8sw16
+  name: wwiras/k8sw17
   tag: v1
 totalNodes: 10
 cluster: 0
+model: ER
