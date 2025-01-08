@@ -26,6 +26,27 @@ topology_folder = os.path.join(current_directory, "topology")
 with open(os.path.join(topology_folder, "nodes10_Jan062025154931_ER0.4.json"), 'r') as f:  # Use self.filename
     data = json.load(f)
 
+# Check if any edge has a 'weight' attribute
+attribute = None
+for edge in data['edges']:
+    if 'weight' in edge:
+        attribute='weight'
+        break
+    elif 'latency' in edge:
+        attribute = 'latency'
+        break
+
+if attribute:
+  print(f"The edges in the JSON file use '{attribute}' as the attribute.")
+else:
+  print("Neither 'weight' nor 'latency' found as edge attributes in the JSON file.")
+
+# if data['edges']['latency']:
+#     print(f"data['edges']['latency']: {data['edges']['latency']}")
+
+# if data['edges']['weight']:
+#     print(f"data['edges']['weight']: {data['edges']['weight']}")
+
 # Build graph (existing topology)
 G = nx.Graph()
 # data = []

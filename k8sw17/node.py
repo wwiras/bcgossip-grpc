@@ -27,7 +27,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # if os.environ['CLUSTER'] == 1, choose "topology_kmeans" folder
         if os.environ['CLUSTER'] == '0':
             topology_folder = "topology"
-        else:
+        elif os.environ['CLUSTER'] == '1':
             topology_folder = "topology_kmeans"
 
         # Load the topology based on model network required
@@ -65,7 +65,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # it will be more than one cluster here
         if os.environ['CLUSTER'] == '0':
             search_str = f'nodes{total_replicas}_'
-        else:
+        elif os.environ['CLUSTER'] == '1':
             search_str = f'kmeans_nodes{total_replicas}_'
 
         # Find the corresponding topology file
@@ -173,35 +173,28 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
 
     def _find_neighbors(self, node_id):
+
         """
         Identifies the neighbors of the given node based on the topology,
         including the latency of the connection.
+        Determine which options should be used for latency.
+        The value is predetermined in the topology.
+        Indicator is from helm values
+        use other option (weight for now) - 'weight'
+        use latency value - 'latency'
+
+        Notes : As of now, we assume that the weight is the latency
+        Date and time : 8 Jan 2024 at 12:37 pm
         """
 
-        """
-        Check whether the latency is random or fixed for all
-        Random is determined by the predetermined latency_ms value
-        (from helm values). If latency_ms==0, it is
-        random latency option (from topology info),
-        while fix is otherwise (latency_ms>0)
-        """
-        if (int(os.environ['LATENCY']) > 0):
-            latency_ms = int(os.environ['LATENCY'])
-        else:
-            latency_ms = 0
+        latency_option = f'{os.environ['LATENCY_OPTION']}'
 
         neighbors = []
         for edge in self.topology['edges']:
             if edge['source'] == node_id:
-                if latency_ms > 0:
-                    neighbors.append((edge['target'], latency_ms))  # Add neighbor and latency as a tuple (from values)
-                else:
-                    neighbors.append((edge['target'], edge['latency']))  # Add neighbor and latency as a tuple (from topology)
+                neighbors.append((edge['target'], edge[latency_option]))  # Add neighbor and latency as a tuple (from topology)
             elif edge['target'] == node_id:
-                if latency_ms > 0:
-                    neighbors.append((edge['source'], latency_ms))  # Add neighbor and latency as a tuple (from values)
-                else:
-                    neighbors.append((edge['source'], edge['latency']))  # Add neighbor and latency as a tuple
+                neighbors.append((edge['target'], edge[latency_option]))  # Add neighbor and latency as a tuple (from topology)
 
         return neighbors
 

@@ -24,8 +24,8 @@ spec:
           env:
             - name: NODES
               value: "{{ .Values.totalNodes }}"
-            - name: LATENCY
-              value: "{{ .Values.latency_ms }}"
+            - name: LATENCY_OPTION
+              value: "{{ .Values.latency_option }}"
             - name: CLUSTER
               value: "{{ .Values.cluster }}"
             - name: MODEL

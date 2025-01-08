@@ -1,7 +1,28 @@
-latency_ms: 0
+## Latency flag from json topology
+# we don't use direct latency, all latency will be based on
+# the topology file
+# if 'weight', means latency is based on weight
+# if 'latency', latency is based on latency itself
+latency_option: weight
+#latency_option: latency
+
+## docker image
+# name: name of the based image
+# tag: the version of the image base
 image:
   name: wwiras/k8sw17
   tag: v1
+
+## Total nodes to test
 totalNodes: 10
+
+## Non cluster or cluster topology
+## More clusters to come
+# 0 - Non cluster
+# 1 - Cluster (kmeans)
 cluster: 0
+
+## There are 2 models for now
+# ER - ER = Erdös – Rényi(ER) network model
+# BA - Barabási–Albert Network model
 model: ER
