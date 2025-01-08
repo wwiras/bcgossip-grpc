@@ -194,7 +194,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             if edge['source'] == node_id:
                 neighbors.append((edge['target'], edge[latency_option]))  # Add neighbor and latency as a tuple (from topology)
             elif edge['target'] == node_id:
-                neighbors.append((edge['target'], edge[latency_option]))  # Add neighbor and latency as a tuple (from topology)
+                neighbors.append((edge['source'], edge[latency_option]))  # Add neighbor and latency as a tuple (from topology)
 
         return neighbors
 
