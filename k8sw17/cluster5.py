@@ -3,6 +3,7 @@ import os
 import json
 from sklearn.cluster import KMeans
 import numpy as np
+import matplotlib.pyplot as plt
 
 def check_cluster_connectivity(G,cluster_members):
     all_cluster_connected = True
@@ -142,7 +143,97 @@ def fix_clusters_connection(G,cluster_members,disconnected_clusters):
 
     return cluster_members
 
+def create_cluster_graph(graph,cluster_members):
 
+    newgraph = nx.Graph()
+
+    # Create nodes based on each cluster
+    # print(f"cluster_members: {cluster_members}")
+    # print(f"len(self.cluster_members): {len(self.cluster_members)}")
+    for clusterid, nodes in enumerate(cluster_members):
+        # print(f"clusterid:{clusterid},{nodes}")
+        # Add nodes to new graph
+        for node in nodes:
+            newgraph.add_node(node)
+
+        # Add edges to new graph nodes with weight
+        # if self cluster by itself no need to add edges
+        if len(nodes) > 1:
+            for n1 in nodes:
+                for n2 in nodes:
+                    # ignore same nodes
+                    if n1 == n2:
+                        continue
+                    else:
+                        # Get edge data between nodes from previous graph
+                        edge_data = graph.get_edge_data(n1, n2)
+                        # if there is edge data from prev graph, get edge data
+                        if edge_data is not None:
+                            # if edge data not exist in new graph, add edge data
+                            if not newgraph.get_edge_data(n1, n2):
+                                newgraph.add_edge(n1, n2,weight=edge_data['weight'])
+                                # print(f"New edge data between {n1} and {n2}: {edge_data} is added to new graph")
+        print(f"newgraph:{newgraph}")
+
+    print(f"nx.is_connected(newgraph) ? : {nx.is_connected(newgraph)}")
+    return newgraph
+
+def create_cluster_connectors(graph,newgraph,centroid_nodes):
+    all_connected = False
+    for cen in centroid_nodes:
+        for cen_others in centroid_nodes:
+            if not all_connected:
+                if cen is not cen_others:
+
+                    # Get shortest path (with node sequence)
+                    shortest_path = nx.shortest_path(graph, source=cen, target=cen_others, weight='weight')
+                    # print(f"nx.shortest_path(self.graph, source={cen}, target={cen_others}, weight='weight') \n {shortest_path}")
+
+                    # Crawl or iterate through the shortest path
+                    # Iterate up to the second-to-last element
+                    for i in range(len(shortest_path ) - 1):
+                        current_node = shortest_path [i]
+                        next_node = shortest_path [i + 1]
+                        # print(f'self.newgraph.get_edge_data({current_node}, {next_node}):{self.newgraph.get_edge_data(current_node, next_node)}')
+
+                        # Check whether there is connection between
+                        # two nodes in the path (crawler)
+                        # If no edge (None). So add edge
+                        if newgraph.get_edge_data(current_node, next_node) is None:
+                            edge_data = graph.get_edge_data(current_node, next_node)
+                            newgraph.add_edge(current_node, next_node, weight=edge_data['weight'])
+                            # print(f'self.newgraph.get_edge_data({current_node},{next_node}):{self.newgraph.get_edge_data(current_node,next_node)}')
+
+                            # Check new graph whether all nodes are connected
+                            if nx.is_connected(newgraph):
+                                all_connected = True
+                                break
+    if all_connected:
+        return newgraph
+    else:
+        return all_connected
+
+def display_new_topology(cluster_members,newgraph):
+    """Displays the new topology with colored clusters and centroid indicators."""
+    # Create a dictionary to map node to cluster
+    node_to_cluster = {}
+    for cluster_id, members in enumerate(cluster_members):
+        for node in members:
+            node_to_cluster[node] = cluster_id
+    # print(f'node_to_cluster:\n {node_to_cluster}')
+
+    # Get a list of node colors based on cluster assignment
+    node_colors = [node_to_cluster[node] for node in newgraph.nodes()]
+
+    # Get positions for nodes using a spring layout
+    pos = nx.spring_layout(newgraph)
+
+    # Draw the graph with colored nodes and edge labels
+    nx.draw(newgraph, pos, with_labels=True, node_color=node_colors, cmap=plt.cm.viridis)
+    labels = nx.get_edge_attributes(newgraph, 'weight')
+    nx.draw_networkx_edge_labels(newgraph, pos, edge_labels=labels)
+
+    plt.show()
 
 # Get the current working directory
 current_directory = os.getcwd()
@@ -151,18 +242,19 @@ current_directory = os.getcwd()
 topology_folder = os.path.join(current_directory, "topology")
 
 # k = total clusters
-k=10
-
+k=3
 # select filename
 # filename = "nodes10_Jan062025154931_ER0.4.json"
-# filename = "nodes10_Jan062025154921_BA3.json"
+filename = "nodes10_Jan062025154921_BA3.json"
 # filename = "nodes30_Jan082025004502_BA5.json"
 # filename = "nodes30_Jan082025004652_ER0.1.json"
 # filename = "nodes50_Jan082025004511_BA5.json"
 # filename = "nodes50_Jan082025181240_BA5.json"
 # filename ="nodes50_Jan082025181429_ER0.1.json"
 # filename ="nodes70_Jan082025004519_BA5.json"
-filename ="nodes70_Jan082025201400_ER0.1.json"
+# filename ="nodes70_Jan082025201400_ER0.1.json"
+# filename ="nodes100_Jan082025004526_BA5.json"
+# filename = "nodes100_Jan082025201753_ER0.1.json"
 
 
 # Load data from the JSON file
@@ -178,7 +270,7 @@ for node in data['nodes']:
 for edge in data['edges']:
     G.add_edge(edge['source'], edge['target'], weight=edge['weight'])
 
-print(f"Topology from {filename} is connected nx.is_connected(G) ? : {nx.is_connected(G)}")
+print(f"Topology from {filename} is connected nx.is_connected(G) ? : {nx.is_connected(G)} and G:{G}")
 
 num_nodes = len(data['nodes'])
 
@@ -226,11 +318,28 @@ print(f'all_clusters_connected:{all_clusters_connected}')
 # new_cluster_members = fix_clusters_connection(G,cluster_members,disconnected_clusters)
 # print(f'new_cluster_members: {new_cluster_members}')
 
+# Check and fix inter cluster connectors
 fixed_members = ensure_connected_clusters(G, cluster_members)
-if fixed_members:
-    print(f'All inter clusters are connected \n fix_members: {fixed_members}')
-else:
-    print(f'Sorry! For {filename} this topolgy unable to be clustered using kMeans')
+if fixed_members: # if inter cluster connection can be established, return fix cluster members
+
+    print(f'All inter clusters are connected !')
+    # print(f'All inter clusters are connected \n fix_members: {fixed_members}')
+
+    # Construct new graph
+    newG = create_cluster_graph(G, fixed_members)
+
+    # Connect intra clusters
+    newG = create_cluster_connectors(G, newG, centroid_nodes)
+
+    if not newG: # If intra cluster connection cannot be established, return False
+        print(f'Sorry! {filename} topolgy unable to connect intra cluster using kMeans with (cluster={k}).')
+    else: # If intra cluster can be established, return updated new graphs with intra cluster connectors
+        print(f'newG: {newG}')
+        print(f'total clusters: {k}')
+        print(f'nx.is_connected(newG): {nx.is_connected(newG)}')
+        display_new_topology(cluster_members, newG)
+else: # If inter cluster can be established, return False
+    print(f'Sorry! {filename} topolgy unable to connect inter cluster using kMeans (cluster={k})')
 
 
 # Print the shortest path from node 0 to node 1
