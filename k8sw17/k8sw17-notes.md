@@ -110,3 +110,6 @@ $ python3 start.py --message "any message"
 
 ### Running Latency Automation Test
 We will write the commands here
+
+### Notes on working topology
+nodes50_Jan082025181429_ER0.1.json, works for k2 and k4

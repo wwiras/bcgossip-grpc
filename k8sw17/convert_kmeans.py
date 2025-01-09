@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import os, json
 import argparse
 import numpy as np
+import time
 
 
 class kMeans:  # Define the class correctly
@@ -23,6 +24,9 @@ class kMeans:  # Define the class correctly
         self.centroids_nodes = []
         self.clusters_members = []
         self.clusters = []
+        self.start_time = 0 # Get clustering start time
+        self.end_time_kmeans = 0 # Get kmeans completed time
+        self.end_time_all = 0 # Get all cluster establishment (connection) completed time
 
     def get_prev_graph(self):
         """Loads JSON data from a file and creates a NetworkX graph."""
@@ -92,12 +96,16 @@ class kMeans:  # Define the class correctly
         # distances = [[distance_matrix[n1][n2] for n2 in self.graph.nodes] for n1 in self.graph.nodes]
         # print(f"distances:\n {distances}")
 
+        self.start_time = time.time()  # Record start time
+
         # 2. Apply K-means clustering
         kmeans = KMeans(n_clusters=self.num_clusters, random_state=0, n_init="auto")
         kmeans.fit(self.distances)
 
         # Get cluster labels and centroids
         labels = kmeans.labels_
+        self.end_time_kmeans = (time.time() - self.start_time) * 1000  # Calculate time in milliseconds
+
         centroids = kmeans.cluster_centers_
 
         # Find the closest nodes to the centroids
@@ -185,6 +193,7 @@ class kMeans:  # Define the class correctly
                                 if nx.is_connected(self.newgraph):
                                     all_connected = True
                                     break
+        self.end_time_all = (time.time() - self.start_time) * 1000  # Calculate time in milliseconds
         return all_connected
     def display_new_topology(self):
         """Displays the new topology with colored clusters and centroid indicators."""
@@ -228,6 +237,9 @@ class kMeans:  # Define the class correctly
         graph_data = {
             'directed': False,
             'multigraph': False,
+            # Add clustering time as a comment (disabled by default)
+            'kmeans_clustering_time_ms': self.end_time_kmeans,
+            'total_clustering_time_ms': self.end_time_all,
             'graph': {},
             'nodes': nodes,
             'edges': edges

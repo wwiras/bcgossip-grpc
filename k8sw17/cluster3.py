@@ -66,19 +66,19 @@ print(f"Distances Matrix:\n {distances}")
 
 
 # Print the shortest path from node 6 to node 0
-print(f"nx.shortest_path(G, source=0, target=6, weight='weight') \n {nx.shortest_path(G,source='gossip-statefulset-0', target='gossip-statefulset-6', weight='weight')}")
+# print(f"nx.shortest_path(G, source=0, target=6, weight='weight') \n {nx.shortest_path(G,source='gossip-statefulset-0', target='gossip-statefulset-6', weight='weight')}")
 
 # Print the shortest path from node 6 to node 0
-print(f"nx.shortest_path(G, source=0, target=6, weight='weight') \n {nx.shortest_path(G,source='gossip-statefulset-2', target='gossip-statefulset-6', weight='weight')}")
+# print(f"nx.shortest_path(G, source=0, target=6, weight='weight') \n {nx.shortest_path(G,source='gossip-statefulset-2', target='gossip-statefulset-6', weight='weight')}")
 
 # Print the shortest path from node 5 to node 6
-print(f"nx.shortest_path(G, source=5, target=6, weight='weight') \n {nx.shortest_path(G,source='gossip-statefulset-5', target='gossip-statefulset-6', weight='weight')}")
+# print(f"nx.shortest_path(G, source=5, target=6, weight='weight') \n {nx.shortest_path(G,source='gossip-statefulset-5', target='gossip-statefulset-6', weight='weight')}")
 
 # Print the shortest path from node 5 to node 6
-print(f"nx.shortest_path(G, source=5, target=0, weight='weight') \n {nx.shortest_path(G,source='gossip-statefulset-5', target='gossip-statefulset-0', weight='weight')}")
+# print(f"nx.shortest_path(G, source=5, target=0, weight='weight') \n {nx.shortest_path(G,source='gossip-statefulset-5', target='gossip-statefulset-0', weight='weight')}")
 
 # Print the shortest path from node 5 to node 6
-print(f"nx.shortest_path(G, source=8, target=6, weight='weight') \n {nx.shortest_path(G,source='gossip-statefulset-8', target='gossip-statefulset-6', weight='weight')}")
+# print(f"nx.shortest_path(G, source=8, target=6, weight='weight') \n {nx.shortest_path(G,source='gossip-statefulset-8', target='gossip-statefulset-6', weight='weight')}")
 
 # Print the shortest path from node 0 to node 1
 print(f"nx.shortest_path(G, source=0, target=1, weight='weight') \n {nx.shortest_path(G,source='gossip-statefulset-0', target='gossip-statefulset-1', weight='weight')}")
