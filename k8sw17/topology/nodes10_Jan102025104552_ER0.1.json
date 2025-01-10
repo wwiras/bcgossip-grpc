@@ -1,0 +1,86 @@
+{
+    "directed": false,
+    "multigraph": false,
+    "graph": {
+        "name": "Erd\u00f6s \u2013 R\u00e9nyi(ER)"
+    },
+    "nodes": [
+        {
+            "id": "gossip-statefulset-0"
+        },
+        {
+            "id": "gossip-statefulset-1"
+        },
+        {
+            "id": "gossip-statefulset-2"
+        },
+        {
+            "id": "gossip-statefulset-3"
+        },
+        {
+            "id": "gossip-statefulset-4"
+        },
+        {
+            "id": "gossip-statefulset-5"
+        },
+        {
+            "id": "gossip-statefulset-6"
+        },
+        {
+            "id": "gossip-statefulset-7"
+        },
+        {
+            "id": "gossip-statefulset-8"
+        },
+        {
+            "id": "gossip-statefulset-9"
+        }
+    ],
+    "edges": [
+        {
+            "weight": 86,
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-7"
+        },
+        {
+            "weight": 22,
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-7"
+        },
+        {
+            "weight": 23,
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-4"
+        },
+        {
+            "weight": 26,
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-8"
+        },
+        {
+            "weight": 58,
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-5"
+        },
+        {
+            "weight": 67,
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-8"
+        },
+        {
+            "weight": 49,
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-7"
+        },
+        {
+            "weight": 24,
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-9"
+        },
+        {
+            "weight": 10,
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-8"
+        }
+    ]
+}

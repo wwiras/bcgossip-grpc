@@ -4,6 +4,8 @@ import json
 from sklearn.cluster import KMeans
 import numpy as np
 import matplotlib.pyplot as plt
+import argparse
+import time
 
 def check_cluster_connectivity(G,cluster_members):
     all_cluster_connected = True
@@ -87,61 +89,6 @@ def ensure_connected_clusters(G, cluster_members):
         return cluster_members
     else:
         return all_clusters_connected
-
-# This is good enough but need to make sure the closest cluster
-def fix_clusters_connection(G,cluster_members,disconnected_clusters):
-
-    for cluster_id in disconnected_clusters:
-        # get all members of the disconnected cluster
-        members = cluster_members[cluster_id]
-        print(f"Cluster ID: {cluster_id}")
-
-        # merge them in to subgraph
-        subgraph = G.subgraph(members)
-
-        # get all components (that are isolated)
-        components = list(nx.connected_components(subgraph))
-        print(f"Components: {components}")
-
-        # Get the longest component (the one with the most nodes)
-        # longest_component = max(components, key=len)
-        # print(f"longest_component: {longest_component}")
-
-        # Take the first longest component as the default cluster
-        # Sort components by length in descending order
-        components.sort(key=len, reverse=True)
-        base_component = components[0]
-        print(f" base_component: {base_component}")
-
-        # Find suitable clusters for the remaining components
-        for i, component in enumerate(components[1:]):
-            for node1 in component:
-                for other_cluster_id, other_members in enumerate(cluster_members):
-                    if other_cluster_id != cluster_id:
-                        # Directly check if moving node1 creates a connected subgraph
-                        temp_members = other_members + [node1]
-                        temp_subgraph = G.subgraph(temp_members)
-                        if nx.is_connected(temp_subgraph):
-                            print(f"  - Moving {node1} from component {component} to cluster {other_cluster_id}")
-                            cluster_members[cluster_id].remove(node1)
-                            cluster_members[other_cluster_id].append(node1)
-                            break  # Move to the next component
-                        if node1 not in cluster_members[cluster_id]:
-                            break  # Node has been moved, move to the next component
-                if node1 not in cluster_members[cluster_id]:
-                    break  # Node has been moved, move to the next component
-
-    # Verify connectivity of the entire graph after processing all clusters
-    all_cluster_nodes = set()
-    for members in cluster_members:
-        all_cluster_nodes.update(members)
-    final_subgraph = G.subgraph(all_cluster_nodes)
-    if nx.is_connected(final_subgraph):
-        print("Final graph is connected.")
-    else:
-        print("WARNING: Final graph is NOT connected!")
-
-    return cluster_members
 
 def create_cluster_graph(graph,cluster_members):
 
@@ -235,117 +182,127 @@ def display_new_topology(cluster_members,newgraph):
 
     plt.show()
 
-# Get the current working directory
-current_directory = os.getcwd()
+# Main code
 
-# Construct the full path to the topology folder
-topology_folder = os.path.join(current_directory, "topology")
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Choose options.")
+    parser.add_argument('--cluster', type=int, default=2, help="How many clusters to create")
+    # Add the optional argument with a default value of False
+    parser.add_argument('--display', action='store_true', help="Display new topology (default: False)")
+    parser.add_argument('--save', action='store_true', help="Save new topology to json(default: False)")
+    args = parser.parse_args()
 
-# k = total clusters
-k=2
-# select filename
-# filename = "nodes10_Jan062025154931_ER0.4.json"
-# filename = "nodes10_Jan062025154921_BA3.json"
-# filename = "nodes30_Jan082025004502_BA5.json"
-# filename = "nodes30_Jan082025004652_ER0.1.json"
-# filename = "nodes50_Jan082025004511_BA5.json"
-# filename = "nodes50_Jan082025181240_BA5.json"
-filename ="nodes50_Jan082025181429_ER0.1.json"
-# filename ="nodes70_Jan082025004519_BA5.json"
-# filename ="nodes70_Jan082025201400_ER0.1.json"
-# filename ="nodes100_Jan082025004526_BA5.json"
-# filename = "nodes100_Jan082025201753_ER0.1.json"
+    # k = total clusters
+    k=int((args.cluster))
 
+    # select filename manually from here. Easy to remember with manual
+    filename = "nodes10_Jan102025104552_ER0.1.json"
+    # filename = "nodes10_Jan102025113639_BA5.json"
+    # filename = "nodes30_Jan102025113707_BA5.json"
+    # filename = "nodes30_Jan102025113830_ER0.1.json"
+    # filename = "nodes50_Jan082025181240_BA5.json"
+    # filename ="nodes50_Jan082025181429_ER0.1.json"
+    # filename ="nodes70_Jan082025004519_BA5.json"
+    # filename ="nodes70_Jan082025201400_ER0.1.json"
+    # filename ="nodes100_Jan082025004526_BA5.json"
+    # filename = "nodes100_Jan082025201753_ER0.1.json"
 
-# Load data from the JSON file
-print(f"filename = {filename}")
-with open(os.path.join(topology_folder,filename), 'r') as f:  # Use self.filename
-    data = json.load(f)
+    # Get the current working directory
+    current_directory = os.getcwd()
 
-# Build graph (existing topology)
-G = nx.Graph()
-for node in data['nodes']:
-    # print(f"node['id']:{node['id']}")
-    G.add_node(node['id'])
-for edge in data['edges']:
-    G.add_edge(edge['source'], edge['target'], weight=edge['weight'])
+    # Construct the full path to the topology folder
+    topology_folder = os.path.join(current_directory, "topology")
 
-print(f"Topology from {filename} is connected nx.is_connected(G) ? : {nx.is_connected(G)} and G:{G}")
+    # Load data from the JSON file
+    print(f"filename = {filename}")
+    with open(os.path.join(topology_folder,filename), 'r') as f:  # Use self.filename
+        data = json.load(f)
 
-num_nodes = len(data['nodes'])
+    # Build graph from json (existing topology)
+    G = nx.Graph()
+    for node in data['nodes']:
+        # print(f"node['id']:{node['id']}")
+        G.add_node(node['id'])
+    for edge in data['edges']:
+        G.add_edge(edge['source'], edge['target'], weight=edge['weight'])
 
-# Calculate the distances matrix
-distance_matrix = dict(nx.all_pairs_dijkstra_path_length(G))
-distances = [[distance_matrix[n1][n2] for n2 in G.nodes] for n1 in G.nodes]
-# print(f"Distances Matrix:\n {distances}")
+    # Confirm that the topology is connected
+    print(f"From {filename} topology, is it all connected? (nx.is_connected(G)): {nx.is_connected(G)} and \n The graph info is G:{G}")
 
-# 2. Apply K-means clustering
-kmeans = KMeans(n_clusters=k, random_state=0, n_init="auto")
-kmeans.fit(distances)
+    # Get number of nodes
+    num_nodes = len(data['nodes'])
 
-# Get cluster labels and centroids
-labels = kmeans.labels_
-print(f'Kmeans clustering, labels: {labels}')
+    # Start calculation time includes
+    # a. distance matrix
+    # b. kMeans fitting
+    # c. get centroid neighbors and cluster members
+    # d. fix cluster members connection (inter cluster)
+    # e. fix intra cluster connection
+    start_kmeans_time = time.time()
 
-# Find the closest nodes to the centroids
-centroids = kmeans.cluster_centers_
-centroid_nodes = []
-for centroid in centroids:
-    # distances_to_centroid = [np.linalg.norm(np.array(row) - centroid) for row in self.weight_matrix]
-    distances_to_centroid = [np.linalg.norm(np.array(row) - centroid) for row in distances]
-    # print(f"distances_to_centroid: \n {distances_to_centroid}")
-    closest_node_index = np.argmin(distances_to_centroid)
-    # print(f"closest_node_index: \n {closest_node_index}")
-    closest_node = list(G.nodes)[closest_node_index]
-    # print(f"closest_node: \n {closest_node}")
-    centroid_nodes.append(closest_node)
+    # Calculate the distances matrix from json topology
+    distance_matrix = dict(nx.all_pairs_dijkstra_path_length(G))
+    distances = [[distance_matrix[n1][n2] for n2 in G.nodes] for n1 in G.nodes]
+    # print(f"Distances Matrix:\n {distances}")
 
-# Create a list to store the nodes in each cluster
-cluster_members = [[] for _ in range(k)]
-for i, label in enumerate(labels):
-    cluster_members[label].append(list(G.nodes)[i])
+    # Apply K-means clustering
+    kmeans = KMeans(n_clusters=k, random_state=0, n_init="auto")
+    kmeans.fit(distances)
 
-# Cluster details
-cluster_members = cluster_members
-# print(f'Kmeans clustering, cluster_members: {cluster_members}')
+    # kmeans fitting time
+    kmeans_fitting_time = time.time()
 
-centroid_nodes = centroid_nodes
-print(f'Kmeans clustering, centroid_nodes: {centroid_nodes}')
+    # Get cluster labels and centroids
+    labels = kmeans.labels_
+    print(f'Kmeans clustering, labels: {labels}')
 
-all_clusters_connected = check_cluster_connectivity(G, cluster_members)
-print(f'all_clusters_connected:{all_clusters_connected}')
+    # Find the closest nodes to the centroids
+    centroids = kmeans.cluster_centers_
+    centroid_nodes = []
+    for centroid in centroids:
+        # distances_to_centroid = [np.linalg.norm(np.array(row) - centroid) for row in self.weight_matrix]
+        distances_to_centroid = [np.linalg.norm(np.array(row) - centroid) for row in distances]
+        # print(f"distances_to_centroid: \n {distances_to_centroid}")
+        closest_node_index = np.argmin(distances_to_centroid)
+        # print(f"closest_node_index: \n {closest_node_index}")
+        closest_node = list(G.nodes)[closest_node_index]
+        # print(f"closest_node: \n {closest_node}")
+        centroid_nodes.append(closest_node)
+    # print(f'Kmeans clustering, centroid_nodes: {centroid_nodes}')
 
-# new_cluster_members = fix_clusters_connection(G,cluster_members,disconnected_clusters)
-# print(f'new_cluster_members: {new_cluster_members}')
+    # Create a list to store the nodes in each cluster and cluster details
+    cluster_members = [[] for _ in range(k)]
+    for i, label in enumerate(labels):
+        cluster_members[label].append(list(G.nodes)[i])
+    # print(f'Kmeans clustering, cluster_members: {cluster_members}')
 
-# Check and fix inter cluster connectors
-fixed_members = ensure_connected_clusters(G, cluster_members)
-if fixed_members: # if inter cluster connection can be established, return fix cluster members
+    # Check whether all clusters connected or not
+    # all_clusters_connected = check_cluster_connectivity(G, cluster_members)
+    # print(f'all_clusters_connected:{all_clusters_connected}')
 
-    print(f'All inter clusters are connected !')
-    # print(f'All inter clusters are connected \n fix_members: {fixed_members}')
+    # Check and fix inter cluster connectors
+    fixed_members = ensure_connected_clusters(G, cluster_members)
+    if fixed_members: # if inter cluster connection can be established, return fix cluster members
 
-    # Construct new graph
-    newG = create_cluster_graph(G, fixed_members)
+        print(f'All inter clusters are connected !')
+        # print(f'All inter clusters are connected \n fix_members: {fixed_members}')
 
-    # Connect intra clusters
-    newG = create_cluster_connectors(G, newG, centroid_nodes)
+        # Construct new graph
+        newG = create_cluster_graph(G, fixed_members)
 
-    if not newG: # If intra cluster connection cannot be established, return False
-        print(f'Sorry! {filename} topolgy unable to connect intra cluster using kMeans with (cluster={k}).')
-    else: # If intra cluster can be established, return updated new graphs with intra cluster connectors
-        print(f'newG: {newG}')
-        print(f'total clusters: {k}')
-        print(f'nx.is_connected(newG): {nx.is_connected(newG)}')
-        display_new_topology(cluster_members, newG)
-else: # If inter cluster can be established, return False
-    print(f'Sorry! {filename} topolgy unable to connect inter cluster using kMeans (cluster={k})')
+        # Connect intra clusters
+        newG = create_cluster_connectors(G, newG, centroid_nodes)
 
-
-# Print the shortest path from node 0 to node 1
-# print(f"nx.shortest_path(G, source=0, target=1, weight='weight') \n {nx.shortest_path(G,source='gossip-statefulset-0', target='gossip-statefulset-1', weight='weight')}")
-
-# Print the shortest path from node 0 to all other nodes
-# p = nx.shortest_path(G, source=0, weight='weight')
-# print(f"nx.shortest_path(G, source=0, weight='weight') \n {p}")
-
+        if not newG: # If intra cluster connection cannot be established, return False
+            print(f'Sorry! {filename} topolgy unable to connect intra cluster using kMeans with (cluster={k}).')
+        else: # If intra cluster can be established, return updated new graphs with intra cluster connectors
+            # total cluster kmeans time
+            end_time_all = (time.time() - start_kmeans_time) * 1000  # Calculate time in milliseconds
+            print(f'Total clustering time (ms) : {end_time_all}')
+            print(f'newG: {newG}')
+            print(f'total clusters: {k}')
+            print(f'Is newG is connected (nx.is_connected(newG)): {nx.is_connected(newG)}')
+            if args.display:
+                display_new_topology(cluster_members, newG)
+    else: # If inter cluster can be established, return False
+        print(f'Sorry! {filename} topolgy unable to connect inter cluster using kMeans (cluster={k})')

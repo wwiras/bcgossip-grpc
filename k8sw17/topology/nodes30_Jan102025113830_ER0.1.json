@@ -1,0 +1,381 @@
+{
+    "directed": false,
+    "multigraph": false,
+    "graph": {
+        "name": "Erd\u00f6s \u2013 R\u00e9nyi(ER)"
+    },
+    "nodes": [
+        {
+            "id": "gossip-statefulset-0"
+        },
+        {
+            "id": "gossip-statefulset-1"
+        },
+        {
+            "id": "gossip-statefulset-2"
+        },
+        {
+            "id": "gossip-statefulset-3"
+        },
+        {
+            "id": "gossip-statefulset-4"
+        },
+        {
+            "id": "gossip-statefulset-5"
+        },
+        {
+            "id": "gossip-statefulset-6"
+        },
+        {
+            "id": "gossip-statefulset-7"
+        },
+        {
+            "id": "gossip-statefulset-8"
+        },
+        {
+            "id": "gossip-statefulset-9"
+        },
+        {
+            "id": "gossip-statefulset-10"
+        },
+        {
+            "id": "gossip-statefulset-11"
+        },
+        {
+            "id": "gossip-statefulset-12"
+        },
+        {
+            "id": "gossip-statefulset-13"
+        },
+        {
+            "id": "gossip-statefulset-14"
+        },
+        {
+            "id": "gossip-statefulset-15"
+        },
+        {
+            "id": "gossip-statefulset-16"
+        },
+        {
+            "id": "gossip-statefulset-17"
+        },
+        {
+            "id": "gossip-statefulset-18"
+        },
+        {
+            "id": "gossip-statefulset-19"
+        },
+        {
+            "id": "gossip-statefulset-20"
+        },
+        {
+            "id": "gossip-statefulset-21"
+        },
+        {
+            "id": "gossip-statefulset-22"
+        },
+        {
+            "id": "gossip-statefulset-23"
+        },
+        {
+            "id": "gossip-statefulset-24"
+        },
+        {
+            "id": "gossip-statefulset-25"
+        },
+        {
+            "id": "gossip-statefulset-26"
+        },
+        {
+            "id": "gossip-statefulset-27"
+        },
+        {
+            "id": "gossip-statefulset-28"
+        },
+        {
+            "id": "gossip-statefulset-29"
+        }
+    ],
+    "edges": [
+        {
+            "weight": 57,
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-5"
+        },
+        {
+            "weight": 56,
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-18"
+        },
+        {
+            "weight": 11,
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-19"
+        },
+        {
+            "weight": 22,
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-25"
+        },
+        {
+            "weight": 60,
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-2"
+        },
+        {
+            "weight": 71,
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-12"
+        },
+        {
+            "weight": 12,
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-15"
+        },
+        {
+            "weight": 78,
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-17"
+        },
+        {
+            "weight": 69,
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-22"
+        },
+        {
+            "weight": 80,
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-7"
+        },
+        {
+            "weight": 59,
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-8"
+        },
+        {
+            "weight": 33,
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-13"
+        },
+        {
+            "weight": 89,
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-4"
+        },
+        {
+            "weight": 71,
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-16"
+        },
+        {
+            "weight": 97,
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-18"
+        },
+        {
+            "weight": 68,
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-25"
+        },
+        {
+            "weight": 6,
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-26"
+        },
+        {
+            "weight": 16,
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-20"
+        },
+        {
+            "weight": 76,
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-27"
+        },
+        {
+            "weight": 55,
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-12"
+        },
+        {
+            "weight": 13,
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-16"
+        },
+        {
+            "weight": 23,
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-27"
+        },
+        {
+            "weight": 95,
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-11"
+        },
+        {
+            "weight": 48,
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-17"
+        },
+        {
+            "weight": 17,
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-21"
+        },
+        {
+            "weight": 72,
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-12"
+        },
+        {
+            "weight": 90,
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-17"
+        },
+        {
+            "weight": 8,
+            "source": "gossip-statefulset-8",
+            "target": "gossip-statefulset-29"
+        },
+        {
+            "weight": 60,
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-13"
+        },
+        {
+            "weight": 65,
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-20"
+        },
+        {
+            "weight": 67,
+            "source": "gossip-statefulset-9",
+            "target": "gossip-statefulset-28"
+        },
+        {
+            "weight": 70,
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-13"
+        },
+        {
+            "weight": 39,
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-24"
+        },
+        {
+            "weight": 97,
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-25"
+        },
+        {
+            "weight": 72,
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-26"
+        },
+        {
+            "weight": 1,
+            "source": "gossip-statefulset-10",
+            "target": "gossip-statefulset-28"
+        },
+        {
+            "weight": 8,
+            "source": "gossip-statefulset-12",
+            "target": "gossip-statefulset-16"
+        },
+        {
+            "weight": 84,
+            "source": "gossip-statefulset-13",
+            "target": "gossip-statefulset-26"
+        },
+        {
+            "weight": 69,
+            "source": "gossip-statefulset-14",
+            "target": "gossip-statefulset-18"
+        },
+        {
+            "weight": 53,
+            "source": "gossip-statefulset-14",
+            "target": "gossip-statefulset-25"
+        },
+        {
+            "weight": 51,
+            "source": "gossip-statefulset-14",
+            "target": "gossip-statefulset-26"
+        },
+        {
+            "weight": 54,
+            "source": "gossip-statefulset-15",
+            "target": "gossip-statefulset-16"
+        },
+        {
+            "weight": 34,
+            "source": "gossip-statefulset-15",
+            "target": "gossip-statefulset-23"
+        },
+        {
+            "weight": 32,
+            "source": "gossip-statefulset-15",
+            "target": "gossip-statefulset-25"
+        },
+        {
+            "weight": 11,
+            "source": "gossip-statefulset-15",
+            "target": "gossip-statefulset-26"
+        },
+        {
+            "weight": 35,
+            "source": "gossip-statefulset-16",
+            "target": "gossip-statefulset-19"
+        },
+        {
+            "weight": 64,
+            "source": "gossip-statefulset-17",
+            "target": "gossip-statefulset-22"
+        },
+        {
+            "weight": 77,
+            "source": "gossip-statefulset-17",
+            "target": "gossip-statefulset-25"
+        },
+        {
+            "weight": 46,
+            "source": "gossip-statefulset-20",
+            "target": "gossip-statefulset-21"
+        },
+        {
+            "weight": 80,
+            "source": "gossip-statefulset-20",
+            "target": "gossip-statefulset-22"
+        },
+        {
+            "weight": 94,
+            "source": "gossip-statefulset-20",
+            "target": "gossip-statefulset-25"
+        },
+        {
+            "weight": 12,
+            "source": "gossip-statefulset-21",
+            "target": "gossip-statefulset-23"
+        },
+        {
+            "weight": 54,
+            "source": "gossip-statefulset-21",
+            "target": "gossip-statefulset-29"
+        },
+        {
+            "weight": 2,
+            "source": "gossip-statefulset-22",
+            "target": "gossip-statefulset-25"
+        },
+        {
+            "weight": 23,
+            "source": "gossip-statefulset-25",
+            "target": "gossip-statefulset-28"
+        },
+        {
+            "weight": 81,
+            "source": "gossip-statefulset-25",
+            "target": "gossip-statefulset-29"
+        }
+    ]
+}
