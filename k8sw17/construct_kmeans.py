@@ -289,12 +289,12 @@ if __name__ == '__main__':
     # filename = "nodes10_Jan102025104552_ER0.1.json"
     # filename = "nodes10_Jan102025113639_BA5.json"
     # filename = "nodes30_Jan102025113707_BA5.json"
-    filename = "nodes30_Jan102025113830_ER0.1.json"
-    # filename = "nodes50_Jan082025181240_BA5.json"
-    # filename ="nodes50_Jan082025181429_ER0.1.json"
-    # filename ="nodes70_Jan082025004519_BA5.json"
-    # filename ="nodes70_Jan082025201400_ER0.1.json"
-    # filename ="nodes100_Jan082025004526_BA5.json"
+    # filename = "nodes30_Jan102025113830_ER0.1.json"
+    filename = "nodes50_Jan082025181240_BA5.json"
+    # filename = "nodes50_Jan082025181429_ER0.1.json"
+    # filename = "nodes70_Jan082025004519_BA5.json"
+    # filename = "nodes70_Jan082025201400_ER0.1.json"
+    # filename = "nodes100_Jan082025004526_BA5.json"
     # filename = "nodes100_Jan082025201753_ER0.1.json"
 
     # Get the current working directory
