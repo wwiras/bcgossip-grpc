@@ -9,6 +9,15 @@ import time
 
 
 def check_inter_clusters(G,cluster_members):
+    """
+        This is optional. It will check whether inter clusters
+        are connected or not.
+
+        Input: G - NetworkX graph (existing topology - BA/ER)
+        cluster_members - list of members of the clusters (with its cluser id)
+
+        Returns: True if the clusters are connected, False otherwise
+    """
     all_cluster_connected = True
     # Check connectivity within each cluster
     for cluster_id, members in enumerate(cluster_members):
@@ -92,6 +101,19 @@ def inter_clusters_connectors(G, cluster_members):
         return all_clusters_connected
 
 def intra_clusters_connectors(graph,newgraph,centroid_nodes):
+    """
+        Input:
+        a. graph - networkx graph from BA/ER model
+        b. newgraph - networkx graph with fully inter cluster connected components
+        b. centroid - list of centroid cluster members (from each cluster)
+
+        Return :
+        If newgraph is fully connected, return it
+        If newgraph is not fully connected, return False
+
+        If inter clusters and intra clusters are successfully connected,
+        a newly networkx graph will be created and returned
+    """
     all_connected = False
     for cen in centroid_nodes:
         for cen_others in centroid_nodes:
@@ -127,6 +149,17 @@ def intra_clusters_connectors(graph,newgraph,centroid_nodes):
         return all_connected
 
 def create_cluster_graph(graph,cluster_members):
+    """
+    Input:
+    a. graph - a networkx graph (empty)
+    b. cluster_members - Cluster with inter cluster
+    are connected
+
+    Return : graph - a networkx graph with cluster members content
+
+    If inter clusters and intra clusters are successfully connected,
+    a newly networkx graph will be created and returned
+    """
 
     newgraph = nx.Graph()
 
@@ -162,7 +195,9 @@ def create_cluster_graph(graph,cluster_members):
     return newgraph
 
 def display_new_topology(cluster_members,newgraph):
-    """Displays the new topology with colored clusters and centroid indicators."""
+    """
+    Displays the new topology with colored clusters and centroid indicators.
+    """
     # Create a dictionary to map node to cluster
     node_to_cluster = {}
     for cluster_id, members in enumerate(cluster_members):
@@ -184,7 +219,22 @@ def display_new_topology(cluster_members,newgraph):
     plt.show()
 
 def save_new_topology(gnewgraph, filename, k, end_time, clusters):
-    """Saves the topology to a JSON file with date and time in the filename."""
+    """
+    Saves the topology to a JSON file with date and time in the filename.
+    It will store details about the cluster
+    a. time to complete the cluster (ms)
+    b. number of clusters
+
+    Input:
+    a. gnewgraph: networkx graph (newly created)
+    b. filename: topology json filename (BA/ER) network
+    c. k: number of clusters
+    d. end_time: total time to construct cluster (ms)
+    e. clusters: list of clusters (fixed member cluster)
+
+    Return: None (newly kmeans topology will be saved)
+    at "topology_kmeans" directory
+    """
     # Create directory if it doesn't exist
     output_dir = "topology_kmeans"
     os.makedirs(output_dir, exist_ok=True)
