@@ -6,7 +6,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 import time
+from timeit import default_timer as timer
 
+start_timer = 0
+end_timer = 0
 
 def check_inter_clusters(G,cluster_members):
     """
@@ -329,6 +332,7 @@ if __name__ == '__main__':
     # d. fix cluster members connection (inter cluster)
     # e. fix intra cluster connection
     start_kmeans_time = time.time()
+    start_timer = timer()
 
     # Calculate the distances matrix from json topology
     distance_matrix = dict(nx.all_pairs_dijkstra_path_length(G))
@@ -390,9 +394,11 @@ if __name__ == '__main__':
             # total cluster kmeans time
             end_time_all = (time.time() - start_kmeans_time) * 1000  # Calculate time in milliseconds
             end_time_ms = "{:.5f}".format(end_time_all)
+            end_timer = timer()
 
             # Print all info required
             print(f'Total clustering time (ms) : {end_time_ms}')
+            # print(f'Total clustering time (ms) with timer : {(end_timer - start_timer)}')
             print(f'newG: {newG}')
             print(f'Is newG is connected (nx.is_connected(newG)): {nx.is_connected(newG)}')
 

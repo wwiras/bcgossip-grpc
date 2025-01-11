@@ -222,6 +222,7 @@ if __name__ == '__main__':
         print(f"node={node}", flush=True)
 
         # if node == 10 or node == 30:
+        # if node == 50:
         if node == 10:
             if test.wait_for_pods_to_be_down(namespace='default',timeout=300):
 

@@ -60,11 +60,11 @@ in topology_kmeans folder.
 
 ```shell
 # To run the code and display or save new topology (display=True) and (save=True):
-python convert_kmeans.py --filename nodes10_Dec2820240043.json --num_cluster 2 --display --save
+python construct_kmeans.py --filename nodes10_Dec2820240043.json --num_cluster 2 --display --save
 # the output file will kmeans_k2_nodes10_Dec2820240043.json
     
 #To run the code and ignore display and save new topology (display=False)and (save=False):
-python convert_kmeans.py --filename nodes10_Dec2820240043.json --num_cluster 2
+python construct_kmeans.py --filename nodes10_Dec2820240043.json --num_cluster 2
 ```
 
 #### Step 3 - Buidl docker image (k8sw17) and run cluster options
