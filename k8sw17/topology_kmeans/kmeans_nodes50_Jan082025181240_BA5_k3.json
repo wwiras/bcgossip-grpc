@@ -2,7 +2,7 @@
     "directed": false,
     "multigraph": false,
     "total_clusters": 3,
-    "total_clustering_time_ms": "32.43017",
+    "total_clustering_time_ms": "45.53318",
     "graph": {},
     "nodes": [
         {
