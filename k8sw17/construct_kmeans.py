@@ -125,7 +125,7 @@ def intra_clusters_connectors(graph,newgraph,centroid_nodes):
 
                     # Get shortest path (with node sequence)
                     shortest_path = nx.shortest_path(graph, source=cen, target=cen_others, weight='weight')
-                    # print(f"nx.shortest_path(self.graph, source={cen}, target={cen_others}, weight='weight') \n {shortest_path}")
+                    print(f"nx.shortest_path(self.graph, source={cen}, target={cen_others}, weight='weight') \n {shortest_path}")
 
                     # Crawl or iterate through the shortest path
                     # Iterate up to the second-to-last element
@@ -149,6 +149,67 @@ def intra_clusters_connectors(graph,newgraph,centroid_nodes):
     if all_connected:
         return newgraph
     else:
+        return all_connected
+
+def intra_clusters_connectors2(graph,newgraph,cluster_members):
+    """
+        Input:
+        a. graph - networkx graph from BA/ER model
+        b. newgraph - networkx graph with fully inter cluster connected components
+        c. cluster_members(list) : i. list of cluster members (from each cluster)
+                                 : ii. list index is the cluster id
+        Return :
+        If newgraph is fully connected, return it
+        If newgraph is not fully connected, return False
+
+        If inter clusters and intra clusters are successfully connected,
+        a newly networkx graph will be created and returned
+    """
+    all_connected = False
+
+    # Crawling to all cluster members
+    # and find the shortest path. The probability of disconnected clusters is quite high
+    # print(f"Test looping all clusters...")
+    for current_cluster_id, cluster1 in enumerate(cluster_members):
+        for next_cluster_id, cluster2 in enumerate(cluster_members):
+            if (current_cluster_id is not next_cluster_id) and not all_connected:
+                # print(f"current_cluster_id {current_cluster_id} and next_cluster_id is {next_cluster_id}")
+
+                # Loop intra cluster
+                for c1 in cluster1:
+                    for c2 in cluster2:
+                        if not all_connected:
+                            if c1 is not c2:
+                                # Get shortest path (with node sequence)
+                                shortest_path = nx.shortest_path(graph, source=c1, target=c2, weight='weight')
+                                # print(f"nx.shortest_path(self.graph, source={c1}, target={c2}, weight='weight') \n {shortest_path}")
+
+                                # Crawl or iterate through the shortest path
+                                # Iterate up to the second-to-last element
+                                for i in range(len(shortest_path) - 1):
+                                    current_node = shortest_path[i]
+                                    next_node = shortest_path[i + 1]
+
+                                    # Check whether there is connection between
+                                    # two nodes in the path (crawler)
+                                    # If no edge (None). So add edge
+                                    if newgraph.get_edge_data(current_node, next_node) is None:
+                                        edge_data = graph.get_edge_data(current_node, next_node)
+                                        newgraph.add_edge(current_node, next_node, weight=edge_data['weight'])
+                                        # print(f'self.newgraph.get_edge_data({current_node},{next_node}):{self.newgraph.get_edge_data(current_node,next_node)}')
+
+                                        # Check new graph whether all nodes are connected
+                                        if nx.is_connected(newgraph):
+                                            all_connected = True
+                                            break
+            else:
+                break
+
+    if all_connected:
+        # return intra clusters connected graph
+        return newgraph
+    else:
+        # return False if intra clusters not connected graph
         return all_connected
 
 def create_cluster_graph(graph,cluster_members):
@@ -272,8 +333,12 @@ def save_new_topology(gnewgraph, filename, k, end_time, clusters):
     }
 
     # Save the topology
-    with open(file_path, 'w') as f:
-        json.dump(graph_data, f, indent=4)
+    try:
+        with open(file_path, 'w') as f:
+            json.dump(graph_data, f, indent=4)
+        return fileout
+    except Exception as e:
+        return False
 
 
 # Main code
@@ -298,7 +363,41 @@ if __name__ == '__main__':
     # filename = "nodes70_Jan082025004519_BA5.json"
     # filename = "nodes70_Jan082025201400_ER0.1.json"
     # filename = "nodes100_Jan082025004526_BA5.json"
-    filename = "nodes100_Jan082025201753_ER0.1.json"
+    # filename = "nodes100_Jan082025201753_ER0.1.json"
+
+    # filename = "nodes150_Jan122025210508_BA7.json"
+    # filename = "nodes150_Jan122025210546_ER0.1.json"
+
+    filename = "nodes200_Jan122025210633_ER0.1.json" # Only k=2 is available
+    # filename = "nodes200_Jan152025072929_ER0.1.json" # Available for k=3
+    # filename = "nodes200_Jan122025210705_BA10.json"  # Only k=2 available
+    # filename = "nodes200_Jan152025073900_BA10.json"  # only k=2 available
+    # filename ="nodes200_Jan152025074007_BA10.json"
+
+    # filename = "nodes500_Jan122025212227_BA10.json"
+    # filename = "nodes500_Jan122025212343_BA15.json"
+    # filename = "nodes500_Jan122025212442_BA20.json"
+    #
+    # filename = "nodes1000_Jan122025212246_BA10.json" # Fail 3 clusters
+    # filename = "nodes1000_Jan152025083900_BA10.json" # Fail 3 clusters
+    # filename = "nodes1000_Jan152025084647_BA10.json" # Fail 3 clusters
+    # filename = "nodes1000_Jan152025084954_BA10.json"
+    # filename = "nodes1000_Jan122025212404_BA15.json"
+    # filename = "nodes1000_Jan122025212451_BA20.json"
+    #
+    # filename = "nodes1500_Jan122025212258_BA10.json" # Fail to convert
+    # filename = "nodes1500_Jan152025085557_BA10.json" # Fail to convert
+    # filename = "nodes1500_Jan152025090343_BA10.json" # Fail to convert
+    # filename = "nodes1500_Jan152025091633_BA10.json" # Fail to ceonvert
+    # filename = "nodes1500_Jan152025092815_BA10.json" # Fail to ceonvert
+    # filename = "nodes1500_Jan152025093640_BA10.json" # Fail to convvert
+    # filename = "nodes1500_Jan152025100604_BA10.json" # Fail to convvert
+    # filename = "nodes1500_Jan152025105610_BA10.json" # Fail to convert
+    # filename = "nodes1500_Jan152025112657_BA10.json"
+    # filename = "nodes1500_Jan122025212427_BA15.json"
+    # filename = "nodes1500_Jan122025212457_BA20.json" # Fail to convert
+    # filename = "nodes1500_Jan152025091055_BA20.json"
+
 
     # Get the current working directory
     current_directory = os.getcwd()
@@ -307,7 +406,7 @@ if __name__ == '__main__':
     topology_folder = os.path.join(current_directory, "topology")
 
     # Load data from the JSON file
-    print(f"filename = {filename}")
+    # print(f"filename = {filename}")
     with open(os.path.join(topology_folder,filename), 'r') as f:  # Use self.filename
         data = json.load(f)
 
@@ -385,10 +484,11 @@ if __name__ == '__main__':
         newG = create_cluster_graph(G, fixed_members)
 
         # Connect intra clusters
-        newG = intra_clusters_connectors(G, newG, centroid_nodes)
+        # newG = intra_clusters_connectors(G, newG, centroid_nodes)
+        newG = intra_clusters_connectors2(G, newG, fixed_members)
 
         if not newG: # If intra cluster connection cannot be established, return False
-            print(f'Sorry! {filename} topolgy unable to connect intra cluster using kMeans with (cluster={k}).')
+            print(f'Sorry! {filename} topology unable to connect intra cluster using kMeans with (cluster={k}).')
         else: # If intra cluster can be established, return updated new graphs with intra cluster connectors
 
             # total cluster kmeans time
@@ -396,20 +496,26 @@ if __name__ == '__main__':
             end_time_ms = "{:.5f}".format(end_time_all)
             end_timer = timer()
 
-            # Print all info required
-            print(f'Total clustering time (ms) : {end_time_ms}')
-            # print(f'Total clustering time (ms) with timer : {(end_timer - start_timer)}')
-            print(f'newG: {newG}')
-            print(f'Is newG is connected (nx.is_connected(newG)): {nx.is_connected(newG)}')
-
             # display kmeans topology
             if args.display:
                 display_new_topology(fixed_members, newG)
 
             # save kmeans topology
+            fileout = False
             if args.save:
-                save_new_topology(newG, filename, k, end_time_ms,fixed_members)
-                # save_new_topology(gnewgraph, filename, k, end_time, cluster_members)
+                fileout = save_new_topology(newG, filename, k, end_time_ms,fixed_members)
+
+            # Print all info required
+            print(f'File topology : {filename}')
+            print(f'G : {G}')
+            print(f'Total clustering time (ms) : {end_time_ms}')
+            # print(f'Total clustering time (ms) with timer : {(end_timer - start_timer)}')
+            print(f'newG: {newG}')
+            print(f'Is newG is connected (nx.is_connected(newG)): {nx.is_connected(newG)}')
+            print(f'kMeans topology filename : {fileout}')
+
 
     else: # If inter cluster can be established, return False
-        print(f'Sorry! {filename} topolgy unable to connect inter cluster using kMeans (cluster={k})')
+        print(f'File topology : {filename}')
+        print(f'G : {G}')
+        print(f'This topology unable to connect inter cluster using kMeans (cluster={k})')
