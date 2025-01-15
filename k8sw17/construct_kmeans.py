@@ -355,7 +355,7 @@ if __name__ == '__main__':
 
     # select filename manually from here. Easy to remember with manual
     # filename = "nodes10_Jan102025104552_ER0.1.json"
-    # filename = "nodes10_Jan102025113639_BA5.json"
+    filename = "nodes10_Jan102025113639_BA5.json"
     # filename = "nodes30_Jan102025113707_BA5.json"
     # filename = "nodes30_Jan102025113830_ER0.1.json"
     # filename = "nodes50_Jan082025181240_BA5.json"
@@ -368,7 +368,7 @@ if __name__ == '__main__':
     # filename = "nodes150_Jan122025210508_BA7.json"
     # filename = "nodes150_Jan122025210546_ER0.1.json"
 
-    filename = "nodes200_Jan122025210633_ER0.1.json" # Only k=2 is available
+    # filename = "nodes200_Jan122025210633_ER0.1.json" # Only k=2 is available
     # filename = "nodes200_Jan152025072929_ER0.1.json" # Available for k=3
     # filename = "nodes200_Jan122025210705_BA10.json"  # Only k=2 available
     # filename = "nodes200_Jan152025073900_BA10.json"  # only k=2 available
@@ -488,7 +488,7 @@ if __name__ == '__main__':
         newG = intra_clusters_connectors2(G, newG, fixed_members)
 
         if not newG: # If intra cluster connection cannot be established, return False
-            print(f'Sorry! {filename} topology unable to connect intra cluster using kMeans with (cluster={k}).')
+            print(f'{filename} topology unable to connect intra cluster using kMeans with (cluster={k}).')
         else: # If intra cluster can be established, return updated new graphs with intra cluster connectors
 
             # total cluster kmeans time
@@ -506,14 +506,16 @@ if __name__ == '__main__':
                 fileout = save_new_topology(newG, filename, k, end_time_ms,fixed_members)
 
             # Print all info required
-            print(f'File topology : {filename}')
+            print(f'Source file topology : {filename}')
             print(f'G : {G}')
-            print(f'Total clustering time (ms) : {end_time_ms}')
+            print(f'Total clustering time (ms) for {k} clusters : {end_time_ms}')
             # print(f'Total clustering time (ms) with timer : {(end_timer - start_timer)}')
             print(f'newG: {newG}')
             print(f'Is newG is connected (nx.is_connected(newG)): {nx.is_connected(newG)}')
-            print(f'kMeans topology filename : {fileout}')
-
+            if fileout:
+                print(f'Successfully creating kMeans topology : {fileout}')
+            else:
+                print(f'kMeans topology file is not created!')
 
     else: # If inter cluster can be established, return False
         print(f'File topology : {filename}')
