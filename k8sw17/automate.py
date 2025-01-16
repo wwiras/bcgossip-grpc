@@ -8,15 +8,17 @@ import time
 import uuid
 import select
 
+
 class Test:
     # def __init__(self,num_test,cluster):
-    def __init__ (self,num_test, cluster, model, target_filename)
+    def __init__(self, num_test, cluster, model, target_filename):
 
         # Getting model
         self.model = model
 
         # Getting input total nodes
         self.target_filename = target_filename
+        print(f'self.target_filename = {target_filename}')
 
         # Getting topology folder
         # 0 - for non cluster, 1 - for cluster topology
@@ -47,9 +49,11 @@ class Test:
         Returns a list of nodes (json files) or single json file for a given directory,
         filtering by the model specified in self.model and self.target_filename .
         """
-        try:
 
-            if self.target_filename is not None:
+        try:
+            filtered_files = []
+            # print(f"filtered_files inside = {filtered_files}", flush=True)
+            if self.target_filename != '':
                 # Filter files by target_filename nodes. will return single file
                 filtered_files = [
                     f for f in os.listdir(directory)
@@ -58,19 +62,20 @@ class Test:
                 ]
             else:
                 # Filter files by self.model. return all files with the model
+                # print(f"os.listdir(directory) = {os.listdir(directory)}", flush=True)
                 filtered_files = [
                     f for f in os.listdir(directory)
                     if os.path.isfile(os.path.join(directory, f)) and
                        self.model in f
                 ]
-
-            return []
+            # print(f"filtered_files outside = {filtered_files}", flush=True)
+            return filtered_files
 
         except FileNotFoundError:
             print(f"Directory not found: {directory}", flush=True)
             return []
 
-    def getTotalNodes(self,filename):
+    def getTotalNodes(self, filename):
         """
         Returns of nodes total for a given filename
         Example : nodes10_Dec2820242230.json, will return 10
@@ -78,9 +83,9 @@ class Test:
 
         # Select search keywords based on cluster type
         try:
-            if self.cluster is '0':
+            if self.cluster == '0':
                 match = re.search(r"nodes(\d+)_", filename)  # Use regex to find the number
-            elif self.cluster is '1':
+            elif self.cluster == '1':
                 match = re.search(r"kmeans_nodes(\d+)_", filename)  # Use regex to find the number
             else:
                 raise ValueError("Invalid CLUSTER environment variable. Should be 0 or 1.")
@@ -92,7 +97,7 @@ class Test:
             print(f"Filename {filename} do not exist", flush=True)
             return []
 
-    def run_command(self,command, full_path=None):
+    def run_command(self, command, full_path=None):
         """
         Runs a command and handles its output and errors.
 
@@ -118,7 +123,7 @@ class Test:
                     print(f"Changes applied to {full_path}:", flush=True)
                     print(result.stdout, flush=True)
 
-            print(f"result.stdout: {result.stdout}",flush=True)
+            print(f"result.stdout: {result.stdout}", flush=True)
             print(f"result.stderr: {result.stderr}", flush=True)
             return result.stdout, result.stderr
         except subprocess.CalledProcessError as e:
@@ -137,7 +142,7 @@ class Test:
             traceback.print_exc()
             sys.exit(1)
 
-    def wait_for_pods_to_be_ready(self,namespace='default', expected_pods=0, timeout=300):
+    def wait_for_pods_to_be_ready(self, namespace='default', expected_pods=0, timeout=300):
         """
                 Waits for all pods in the specified namespace to be down
                 by checking every second until they are terminated or timeout is reached.
@@ -169,7 +174,7 @@ class Test:
         print(f"Timeout waiting for pods to terminate in namespace {namespace}.", flush=True)
         return False  # Timeout reached
 
-    def wait_for_pods_to_be_down(self,namespace='default', timeout=300):
+    def wait_for_pods_to_be_down(self, namespace='default', timeout=300):
         """
         Waits for all pods in the specified namespace to be down
         by checking every second until they are terminated or timeout is reached.
@@ -182,7 +187,7 @@ class Test:
         while time.time() - start_time < timeout:
             try:
                 result = subprocess.run(get_pods_cmd, shell=True,
-                    stdout=subprocess.PIPE, stderr=subprocess.PIPE,text=True)
+                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
                 # Check for "No resources found" in the output
                 # terminating_pods = int(result.stdout.strip())
@@ -202,7 +207,7 @@ class Test:
         print(f"Timeout waiting for pods to terminate in namespace {namespace}.", flush=True)
         return False  # Timeout reached
 
-    def access_pod_and_initiate_gossip(self,pod_name, filename, unique_id, iteration):
+    def access_pod_and_initiate_gossip(self, pod_name, filename, unique_id, iteration):
         try:
             session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--', 'sh'], stdin=subprocess.PIPE,
                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -235,71 +240,105 @@ class Test:
 
 
 if __name__ == '__main__':
-    # parser = argparse.ArgumentParser(description="Usage: python automate.py --num_test <number_of_tests> --cluster <total_cluster>")
-    # parser.add_argument('--num_test', required=True, help="Total number of tests to do")
-    # parser.add_argument('--cluster', required=True, help="Cluster or Non-cluster")
-    # args = parser.parse_args()
-    # test = Test(int(args.num_test),args.cluster)
 
     # Getting the input or setting
-    parser = argparse.ArgumentParser(description="Usage: python automate.py --num_test <number_of_tests> --cluster <total_cluster> --model <model>")
+    parser = argparse.ArgumentParser(
+        description="Usage: python automate.py --num_test <number_of_tests> --cluster <total_cluster> --model <model>")
     parser.add_argument('--num_test', required=True, type=int, help="Total number of tests to do")
     parser.add_argument('--cluster', required=True, help="Cluster or Non-cluster")
-    parser.add_argument('--model', required=True, help="Network model (BA or ER)")  # Add model argument
-    parser.add_argument('--target_filename',default='',help="Specific filename to be tested. If False it means test all nodes (or files). Default=False")
+    parser.add_argument('--model', default='', help="Network model (BA or ER)")  # Add model argument
+    parser.add_argument('--target_filename', default='',
+                        help="Specific filename to be tested. If False it means test all nodes (or files). Default=False")
 
     args = parser.parse_args()
-    test = Test(args.num_test, args.cluster, args.model, args.target_filename)  # Pass the new arguments to Test
 
-    # helm name is fixed
-    statefulsetname = 'gossip-statefulset'
+    #####  Last check before test ###########
+    canTest = True
+    # Making sure that model is chosen for blank target_filename
+    if args.target_filename == '':
+        if not (args.model == 'BA' or args.model == 'ER'):
+            canTest = False
+            # print(f"No model provided")
+    # Making sure that model is the same the model in target_filename
+    else:
+        if 'BA' in args.target_filename and args.model == 'BA':
+            # print(f"model BA is provided")
+            canTest = True
+        elif 'ER' in args.target_filename and args.model == 'ER':
+            # print(f"model ER is provided")
+            canTest = True
+        else:
+            canTest = False
+            # print(f"model is not the same as target_filename")
+    ############################################
 
-    # All files have been filtered through getListofFiles method
-    # Initiate helm chart and start the test based on nodes
-    for i, file in enumerate(test.listOfFiles):
+    # If pass, proceed the test
+    if canTest:
 
-        # Getting filename
-        print(f"file={file}", flush=True)
+        test = Test(args.num_test, args.cluster, args.model, args.target_filename)  # Pass the new arguments to Test
 
-        # Get total nodes from a filename
-        node = test.getTotalNodes(file)
-        print(f"node={node}", flush=True)
+        # helm name is fixed
+        statefulsetname = 'gossip-statefulset'
 
-        # if node == 10: We don't need to specify because nodes have been filtered
-        if test.wait_for_pods_to_be_down(namespace='default',timeout=300):
+        # All files have been filtered through getListofFiles method
+        # Initiate helm chart and start the test based on nodes
+        if test.listOfFiles:
+            for i, file in enumerate(test.listOfFiles):
 
-            # Apply helm
-            # helm install gossip-statefulset chartw/ --values chartw/values.yaml --debug --set image.tag=v5 --set cluster=0
-            result = test.run_command(['helm', 'install', statefulsetname, 'chartw/', '--values',
-                                       'chartw/values.yaml', '--debug', '--set','cluster=' + str(test.cluster), '--set',
-                                        'targetNodes=' + str(node),'--set','model=' + str(test.model)])
-            print(f"Helm {statefulsetname}: {file} started...", flush=True)
+                # Getting filename
+                print(f"file={file}", flush=True)
 
-            if test.wait_for_pods_to_be_ready(namespace='default', expected_pods=node, timeout=300):
+                # Get total nodes from a filename
+                node = test.getTotalNodes(file)
+                print(f"node={node}", flush=True)
 
-                # Create unique uuid for this test
-                unique_id = str(uuid.uuid4())[:4]  # Generate a UUID and take the first 4 characters
+                # if node == 10: We don't need to specify because nodes have been filtered
+                if test.wait_for_pods_to_be_down(namespace='default', timeout=300):
 
-                # Test iteration starts here
-                for nt in range(1, test.num_test + 1):
+                    # Apply helm
+                    # helm install gossip-statefulset chartw/ --values chartw/values.yaml --debug --set image.tag=v5 --set cluster=0
+                    result = test.run_command(['helm', 'install', statefulsetname, 'chartw/', '--values',
+                                               'chartw/values.yaml', '--debug', '--set', 'cluster=' + str(test.cluster),
+                                               '--set',
+                                               'totalNodes=' + str(node), '--set', 'model=' + str(test.model)])
 
-                    # Choosing gossip-statefulset-0 as initiator
-                    # Can change this to random later
-                    pod_name = "gossip-statefulset-0"
-                    print(f"Selected pod for test {nt}: {pod_name}", flush=True)
+                    print(f"Helm {statefulsetname}: {file} started...", flush=True)
 
-                    # Start accessing the pods and initiate gossip
-                    if test.access_pod_and_initiate_gossip(pod_name, file, unique_id, nt):
-                        print(f"Test {nt} complete for {file}.", flush=True)
+                    if test.wait_for_pods_to_be_ready(namespace='default', expected_pods=node, timeout=300):
+
+                        # Create unique uuid for this test
+                        unique_id = str(uuid.uuid4())[:4]  # Generate a UUID and take the first 4 characters
+
+                        # Test iteration starts here
+                        for nt in range(1, test.num_test + 1):
+
+                            # Choosing gossip-statefulset-0 as initiator
+                            # Can change this to random later
+                            pod_name = "gossip-statefulset-0"
+                            print(f"Selected pod for test {nt}: {pod_name}", flush=True)
+
+                            # Start accessing the pods and initiate gossip
+                            if test.access_pod_and_initiate_gossip(pod_name, file, unique_id, nt):
+                                print(f"Test {nt} complete for {file}.", flush=True)
+                            else:
+                                print(f"Test {nt} failed for {file}.", flush=True)
                     else:
-                        print(f"Test {nt} failed for {file}.", flush=True)
-            else:
-                print(f"Failed to prepare pods for {file}.", flush=True)
-                continue
+                        print(f"Failed to prepare pods for {file}.", flush=True)
+                        continue
 
-            # Remove helm
-            result = test.run_command(['helm', 'uninstall', statefulsetname])
-            print(f"Helm {statefulsetname} will be uninstalled...", flush=True)
-            if test.wait_for_pods_to_be_down(namespace='default', timeout=300):
-                print(f"Helm {statefulsetname}: {file} uninstalled is completed...", flush=True)
-
+                    # Remove helm
+                    result = test.run_command(['helm', 'uninstall', statefulsetname])
+                    print(f"Helm {statefulsetname} will be uninstalled...", flush=True)
+                    if test.wait_for_pods_to_be_down(namespace='default', timeout=300):
+                        print(f"Helm {statefulsetname}: {file} uninstalled is completed...", flush=True)
+        else:
+            print(f"No file was found for args={args}")
+    else:
+        if (args.target_filename == '' and args.model == ''):
+            print(f"Sorry, model should be BA or ER for target_filename that is not provided ", flush=True)
+        elif not ('BA' in args.target_filename and args.model == 'BA'):
+            print(f"target filename does not have the same model (BA), args={args}")
+        elif not ('ER' in args.target_filename and args.model == 'ER'):
+            print(f"target filename does not have the same model (ER), args={args}")
+        else:
+            print(f"Something wrong with your input args={args}")
