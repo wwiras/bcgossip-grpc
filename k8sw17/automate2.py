@@ -9,22 +9,16 @@ import uuid
 import select
 
 class Test:
-    # def __init__(self,num_test,cluster):
-    def __init__ (self,num_test, cluster, model, target_filename)
-
-        # Getting model
-        self.model = model
-
-        # Getting input total nodes
-        self.target_filename = target_filename
+    def __init__(self,num_test,cluster):
 
         # Getting topology folder
         # 0 - for non cluster, 1 - for cluster topology
-        self.cluster = cluster
         if cluster == '0':
             self.topology_folder_only = 'topology'
+            self.cluster = 0
         else:
             self.topology_folder_only = 'topology_kmeans'
+            self.cluster = 1
 
         # get how many test required
         self.num_test = num_test
@@ -42,49 +36,22 @@ class Test:
         self.listOfFiles = self.getListofFiles(self.topology_folder)
         print(f"self.listOfFiles = {self.listOfFiles}", flush=True)
 
-    def getListofFiles(self, directory):
+    def getListofFiles(self,directory):
         """
-        Returns a list of nodes (json files) or single json file for a given directory,
-        filtering by the model specified in self.model and self.target_filename .
+        Returns a list of nodes (json files) total for a given directory
         """
         try:
-
-            if self.target_filename is not None:
-                # Filter files by target_filename nodes. will return single file
-                filtered_files = [
-                    f for f in os.listdir(directory)
-                    if os.path.isfile(os.path.join(directory, f)) and
-                       f == self.target_filename  # Use equality for exact match
-                ]
-            else:
-                # Filter files by self.model. return all files with the model
-                filtered_files = [
-                    f for f in os.listdir(directory)
-                    if os.path.isfile(os.path.join(directory, f)) and
-                       self.model in f
-                ]
-
-            return []
-
+            return [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
         except FileNotFoundError:
-            print(f"Directory not found: {directory}", flush=True)
+            print(f"Directory not found: {directory}",flush=True)
             return []
 
     def getTotalNodes(self,filename):
         """
         Returns of nodes total for a given filename
-        Example : nodes10_Dec2820242230.json, will return 10
+        Example : nodes11_Dec2820242230.json, will return 10
         """
-
-        # Select search keywords based on cluster type
         try:
-            if self.cluster is '0':
-                match = re.search(r"nodes(\d+)_", filename)  # Use regex to find the number
-            elif self.cluster is '1':
-                match = re.search(r"kmeans_nodes(\d+)_", filename)  # Use regex to find the number
-            else:
-                raise ValueError("Invalid CLUSTER environment variable. Should be 0 or 1.")
-
             match = re.search(r"nodes(\d+)_", filename)  # Use regex to find the number
             if match:
                 return int(match.group(1))  # Extract the captured number and convert to integer
@@ -235,26 +202,15 @@ class Test:
 
 
 if __name__ == '__main__':
-    # parser = argparse.ArgumentParser(description="Usage: python automate.py --num_test <number_of_tests> --cluster <total_cluster>")
-    # parser.add_argument('--num_test', required=True, help="Total number of tests to do")
-    # parser.add_argument('--cluster', required=True, help="Cluster or Non-cluster")
-    # args = parser.parse_args()
-    # test = Test(int(args.num_test),args.cluster)
-
-    # Getting the input or setting
-    parser = argparse.ArgumentParser(description="Usage: python automate.py --num_test <number_of_tests> --cluster <total_cluster> --model <model>")
-    parser.add_argument('--num_test', required=True, type=int, help="Total number of tests to do")
+    parser = argparse.ArgumentParser(description="Usage: python automate.py --num_test <number_of_tests> --cluster <total_cluster>")
+    parser.add_argument('--num_test', required=True, help="Total number of tests to do")
     parser.add_argument('--cluster', required=True, help="Cluster or Non-cluster")
-    parser.add_argument('--model', required=True, help="Network model (BA or ER)")  # Add model argument
-    parser.add_argument('--target_filename',default='',help="Specific filename to be tested. If False it means test all nodes (or files). Default=False")
-
     args = parser.parse_args()
-    test = Test(args.num_test, args.cluster, args.model, args.target_filename)  # Pass the new arguments to Test
+    test = Test(int(args.num_test),args.cluster)
 
     # helm name is fixed
     statefulsetname = 'gossip-statefulset'
 
-    # All files have been filtered through getListofFiles method
     # Initiate helm chart and start the test based on nodes
     for i, file in enumerate(test.listOfFiles):
 
@@ -265,41 +221,43 @@ if __name__ == '__main__':
         node = test.getTotalNodes(file)
         print(f"node={node}", flush=True)
 
-        # if node == 10: We don't need to specify because nodes have been filtered
-        if test.wait_for_pods_to_be_down(namespace='default',timeout=300):
+        # if node == 10 or node == 30:
+        # if node == 50:
+        if node == 10:
+            if test.wait_for_pods_to_be_down(namespace='default',timeout=300):
 
-            # Apply helm
-            # helm install gossip-statefulset chartw/ --values chartw/values.yaml --debug --set image.tag=v5 --set cluster=0
-            result = test.run_command(['helm', 'install', statefulsetname, 'chartw/', '--values',
-                                       'chartw/values.yaml', '--debug', '--set','cluster=' + str(test.cluster), '--set',
-                                        'targetNodes=' + str(node),'--set','model=' + str(test.model)])
-            print(f"Helm {statefulsetname}: {file} started...", flush=True)
+                    # Apply helm
+                    # helm install gossip-statefulset chartw/ --values chartw/values.yaml --debug --set image.tag=v5 --set cluster=0
+                    result = test.run_command(['helm', 'install', statefulsetname, 'chartw/', '--values',
+                                               'chartw/values.yaml', '--debug', '--set','cluster=' + str(test.cluster), '--set',
+                                                'totalNodes=' + str(node)]
+                                              )
+                    print(f"Helm {statefulsetname}: {file} started...", flush=True)
 
-            if test.wait_for_pods_to_be_ready(namespace='default', expected_pods=node, timeout=300):
+                    if test.wait_for_pods_to_be_ready(namespace='default', expected_pods=node, timeout=300):
 
-                # Create unique uuid for this test
-                unique_id = str(uuid.uuid4())[:4]  # Generate a UUID and take the first 4 characters
+                        # Create unique uuid for this test
+                        unique_id = str(uuid.uuid4())[:4]  # Generate a UUID and take the first 4 characters
 
-                # Test iteration starts here
-                for nt in range(1, test.num_test + 1):
+                        # Test iteration starts here
+                        for nt in range(1, test.num_test + 1):
 
-                    # Choosing gossip-statefulset-0 as initiator
-                    # Can change this to random later
-                    pod_name = "gossip-statefulset-0"
-                    print(f"Selected pod for test {nt}: {pod_name}", flush=True)
+                            # Choosing gossip-statefulset-0 as initiator
+                            # Can change this to random later
+                            pod_name = "gossip-statefulset-0"
+                            print(f"Selected pod for test {nt}: {pod_name}", flush=True)
 
-                    # Start accessing the pods and initiate gossip
-                    if test.access_pod_and_initiate_gossip(pod_name, file, unique_id, nt):
-                        print(f"Test {nt} complete for {file}.", flush=True)
+                            # Start accessing the pods and initiate gossip
+                            if test.access_pod_and_initiate_gossip(pod_name, file, unique_id, nt):
+                                print(f"Test {nt} complete for {file}.", flush=True)
+                            else:
+                                print(f"Test {nt} failed for {file}.", flush=True)
                     else:
-                        print(f"Test {nt} failed for {file}.", flush=True)
-            else:
-                print(f"Failed to prepare pods for {file}.", flush=True)
-                continue
+                        print(f"Failed to prepare pods for {file}.", flush=True)
+                        continue
 
-            # Remove helm
-            result = test.run_command(['helm', 'uninstall', statefulsetname])
-            print(f"Helm {statefulsetname} will be uninstalled...", flush=True)
-            if test.wait_for_pods_to_be_down(namespace='default', timeout=300):
-                print(f"Helm {statefulsetname}: {file} uninstalled is completed...", flush=True)
-
+                    # Remove helm
+                    result = test.run_command(['helm', 'uninstall', statefulsetname])
+                    print(f"Helm {statefulsetname} will be uninstalled...", flush=True)
+                    if test.wait_for_pods_to_be_down(namespace='default', timeout=300):
+                        print(f"Helm {statefulsetname}: {file} uninstalled is completed...", flush=True)
