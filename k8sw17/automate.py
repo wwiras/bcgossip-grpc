@@ -242,13 +242,12 @@ class Test:
 if __name__ == '__main__':
 
     # Getting the input or setting
-    parser = argparse.ArgumentParser(
-        description="Usage: python automate.py --num_test <number_of_tests> --cluster <total_cluster> --model <model>")
+    parser = argparse.ArgumentParser(description="Usage: python automate.py --num_test <number_of_tests> --cluster <total_cluster> --model <model>")
     parser.add_argument('--num_test', required=True, type=int, help="Total number of tests to do")
     parser.add_argument('--cluster', required=True, help="Cluster or Non-cluster")
     parser.add_argument('--model', default='', help="Network model (BA or ER)")  # Add model argument
     parser.add_argument('--target_filename', default='',
-                        help="Specific filename to be tested. If False it means test all nodes (or files). Default=False")
+        help="Specific filename to be tested. If False it means test all nodes (or files). Default=False")
 
     args = parser.parse_args()
 
@@ -335,7 +334,7 @@ if __name__ == '__main__':
             print(f"No file was found for args={args}")
     else:
         if (args.target_filename == '' and args.model == ''):
-            print(f"Sorry, model should be BA or ER for target_filename that is not provided ", flush=True)
+            print(f"Sorry, model should be BA or ER for target_filename provided ", flush=True)
         elif not ('BA' in args.target_filename and args.model == 'BA'):
             print(f"target filename does not have the same model (BA), args={args}")
         elif not ('ER' in args.target_filename and args.model == 'ER'):
