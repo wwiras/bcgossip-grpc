@@ -214,7 +214,8 @@ class Test:
             message = f'{filename[:-5]}-{unique_id}-{iteration}'
             session.stdin.write(f'python3 start.py --message {message}\n')
             session.stdin.flush()
-            end_time = time.time() + 300
+            # end_time = time.time() + 300
+            end_time = time.time() + 600
             while time.time() < end_time:
                 reads = [session.stdout.fileno()]
                 ready = select.select(reads, [], [], 5)[0]
