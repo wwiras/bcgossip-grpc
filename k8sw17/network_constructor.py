@@ -65,26 +65,37 @@ def iterate_and_print_graph(graph):
     print("\nGraph Data:")
 
     # Print general graph info
-    print("Name:", graph.name)
-    print("Type:", type(graph))
-    print("Number of nodes:", graph.number_of_nodes())
-    print("Number of edges:", graph.number_of_edges())
+    # print("Name:", graph.name)
+    print("Graph:", graph)
+    # print(f"Average weight (in this case - latency): {calculate_average_weight(graph):.4f} ms")
+    print(f"Average weight (in this case - latency): {graph.average_weight:.4f} ms")
+    # print("Number of nodes:", graph.number_of_nodes())
+    # print("Number of edges:", graph.number_of_edges())
 
     # Print node information
-    print("\nNodes:")
-    for node, data in graph.nodes(data=True):
-        print(f"  - ID: {node}")
-        # Access node attributes
-        for key, value in data.items():
-            print(f"    {key}: {value}")
+    # print("\nNodes:")
+    # for node, data in graph.nodes(data=True):
+    #     print(f"  - ID: {node}")
+    #     # Access node attributes
+    #     for key, value in data.items():
+    #         print(f"    {key}: {value}")
 
     # Print edge information
-    print("\nEdges:")
-    for source, target, data in graph.edges(data=True):
-        print(f"  - Source: {source}, Target: {target}")
-        # Access edge attributes
-        for key, value in data.items():
-            print(f"    {key}: {value}")
+    # print("\nEdges:")
+    # for source, target, data in graph.edges(data=True):
+    #     print(f"  - Source: {source}, Target: {target}")
+    #     # Access edge attributes
+    #     for key, value in data.items():
+    #         print(f"    {key}: {value}")
+
+def calculate_average_weight(graph):
+    # Get all edge weights
+    edge_weights = [data['weight'] for u, v, data in graph.edges(data=True)]
+
+    # Calculate the average
+    average_weight = sum(edge_weights) / len(edge_weights)
+
+    return average_weight
 
 def display_graph(graph, title="Network Graph"):
   """
@@ -131,6 +142,9 @@ def save_topology_to_json(graph, others, type="BA"):
     # Successfully installed networkx-3.4.2
     # Use "edges" for forward compatibility
     graph_data = nx.node_link_data(graph, edges="edges")
+    graph_data["weight_average"] = graph.average_weight
+    graph_data["total_edges"] = graph.total_edges
+    graph_data["total_nodes"] = graph.total_nodes
     file_path = os.path.join(output_dir, filename)
     with open(file_path, 'w') as f:
         json.dump(graph_data, f, indent=4)
@@ -153,6 +167,9 @@ if __name__ == '__main__':
         number_of_nodes = int(args.nodes)
         parameter = int(args.others)
         graph = construct_BA_network(number_of_nodes, parameter)
+        graph.average_weight = calculate_average_weight(graph)
+        graph.total_edges = graph.number_of_edges()
+        graph.total_nodes = graph.number_of_nodes()
 
         # Assuming you have a graph called 'ba_graph' (as in your previous code)
         if args.display:
@@ -168,6 +185,9 @@ if __name__ == '__main__':
         number_of_nodes = int(args.nodes)
         probability_of_edges = float(args.others) # 0.5
         graph = construct_ER_network(number_of_nodes, probability_of_edges)
+        graph.average_weight = calculate_average_weight(graph)
+        graph.total_edges = graph.number_of_edges()
+        graph.total_nodes = graph.number_of_nodes()
 
         if args.display:
             display_graph(graph, "Erdös – Rényi(ER) Network")
@@ -177,7 +197,7 @@ if __name__ == '__main__':
             save_topology_to_json(graph, probability_of_edges, "ER")
 
     # Iterate and print the graph content
-    # iterate_and_print_graph(graph)
+    iterate_and_print_graph(graph)
 
 
 
