@@ -7,57 +7,140 @@ import os
 from datetime import datetime
 import argparse
 
-def construct_BA_network(number_of_nodes, parameter):
+def set_network_latency(graph,min_latency=1,max_latency=100):
 
-    connected=False
-    # make sure all nodes are connected.
-    # if not connected, we will recreate the BA graph model
-    while connected==False:
-        # Construct Barabási – Albert(BA) model topology
-        network = nx.barabasi_albert_graph(number_of_nodes, parameter)
-        network.name = 'Barabási – Albert(BA)'
+    # Registered network graph with its neighbor
+    # and its weight (latency)
+    for u, v in combinations(graph, 2):
+        if graph.has_edge(u, v) and 'weight' not in graph.edges[u, v]:
+            graph.edges[u, v]['weight'] = random.randint(min_latency,max_latency)
 
-        # Rename nodes
-        # mapping = {i: f"gossip-statefulset-{i + 1}" for i in range(number_of_nodes)}
-        mapping = {i: f"gossip-statefulset-{i}" for i in range(number_of_nodes)}
-        network = nx.relabel_nodes(network, mapping)
+    return graph
 
-        # Registered network graph with its neighbor
-        # and its weight (latency)
-        for u, v in combinations(network, 2):
-            if network.has_edge(u, v) and 'weight' not in network.edges[u, v]:
-                network.edges[u, v]['weight'] = random.randint(1, 100)
+def set_network_mapping(graph,number_of_nodes):
 
-        # check if all nodes connected or not
-        if nx.is_connected(network):
-            connected=True
+    # Rename nodes
+    mapping = {i: f"gossip-statefulset-{i}" for i in range(number_of_nodes)}
+    network = nx.relabel_nodes(graph, mapping)
 
     return network
+
+def fix_nodes_edge(graph, target_avg_degree):
+    """Removes edges from nodes with degree higher than the target average degree.
+
+    Args:
+      graph: A NetworkX graph.
+      target_avg_degree: The target average degree.
+
+    Returns:
+      The modified graph with reduced average degree.
+    """
+
+    avg_degree = round(sum(dict(graph.degree()).values()) / graph.number_of_nodes())
+    print(f"Fix BA model initiating..." )
+    print(f"Average degree started: {avg_degree}, from {sum(dict(graph.degree()).values()) / graph.number_of_nodes()}" )
+    while avg_degree > target_avg_degree:
+
+        if nx.is_connected(graph):
+
+            # Get node degrees
+            degrees = dict(graph.degree())
+
+            # Highest degree node
+            highest_degree_node = max(degrees, key=degrees.get)
+            highest_degree = degrees[highest_degree_node]
+
+            # Lowest degree node
+            lowest_degree_node = min(degrees, key=degrees.get)
+            lowest_degree = degrees[lowest_degree_node]
+
+            # print(f"Highest degree node: {highest_degree_node}, with degree: {highest_degree}" )
+            # print(f"Lowest degree node: {lowest_degree_node}, with degree: {lowest_degree}")
+            # break
+
+            # Get neighbors of the highest degree node
+            neighbors = list(graph.neighbors(highest_degree_node))
+
+            # Randomly choose a neighbor to remove
+            if neighbors:  # Check if there are any neighbors
+                neighbor_to_remove = random.choice(neighbors)
+
+                # Remove the edge to the chosen neighbor
+                graph.remove_edge(highest_degree_node, neighbor_to_remove)
+                # print(f"Remove neighbor Node:{neighbor_to_remove} from  Node:{highest_degree_node}")
+
+                # print(f"Check if network graph connected? {nx.is_connected(graph)}")
+                if not nx.is_connected(graph):
+                    graph.add_edge(neighbor_to_remove,lowest_degree_node)
+                    # print(f"Add Node:{neighbor_to_remove} as Node:{lowest_degree_node}'s neighbor")
+
+            avg_degree = round(sum(dict(graph.degree()).values()) / graph.number_of_nodes())
+            # print(f"Average degree: {avg_degree}, from {sum(dict(graph.degree()).values()) / graph.number_of_nodes()}")
+            # break
+
+        else:
+            graph = False
+            break
+
+    if graph:
+        print(f"Average degree after: {avg_degree}, from {sum(dict(graph.degree()).values()) / graph.number_of_nodes()}")
+    return graph
+
+def construct_BA_network(number_of_nodes, parameter):
+
+    # Initial status
+    # Print some information about the graph
+    # print(f"Initial status from the input .....")
+    # print(f"Number of nodes in the network: {number_of_nodes}")
+    # print(f"Average neighbor (degree): {parameter}")
+
+    # Construct Barabási – Albert(BA) model topology
+    # Create a BA model graph
+    print(f"Creating BARABASI ALBERT (BA) network model .....")
+    network = nx.barabasi_albert_graph(number_of_nodes, parameter)
+    network.name = 'Barabási – Albert(BA)'
+    # print(f"Number of nodes: {network.number_of_nodes()}")
+    # print(f"Number of edges: {network.number_of_edges()}")
+    # print(f"Current BA is connected? True/False: {nx.is_connected(network)}")
+
+    # Check if average degree is as required
+    # print(f"Check if average degree (neighbor) is as required: {parameter} ....")
+    current_avg_degree = sum(dict(network.degree()).values()) / number_of_nodes
+    # print(f"Current average degree: {current_avg_degree}")
+    # print(f"Target average degree: {parameter}")
+
+    if current_avg_degree > parameter:
+        print(f"current_avg_degree:{current_avg_degree} is more than target_avg_degree: {parameter}")
+        print(f"Fix graph average degree to target_avg_degree:{parameter}")
+        BA_graph = fix_nodes_edge(network, parameter)
+
+        if BA_graph:
+            return network
+        else:
+            return False
 
 def construct_ER_network(number_of_nodes, probability_of_edges):
 
-    connected = False
-    # make sure all nodes are connected.
-    # if not connected, we will recreate the BA graph model
-    while connected == False:
-        network = nx.Graph()
-        network.name = 'Erdös – Rényi(ER)'
+    average_degree_raw = probability_of_edges * (number_of_nodes - 1)  # average_degree float
+    average_degree = round(average_degree_raw)  # average_degree rounding
 
-        # Creating nodes
-        for i in range(number_of_nodes):
-            network.add_node(f"gossip-statefulset-{i}")
+    print(f"Initial status from the input .....")
+    print(f"Number of nodes in the network: {number_of_nodes}")
+    print(f"Connection probability (degree): {probability_of_edges}")
+    print(f"average_degree: {average_degree} with average_degree_raw: {average_degree_raw}")
 
-        # Add node edges
-        for u, v in combinations(network, 2):
-            if random.random() < probability_of_edges:
-                if u != v:
-                    network.add_edge(u, v, weight=random.randint(1, 100))
+    # Create an ER model graph
+    ER_graph = nx.erdos_renyi_graph(number_of_nodes, probability_of_edges)
+    print(f"Graph: {ER_graph}")
+    avg_graph_degree_raw = sum(dict(ER_graph.degree()).values()) / number_of_nodes
+    print(f"avg_graph_degree_raw: {avg_graph_degree_raw}")
+    avg_graph_degree = round(avg_graph_degree_raw)
+    print(f"avg_graph_degree: {avg_graph_degree}")
 
-        # check if all nodes connected or not
-        if nx.is_connected(network):
-            connected = True
-
-    return network
+    if avg_graph_degree == average_degree:
+        return ER_graph
+    else:
+        return False
 
 def iterate_and_print_graph(graph):
     """Iterates over the graph and prints its content in a structured format."""
@@ -150,16 +233,28 @@ def save_topology_to_json(graph, others, type="BA"):
         json.dump(graph_data, f, indent=4)
     print(f"Topology saved to {filename}")
 
+def confirm_save(graph,others,model):
+    save_graph = input("Do you want to save the graph? (y/n): ")
+    if save_graph.lower() == 'y':
+        # Save the topology to a JSON file
+        save_topology_to_json(graph, others, model)
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Send a message to self (the current pod).")
     parser.add_argument('--nodes', required=True, help="Total number of nodes for the topology")
     parser.add_argument('--others', required=True, help="Total number of probability (ER) or parameter (BA)")
     parser.add_argument('--model', required=True, help="Total number of nodes for the topology")
     # Add the optional argument with a default value of False
+    parser.add_argument('--minlat', default=1 , help="Total number of nodes for the topology")
+    parser.add_argument('--maxlat', default=100, help="Total number of nodes for the topology")
     parser.add_argument('--display', action='store_true', help="Display new topology (default: False)")
     parser.add_argument('--save', action='store_true', help="Save new topology to json(default: False)")
     args = parser.parse_args()
 
+    # Getting minimum and maximum lateny
+    minlat = int(args.minlat)
+    maxlat = int(args.maxlat)
 
     if args.model== "BA":
 
@@ -167,22 +262,6 @@ if __name__ == '__main__':
         number_of_nodes = int(args.nodes)
         parameter = int(args.others)
         graph = construct_BA_network(number_of_nodes, parameter)
-        graph.average_weight = calculate_average_weight(graph)
-        graph.total_edges = graph.number_of_edges()
-        graph.total_nodes = graph.number_of_nodes()
-
-        # test from networkx BA
-        ba_graph = nx.barabasi_albert_graph(int(args.nodes), int(args.others))
-        print(f"ba_graph:\n{ba_graph}")
-
-
-        # Assuming you have a graph called 'ba_graph' (as in your previous code)
-        if args.display:
-            display_graph(graph, "Barabási–Albert Network")
-
-        if args.save:
-            # Save the topology to a JSON file
-            save_topology_to_json(graph,parameter)
 
     else:
 
@@ -190,23 +269,94 @@ if __name__ == '__main__':
         number_of_nodes = int(args.nodes)
         probability_of_edges = float(args.others) # 0.5
         graph = construct_ER_network(number_of_nodes, probability_of_edges)
-        graph.average_weight = calculate_average_weight(graph)
-        graph.total_edges = graph.number_of_edges()
-        graph.total_nodes = graph.number_of_nodes()
 
-        # test from networkx BA
-        er_graph = nx.gnp_random_graph(int(args.nodes), float(args.others))
-        print(f"er_graph:\n{er_graph}")
-
-        if args.display:
-            display_graph(graph, "Erdös – Rényi(ER) Network")
-
-        if args.save:
+        # if args.save:
         # Save the topology to a JSON file
-            save_topology_to_json(graph, probability_of_edges, "ER")
+        #     save_topology_to_json(graph, probability_of_edges, "ER")
+
+    if graph:
+
+        print(f"Graph Before: {network}")
+
+        # Set network mapping (gossip-statefulset labelling)
+        network = set_network_mapping(graph, number_of_nodes)
+
+        # Set latency ranging from minimum and maximum latency
+        network = set_network_latency(network,minlat,maxlat)
+
+        # Get average latency for the network
+        network.average_weight = calculate_average_weight(network)
+
+        # Get nodes and edge info
+        network.total_edges = network.number_of_edges()
+        network.total_nodes = network.number_of_nodes()
+
+        # Asking to save it or not
+        print(f"{args.model} network model is SUCCESSFUL ! ....")
+        print(f"Graph After: {network}")
+        if args.model == 'BA':
+            confirm_save(network,parameter,args.model)
+        else:
+            confirm_save(network, probability_of_edges, args.model)
+
+    else:
+        print(f"{args.model} network model is FAIL ! ....")
 
     # Iterate and print the graph content
-    iterate_and_print_graph(graph)
+    # iterate_and_print_graph(graph)
 
+
+
+# def construct_BA_network(number_of_nodes, parameter):
+#
+#     connected=False
+#     # make sure all nodes are connected.
+#     # if not connected, we will recreate the BA graph model
+#     while connected==False:
+#         # Construct Barabási – Albert(BA) model topology
+#         network = nx.barabasi_albert_graph(number_of_nodes, parameter)
+#         network.name = 'Barabási – Albert(BA)'
+#
+#         # Rename nodes
+#         # mapping = {i: f"gossip-statefulset-{i + 1}" for i in range(number_of_nodes)}
+#         mapping = {i: f"gossip-statefulset-{i}" for i in range(number_of_nodes)}
+#         network = nx.relabel_nodes(network, mapping)
+#
+#         # Registered network graph with its neighbor
+#         # and its weight (latency)
+#         for u, v in combinations(network, 2):
+#             if network.has_edge(u, v) and 'weight' not in network.edges[u, v]:
+#                 network.edges[u, v]['weight'] = random.randint(1, 100)
+#
+#         # check if all nodes connected or not
+#         if nx.is_connected(network):
+#             connected=True
+#
+#     return network
+#
+# def construct_ER_network(number_of_nodes, probability_of_edges):
+#
+#     connected = False
+#     # make sure all nodes are connected.
+#     # if not connected, we will recreate the BA graph model
+#     while connected == False:
+#         network = nx.Graph()
+#         network.name = 'Erdös – Rényi(ER)'
+#
+#         # Creating nodes
+#         for i in range(number_of_nodes):
+#             network.add_node(f"gossip-statefulset-{i}")
+#
+#         # Add node edges
+#         for u, v in combinations(network, 2):
+#             if random.random() < probability_of_edges:
+#                 if u != v:
+#                     network.add_edge(u, v, weight=random.randint(1, 100))
+#
+#         # check if all nodes connected or not
+#         if nx.is_connected(network):
+#             connected = True
+#
+#     return network
 
 

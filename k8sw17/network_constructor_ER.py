@@ -60,28 +60,46 @@ def ensure_connected(graph, avg_degree):
 
 # Parameters for the ER model
 n = 150  # Number of nodes in the network
+# p = 0.1 # Connection probability (degree)
+p = 0.02 # Connection probability (degree)
+average_degree_raw = p * (n-1) # average_degree
+average_degree = round(average_degree_raw)
+print(f"Initial status from the input .....")
+print(f"Number of nodes in the network: {n}")
+print(f"Connection probability (degree): {p}")
+print(f"average_degree: {average_degree} with average_degree_raw: {average_degree_raw}")
+
+# Create an ER model graph
+ER_graph = nx.erdos_renyi_graph(n, p)
+print(f"Graph: {ER_graph}")
+avg_graph_degree_raw = sum(dict(ER_graph.degree()).values())/n
+print(f"avg_graph_degree_raw: {avg_graph_degree_raw}")
+avg_graph_degree = round(avg_graph_degree_raw)
+print(f"avg_graph_degree: {avg_graph_degree}")
+
+if avg_graph_degree == average_degree:
+    print(f"Graph ER is SUCCESSFUL ! : {ER_graph} ....")
+else:
+    print(f"Graph ER is FAIL ! : {ER_graph} ....")
+
+
 # average_degree = 3  # Desired average degree
 
 # Calculate the connection probability
 # p = average_degree / (n - 1)
 
-p = 0.02
-average_degree = round(p * (n-1))
-test_avg = round(3.6)
-test_avg_raw = p * (n-1)
 
-# Create an ER model graph
-ER_graph = nx.erdos_renyi_graph(n, p)
+# average_degree = round(p * (n-1))
+# test_avg = round(3.6)
+# test_avg_raw = p * (n-1)
 
-# Ensure the graph is connected and meets the degree requirement
-ER_graph = ensure_connected(ER_graph, average_degree)
 
 # Print some information about the graph
-print(f"Number of nodes: {ER_graph.number_of_nodes()}")
-print(f"Average degree required: {average_degree}")
-print(f"Number of edges: {ER_graph.number_of_edges()}")
-print(f"Average degree: {sum(dict(ER_graph.degree()).values()) / n}")
-print(f"Calculated connection probability: {p}")
-print(f"Connected: {nx.is_connected(ER_graph)}")
-print(f"test_avg: {test_avg}")
-print(f"test_avg: {test_avg_raw}")
+# print(f"Number of nodes: {ER_graph.number_of_nodes()}")
+# print(f"Average degree required: {average_degree}")
+# print(f"Number of edges: {ER_graph.number_of_edges()}")
+# print(f"Average degree: {sum(dict(ER_graph.degree()).values()) / n}")
+# print(f"Calculated connection probability: {p}")
+# print(f"Connected: {nx.is_connected(ER_graph)}")
+# print(f"test_avg: {test_avg}")
+# print(f"test_avg: {test_avg_raw}")
