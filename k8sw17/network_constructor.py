@@ -171,6 +171,11 @@ if __name__ == '__main__':
         graph.total_edges = graph.number_of_edges()
         graph.total_nodes = graph.number_of_nodes()
 
+        # test from networkx BA
+        ba_graph = nx.barabasi_albert_graph(int(args.nodes), int(args.others))
+        print(f"ba_graph:\n{ba_graph}")
+
+
         # Assuming you have a graph called 'ba_graph' (as in your previous code)
         if args.display:
             display_graph(graph, "Barabási–Albert Network")
@@ -188,6 +193,10 @@ if __name__ == '__main__':
         graph.average_weight = calculate_average_weight(graph)
         graph.total_edges = graph.number_of_edges()
         graph.total_nodes = graph.number_of_nodes()
+
+        # test from networkx BA
+        er_graph = nx.gnp_random_graph(int(args.nodes), float(args.others))
+        print(f"er_graph:\n{er_graph}")
 
         if args.display:
             display_graph(graph, "Erdös – Rényi(ER) Network")
