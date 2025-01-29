@@ -355,7 +355,7 @@ if __name__ == '__main__':
 
     # select filename manually from here. Easy to remember with manual
     # filename = "nodes10_Jan102025104552_ER0.1.json"
-    filename = "nodes10_Jan102025113639_BA5.json"
+    # filename = "nodes10_Jan102025113639_BA5.json"
     # filename = "nodes30_Jan102025113707_BA5.json"
     # filename = "nodes30_Jan102025113830_ER0.1.json"
     # filename = "nodes50_Jan082025181240_BA5.json"
@@ -364,6 +364,9 @@ if __name__ == '__main__':
     # filename = "nodes70_Jan082025201400_ER0.1.json"
     # filename = "nodes100_Jan082025004526_BA5.json"
     # filename = "nodes100_Jan082025201753_ER0.1.json"
+    # filename = "nodes150_Jan292025145915_ER0.02.json"
+    # filename = "nodes150_Jan292025150453_BA2.json"
+    filename = "nodes150_Jan292025160542_BA2.json"
 
     # filename = "nodes150_Jan122025210508_BA7.json"
     # filename = "nodes150_Jan122025210546_ER0.1.json"
