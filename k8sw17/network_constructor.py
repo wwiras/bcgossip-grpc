@@ -104,31 +104,60 @@ def construct_BA_network(number_of_nodes, parameter):
     network.name = 'Barabási – Albert(BA)'
     print(f"Graph: {network}")
 
+    connected = False
+    while not connected:
+
+        if not nx.is_connected(network):
+
+            # Get the separate components
+            components = list(nx.connected_components(network))
+            print(f"components: {components}")
+
+            # If there's more than one component, connect them
+            if len(components) > 1:
+                for i in range(len(components) - 1):
+                    # Choose a random node from the current component
+                    node1 = random.choice(list(components[i]))
+                    # Choose a random node from the next component
+                    node2 = random.choice(list(components[i + 1]))
+                    # Add an edge between the two nodes
+                    network.add_edge(node1, node2)
+
+                    if nx.is_connected(network):
+                        break
+
+        else:
+            connected = True
+            break
+
+    if connected:
+        return network
+    else:
+        return connected
+
     # print(f"Number of nodes: {network.number_of_nodes()}")
     # print(f"Number of edges: {network.number_of_edges()}")
     # print(f"Current BA is connected? True/False: {nx.is_connected(network)}")
 
     # Check if average degree is as required
     # print(f"Check if average degree (neighbor) is as required: {parameter} ....")
-    current_avg_degree = sum(dict(network.degree()).values()) / number_of_nodes
+    # current_avg_degree = sum(dict(network.degree()).values()) / number_of_nodes
     # print(f"Current average degree: {current_avg_degree}")
-    target_avg_degree = parameter + 0.5
-    print(f"Target average degree: {target_avg_degree}")
+    # target_avg_degree = parameter + 0.5
+    # print(f"Target average degree: {target_avg_degree}")
 
-    if current_avg_degree > target_avg_degree:
-        print(f"current_avg_degree:{current_avg_degree} is more than target_avg_degree: {target_avg_degree}")
-        print(f"Fix graph average degree to target_avg_degree:{target_avg_degree}")
-        BA_graph = fix_nodes_edge(network, target_avg_degree)
+    # if current_avg_degree > target_avg_degree:
+    #     print(f"current_avg_degree:{current_avg_degree} is more than target_avg_degree: {target_avg_degree}")
+    #     print(f"Fix graph average degree to target_avg_degree:{target_avg_degree}")
+    #     BA_graph = fix_nodes_edge(network, target_avg_degree)
     #
-        if BA_graph:
-            return network
-        else:
-            return False
+        # if BA_graph:
+        # if BA_graph:
+        #     return network
+        # else:
+        #     return False
 
     # while nx.is_connected(network)==False:
-
-
-
 
 def construct_ER_network(number_of_nodes, probability_of_edges):
 
