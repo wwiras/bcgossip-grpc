@@ -61,7 +61,7 @@ def find_different_cluster(clusters,inter_component_member, current_cluster_id):
     else:
         return new_cluster_member_id
 
-def inter_clusters_connectors3(G, cluster_members):
+def inter_clusters_connectors(G, cluster_members):
     """
     Ensures all clusters are connected by moving disconnected components
     to the nearest cluster. Checks subgraph connectivity before assigning
@@ -165,251 +165,7 @@ def inter_clusters_connectors3(G, cluster_members):
     else:
         return cluster_conn_status
 
-def inter_clusters_connectors2(G, cluster_members):
-    """
-    Ensures all clusters are connected by moving disconnected components
-    to the nearest cluster. Checks subgraph connectivity before assigning
-    to the new cluster and verifies the entire graph's connectivity.
-    Returns False if the final graph is not connected.
-
-    Args:
-        G (networkx.Graph): The original graph.
-        cluster_members (list): List of cluster members.
-
-    Returns:
-        list or False: Updated list of cluster members with connected
-                      clusters or False if the final graph is not connected.
-    """
-
-    all_clusters_connected = False
-    total_clusters = len(cluster_members)
-    current_connected_clusters = 0
-    while not all_clusters_connected:
-        members_updated = False
-        for cluster_id, members in enumerate(cluster_members):
-            subgraph = G.subgraph(members)
-            if members_updated:
-                break
-            else:
-                print(f"nx.is_connected({subgraph} for cluster ID={cluster_id})= {nx.is_connected(subgraph)}")
-                if not nx.is_connected(subgraph):
-                    print(f"Cluster {cluster_id} is NOT connected. Finding nearest clusters for disconnected components...")
-                    components = list(nx.connected_components(subgraph))
-
-                    # Sort components by length in descending order
-                    components.sort(key=len, reverse=True)
-
-                    # print components
-                    for i,c in enumerate(components):
-                        print(f"Component {i} members: {c}")
-
-                    # while not nx.is_connected(subgraph):
-
-                        # first connect between components
-                        # if there are connected, just connect them
-                        # we want to reduce the components
-                        for i, component1 in enumerate(components):
-                            for m1 in component1:
-                                for j, component2 in enumerate(components):
-                                    for m2 in component2:
-                                        if i != j:
-                                            path_members_total = len(nx.shortest_path(G, m1, m2))
-                                            # print(f"path_members_total={path_members_total}")
-
-                                            if path_members_total == 3:
-                                                print(f"path_members_total={path_members_total}")
-                                                print(f"m1={m1} and m2={m2}")
-                                                # print(f"nx.has_path(G, m1, m2)={nx.has_path(G, m1, m2)}")
-                                                print(f"nx.shortest_paths(G, m1, m2)={nx.shortest_path(G, m1, m2)}")
-                                                inter_member = nx.shortest_path(G, m1, m2)[1]
-                                                print(f"inter_member={inter_member}")
-                                                print(f"component1={component1}")
-                                                len_component1 = len(component1)
-                                                print(f"len_component1={len_component1}")
-                                                print(f"component2={component2}")
-                                                len_component2 = len(component2)
-                                                print(f"len_component2={len_component2}")
-                                                # print(f"len_component2={len_component2}")
-                                                new_cluster_id = find_different_cluster(cluster_members,inter_member,cluster_id)
-                                                print(f"new_cluster_id={new_cluster_id}")
-
-                                                if new_cluster_id != "Nothing is connected" :
-
-                                                    if len_component1 >= len_component2:
-                                                        comp_tomove = component2
-                                                    else:
-                                                        comp_tomove = component1
-
-                                                    print(f"cluster_members[{cluster_id}]={cluster_members[cluster_id]}")
-                                                    print(f"cluster_members[{new_cluster_id}]={cluster_members[new_cluster_id]}")
-
-                                                    for comp in comp_tomove:
-                                                        print(f" - Moving {comp} from cluster {cluster_id} to new cluster:{new_cluster_id}")
-                                                        if comp in cluster_members[cluster_id] and len(cluster_members[cluster_id])>1:
-                                                            cluster_members[cluster_id].remove(comp)
-                                                            members_updated = True
-                                                        if not comp in cluster_members[new_cluster_id]:
-                                                            cluster_members[new_cluster_id].append(comp)
-                                                            members_updated = True
-                                                    # cluster_members[new_cluster_id] = cluster_members[new_cluster_id] + list(comp_tomove)
-                                                    # cluster_members[new_cluster_id].extend(comp_tomove)
-                                                    # cluster_members[cluster_id].remove(list(comp_tomove))
-                            # if i==10:
-                                # break
-                                # all_clusters_connected = True
-                                # break
-
-                        print(f"len(components):{len(components)}")
-                        break
-                else:
-                    all_clusters_connected = True
-
-    # Verify connectivity of the entire graph after processing all clusters
-    print("RECHECK inter-cluster connection....")
-    all_clusters_connected = True
-    for clusterid, members in enumerate(cluster_members):
-        temp_subgraph = G.subgraph(members)
-        if nx.is_connected(temp_subgraph):
-            print(f" Cluster {clusterid} is all connected.")
-        else:
-            all_clusters_connected = False
-            print(f" Cluster {clusterid} is not connected.")
-            components = list(nx.connected_components(temp_subgraph))
-
-            # Sort components by length in descending order
-            # components.sort(key=len, reverse=True)
-
-            # print components
-            for i, c in enumerate(components):
-                print(f"Component {i} members: {c}")
-
-    # if all_clusters_connected:
-    #     return cluster_members
-    # else:
-    #     return all_clusters_connected
-
-
-    if all_clusters_connected:
-        return cluster_members
-    else:
-        return all_clusters_connected
-
-def inter_clusters_connectors(G, cluster_members):
-    """
-    Ensures all clusters are connected by moving disconnected components
-    to the nearest cluster. Checks subgraph connectivity before assigning
-    to the new cluster and verifies the entire graph's connectivity.
-    Returns False if the final graph is not connected.
-
-    Args:
-        G (networkx.Graph): The original graph.
-        cluster_members (list): List of cluster members.
-
-    Returns:
-        list or False: Updated list of cluster members with connected
-                      clusters or False if the final graph is not connected.
-    """
-
-    for cluster_id, members in enumerate(cluster_members):
-        subgraph = G.subgraph(members)
-        if not nx.is_connected(subgraph):
-            print(f"Cluster {cluster_id} is NOT connected. Finding nearest clusters for disconnected components...")
-            components = list(nx.connected_components(subgraph))
-
-            # Sort components by length in descending order
-            components.sort(key=len, reverse=True)
-
-            # a. Take the first longest component as the default cluster
-            # base_component = components[0]
-
-            # b. Find nearest clusters for the remaining components
-            for i, component in enumerate(components[1:]):  # Start from the second component
-                for node1 in component:
-                    nearest_cluster_id = None
-                    min_distance = float('inf')
-                    for other_cluster_id, other_members in enumerate(cluster_members):
-                        if other_cluster_id != cluster_id:
-                            # Check if adding node1 to the other cluster creates a connected subgraph
-                            temp_members = other_members + [node1]
-                            temp_subgraph = G.subgraph(temp_members)
-                            if nx.is_connected(temp_subgraph):
-                                for node2 in other_members:
-                                    if nx.has_path(G, node1, node2):
-                                        distance = nx.shortest_path_length(G, source=node1, target=node2, weight='weight')
-                                        if distance < min_distance:
-                                            min_distance = distance
-                                            nearest_cluster_id = other_cluster_id
-
-                    if nearest_cluster_id is not None:
-                        print(f"  - Moving {node1} from component {component} to nearest cluster {nearest_cluster_id} (distance: {min_distance})")
-                        cluster_members[cluster_id].remove(node1)
-                        cluster_members[nearest_cluster_id].append(node1)
-
-    # Verify connectivity of the entire graph after processing all clusters
-    print("RECHECK inter-cluster connection....")
-    all_clusters_connected = True
-    for clusterid, members in enumerate(cluster_members):
-        temp_subgraph = G.subgraph(members)
-        if nx.is_connected(temp_subgraph):
-            print(f" Cluster {clusterid} is all connected.")
-        else:
-            all_clusters_connected = False
-            print(f" Cluster {clusterid} is not connected.")
-
-    if all_clusters_connected:
-        return cluster_members
-    else:
-        return all_clusters_connected
-
-def intra_clusters_connectors(graph,newgraph,centroid_nodes):
-    """
-        Input:
-        a. graph - networkx graph from BA/ER model
-        b. newgraph - networkx graph with fully inter cluster connected components
-        b. centroid - list of centroid cluster members (from each cluster)
-
-        Return :
-        If newgraph is fully connected, return it
-        If newgraph is not fully connected, return False
-
-        If inter clusters and intra clusters are successfully connected,
-        a newly networkx graph will be created and returned
-    """
-    all_connected = False
-    for cen in centroid_nodes:
-        for cen_others in centroid_nodes:
-            if not all_connected:
-                if cen is not cen_others:
-
-                    # Get shortest path (with node sequence)
-                    shortest_path = nx.shortest_path(graph, source=cen, target=cen_others, weight='weight')
-                    print(f"nx.shortest_path(self.graph, source={cen}, target={cen_others}, weight='weight') \n {shortest_path}")
-
-                    # Crawl or iterate through the shortest path
-                    # Iterate up to the second-to-last element
-                    for i in range(len(shortest_path ) - 1):
-                        current_node = shortest_path [i]
-                        next_node = shortest_path [i + 1]
-                        # print(f'self.newgraph.get_edge_data({current_node}, {next_node}):{self.newgraph.get_edge_data(current_node, next_node)}')
-
-                        # Check whether there is connection between
-                        # two nodes in the path (crawler)
-                        # If no edge (None). So add edge
-                        if newgraph.get_edge_data(current_node, next_node) is None:
-                            edge_data = graph.get_edge_data(current_node, next_node)
-                            newgraph.add_edge(current_node, next_node, weight=edge_data['weight'])
-                            # print(f'self.newgraph.get_edge_data({current_node},{next_node}):{self.newgraph.get_edge_data(current_node,next_node)}')
-
-                            # Check new graph whether all nodes are connected
-                            if nx.is_connected(newgraph):
-                                all_connected = True
-                                break
-    if all_connected:
-        return newgraph
-    else:
-        return all_connected
-
-def intra_clusters_connectors2(graph,newgraph,cluster_members):
+def intra_clusters_connectors(graph,newgraph,cluster_members):
     """
         Input:
         a. graph - networkx graph from BA/ER model
@@ -615,9 +371,9 @@ if __name__ == '__main__':
     # filename = "nodes10_Jan102025104552_ER0.1.json"
     # filename = "nodes10_Jan102025113639_BA5.json"
     # filename = "nodes30_Jan102025113707_BA5.json"
-    filename = "nodes30_Jan102025113830_ER0.1.json"
+    # filename = "nodes30_Jan102025113830_ER0.1.json"
     # filename = "nodes50_Jan082025181240_BA5.json"
-    # filename = "nodes50_Jan082025181429_ER0.1.json"
+    filename = "nodes50_Jan082025181429_ER0.1.json"
     # filename = "nodes70_Jan082025004519_BA5.json"
     # filename = "nodes70_Jan082025201400_ER0.1.json"
     # filename = "nodes100_Jan082025004526_BA5.json"
@@ -739,8 +495,7 @@ if __name__ == '__main__':
     # all_clusters_connected = check_inter_clusters(G, cluster_members)
     # print(f'all_clusters_connected:{all_clusters_connected}')
 
-
-    fixed_members = inter_clusters_connectors3(G, cluster_members)
+    fixed_members = inter_clusters_connectors(G, cluster_members)
 
     # Check and fix inter cluster connectors
     # fixed_members = inter_clusters_connectors(G, cluster_members)
@@ -754,7 +509,7 @@ if __name__ == '__main__':
 
         # Connect intra clusters
         # newG = intra_clusters_connectors(G, newG, centroid_nodes)
-        newG = intra_clusters_connectors2(G, newG, fixed_members)
+        newG = intra_clusters_connectors(G, newG, fixed_members)
 
         if not newG: # If intra cluster connection cannot be established, return False
             print(f'{filename} topology unable to connect intra cluster using kMeans with (cluster={k}).')
