@@ -615,14 +615,14 @@ if __name__ == '__main__':
     # filename = "nodes10_Jan102025104552_ER0.1.json"
     # filename = "nodes10_Jan102025113639_BA5.json"
     # filename = "nodes30_Jan102025113707_BA5.json"
-    # filename = "nodes30_Jan102025113830_ER0.1.json"
+    filename = "nodes30_Jan102025113830_ER0.1.json"
     # filename = "nodes50_Jan082025181240_BA5.json"
     # filename = "nodes50_Jan082025181429_ER0.1.json"
     # filename = "nodes70_Jan082025004519_BA5.json"
     # filename = "nodes70_Jan082025201400_ER0.1.json"
     # filename = "nodes100_Jan082025004526_BA5.json"
     # filename = "nodes100_Jan082025201753_ER0.1.json"
-    filename = "nodes150_Jan292025145915_ER0.02.json"
+    # filename = "nodes150_Jan292025145915_ER0.02.json"
     # filename = "nodes150_Jan292025150453_BA2.json"
     # filename = "nodes150_Jan292025160542_BA2.json"
     # filename = "nodes150_Jan232025074732_BA2.json"
@@ -748,45 +748,45 @@ if __name__ == '__main__':
 
         print(f'All inter clusters are connected !')
         # print(f'All inter clusters are connected \n fix_members: {fixed_members}')
-    #
-    #     # Construct new graph
-    #     newG = create_cluster_graph(G, fixed_members)
-    #
-    #     # Connect intra clusters
-    #     # newG = intra_clusters_connectors(G, newG, centroid_nodes)
-    #     newG = intra_clusters_connectors2(G, newG, fixed_members)
-    #
-    #     if not newG: # If intra cluster connection cannot be established, return False
-    #         print(f'{filename} topology unable to connect intra cluster using kMeans with (cluster={k}).')
-    #     else: # If intra cluster can be established, return updated new graphs with intra cluster connectors
-    #
-    #         # total cluster kmeans time
-    #         end_time_all = (time.time() - start_kmeans_time) * 1000  # Calculate time in milliseconds
-    #         end_time_ms = "{:.5f}".format(end_time_all)
-    #         end_timer = timer()
-    #
-    #         # display kmeans topology
-    #         if args.display:
-    #             display_new_topology(fixed_members, newG)
-    #
-    #         # save kmeans topology
-    #         fileout = False
-    #         if args.save:
-    #             fileout = save_new_topology(newG, filename, k, end_time_ms,fixed_members)
-    #
-    #         # Print all info required
-    #         print(f'Source file topology : {filename}')
-    #         print(f'G : {G}')
-    #         print(f'Total clustering time (ms) for {k} clusters : {end_time_ms}')
-    #         # print(f'Total clustering time (ms) with timer : {(end_timer - start_timer)}')
-    #         print(f'newG: {newG}')
-    #         print(f'Is newG is connected (nx.is_connected(newG)): {nx.is_connected(newG)}')
-    #         if fileout:
-    #             print(f'Successfully creating kMeans topology : {fileout}')
-    #         else:
-    #             print(f'kMeans topology file is not created!')
-    #
-    # else: # If inter cluster can be established, return False
-    #     print(f'File topology : {filename}')
-    #     print(f'G : {G}')
-    #     print(f'This topology unable to connect inter cluster using kMeans (cluster={k})')
+
+        # Construct new graph
+        newG = create_cluster_graph(G, fixed_members)
+
+        # Connect intra clusters
+        # newG = intra_clusters_connectors(G, newG, centroid_nodes)
+        newG = intra_clusters_connectors2(G, newG, fixed_members)
+
+        if not newG: # If intra cluster connection cannot be established, return False
+            print(f'{filename} topology unable to connect intra cluster using kMeans with (cluster={k}).')
+        else: # If intra cluster can be established, return updated new graphs with intra cluster connectors
+
+            # total cluster kmeans time
+            end_time_all = (time.time() - start_kmeans_time) * 1000  # Calculate time in milliseconds
+            end_time_ms = "{:.5f}".format(end_time_all)
+            end_timer = timer()
+
+            # display kmeans topology
+            if args.display:
+                display_new_topology(fixed_members, newG)
+
+            # save kmeans topology
+            fileout = False
+            if args.save:
+                fileout = save_new_topology(newG, filename, k, end_time_ms,fixed_members)
+
+            # Print all info required
+            print(f'Source file topology : {filename}')
+            print(f'G : {G}')
+            print(f'Total clustering time (ms) for {k} clusters : {end_time_ms}')
+            # print(f'Total clustering time (ms) with timer : {(end_timer - start_timer)}')
+            print(f'newG: {newG}')
+            print(f'Is newG is connected (nx.is_connected(newG)): {nx.is_connected(newG)}')
+            if fileout:
+                print(f'Successfully creating kMeans topology : {fileout}')
+            else:
+                print(f'kMeans topology file is not created!')
+
+    else: # If inter cluster can be established, return False
+        print(f'File topology : {filename}')
+        print(f'G : {G}')
+        print(f'This topology unable to connect inter cluster using kMeans (cluster={k})')
