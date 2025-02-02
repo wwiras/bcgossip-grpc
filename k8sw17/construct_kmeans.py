@@ -378,7 +378,7 @@ if __name__ == '__main__':
     # filename = "nodes30_Jan102025113707_BA5.json"
     # filename = "nodes30_Jan102025113830_ER0.1.json"
     # filename = "nodes50_Jan082025181240_BA5.json"
-    filename = "nodes50_Jan082025181429_ER0.1.json"
+    # filename = "nodes50_Jan082025181429_ER0.1.json"
     # filename = "nodes70_Jan082025004519_BA5.json"
     # filename = "nodes70_Jan082025201400_ER0.1.json"
     # filename = "nodes100_Jan082025004526_BA5.json"
@@ -426,6 +426,10 @@ if __name__ == '__main__':
     # filename = "nodes1500_Jan152025091055_BA20.json"
 
 
+    filename = "nodes100_Feb022025105931_BA2.json"
+    # filename = "nodes100_Feb022025105830_ER0.02.json"
+
+
     # Get the current working directory
     current_directory = os.getcwd()
 
@@ -443,6 +447,7 @@ if __name__ == '__main__':
         # print(f"node['id']:{node['id']}")
         G.add_node(node['id'])
     for edge in data['edges']:
+        print(f"edge: {edge}")
         G.add_edge(edge['source'], edge['target'], weight=edge['weight'])
 
     # Confirm that the topology is connected

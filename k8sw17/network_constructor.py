@@ -89,13 +89,92 @@ def fix_nodes_edge(graph, target_avg_degree):
         print(f"Average degree after: {avg_degree}, from {sum(dict(graph.degree()).values()) / graph.number_of_nodes()}")
     return graph
 
-def construct_BA_network(number_of_nodes, parameter):
+def fix_nodes_edge2(graph, target_avg_degree):
+    """Removes edges from nodes with degree higher than the target average degree.
+
+    Args:
+      graph: A NetworkX graph.
+      target_avg_degree: The target average degree.
+
+    Returns:
+      The modified graph with reduced average degree.
+    """
+
+    avg_degree = round(sum(dict(graph.degree()).values()) / graph.number_of_nodes())
+    ori_avg_degree = avg_degree
+    print(f"Fix BA/ER model initiating..." )
+    print(f"Average degree started: {avg_degree}, from {ori_avg_degree}" )
+    print(f"target_avg_degree: {target_avg_degree}")
+    prev_degree = 0
+    print(f"Starting prev_degree: {prev_degree}")
+    while avg_degree > target_avg_degree:
+
+        if nx.is_connected(graph):
+        # if prev_degree != avg_degree:
+
+            # Get node degrees
+            degrees = dict(graph.degree())
+
+            # Highest degree node
+            highest_degree_node = max(degrees, key=degrees.get)
+            highest_degree = degrees[highest_degree_node]
+            # print(f"highest_degree : {highest_degree }")
+
+            # Lowest degree node
+            lowest_degree_node = min(degrees, key=degrees.get)
+            lowest_degree = degrees[lowest_degree_node]
+            # print(f"lowest_degree : {lowest_degree}")
+
+            # print(f"Highest degree node: {highest_degree_node}, with degree: {highest_degree}" )
+            # print(f"Lowest degree node: {lowest_degree_node}, with degree: {lowest_degree}")
+            # break
+
+            # Get neighbors of the highest degree node
+            neighbors = list(graph.neighbors(highest_degree_node))
+
+            # Randomly choose a neighbor to remove
+            if neighbors:  # Check if there are any neighbors
+                neighbor_to_remove = random.choice(neighbors)
+
+                # Remove the edge to the chosen neighbor
+                graph.remove_edge(highest_degree_node, neighbor_to_remove)
+                # print(f"Remove neighbor Node:{neighbor_to_remove} from  Node:{highest_degree_node}")
+
+                # print(f"Check if network graph connected? {nx.is_connected(graph)}")
+                if not nx.is_connected(graph):
+                    graph.add_edge(neighbor_to_remove,lowest_degree_node)
+                    # print(f"Add Node:{neighbor_to_remove} as Node:{lowest_degree_node}'s neighbor")
+
+            # Get latest average degree
+            avg_degree = sum(dict(graph.degree()).values()) / graph.number_of_nodes()
+
+            # Check if the removal of neighbor reach it limit
+            # only check second removal onwards
+            # once reached, stop removal
+            # print(f"Average degree: {avg_degree}, from {sum(dict(graph.degree()).values()) / graph.number_of_nodes()}")
+            print(f"Average degree: {avg_degree}, Previous degree: {prev_degree} ")
+            if prev_degree > 0:
+                if avg_degree == prev_degree:
+                    break
+
+            # get previous avg_degree value
+            prev_degree = avg_degree
+
+        else:
+            graph = False
+            break
+
+    if graph:
+        print(f"Average degree after fixed: {avg_degree}, from original: {target_avg_degree}")
+    return graph
+
+def construct_BA_network2(number_of_nodes, parameter):
 
     # Initial status
     # Print some information about the graph
-    # print(f"Initial status from the input .....")
-    # print(f"Number of nodes in the network: {number_of_nodes}")
-    # print(f"Average neighbor (degree): {parameter}")
+    print(f"Initial status from the input .....")
+    print(f"Number of nodes in the network: {number_of_nodes}")
+    print(f"Average neighbor (degree): {parameter}")
 
     # Construct Barabási – Albert(BA) model topology
     # Create a BA model graph
@@ -103,6 +182,107 @@ def construct_BA_network(number_of_nodes, parameter):
     network = nx.barabasi_albert_graph(number_of_nodes, parameter)
     network.name = 'Barabási – Albert(BA)'
     print(f"Graph: {network}")
+
+    # Make sure BA network model degree connection average is as input
+    # Check current and target average degree connection
+    print(f"Check if average degree (neighbor) is as required: {parameter} ....")
+    current_avg_degree = sum(dict(network.degree()).values()) / number_of_nodes
+    print(f"Current average degree: {current_avg_degree}")
+    target_avg_degree = parameter
+    print(f"Target average degree: {target_avg_degree}")
+
+    # Make sure current average degree less or the same as target_avg_degree
+    if current_avg_degree > target_avg_degree:
+        print(f"current_avg_degree:{current_avg_degree} is more than target_avg_degree: {target_avg_degree}")
+        print(f"Fix graph average degree to target_avg_degree:{target_avg_degree}")
+        network = fix_nodes_edge2(network, target_avg_degree)
+
+        if not network:
+            return False
+
+    # make sure all nodes are connected
+    connected = False
+    while not connected:
+
+        if not nx.is_connected(network):
+
+            # Get the separate components
+            components = list(nx.connected_components(network))
+            print(f"components: {components}")
+
+            # If there's more than one component, connect them
+            if len(components) > 1:
+
+                # Sort components by length in descending order
+                # We want to find the longest component
+                components.sort(key=len, reverse=True)
+
+                for comp in components[1:]:
+                    # Choose a random node from the next component
+                    for member in comp:
+                        if member not in components[0]:
+                            # Choose a random node from the current component
+                            node1 = random.choice(list(components[0]))
+                            # Add an edge between the two nodes
+                            network.add_edge(node1, member)
+
+                # Get the separate components
+                # components = list(nx.connected_components(network))
+                # print(f"components: {components}")
+        else:
+            connected = True
+            break
+
+    if connected:
+        return network
+    else:
+        return connected
+
+    # print(f"Number of nodes: {network.number_of_nodes()}")
+    # print(f"Number of edges: {network.number_of_edges()}")
+    # print(f"Current BA is connected? True/False: {nx.is_connected(network)}")
+
+    # Check if average degree is as required
+    # print(f"Check if average degree (neighbor) is as required: {parameter} ....")
+    # current_avg_degree = sum(dict(network.degree()).values()) / number_of_nodes
+    # print(f"Current average degree: {current_avg_degree}")
+    # target_avg_degree = parameter + 0.5
+    # print(f"Target average degree: {target_avg_degree}")
+
+    # if current_avg_degree > target_avg_degree:
+    #     print(f"current_avg_degree:{current_avg_degree} is more than target_avg_degree: {target_avg_degree}")
+    #     print(f"Fix graph average degree to target_avg_degree:{target_avg_degree}")
+    #     BA_graph = fix_nodes_edge(network, target_avg_degree)
+    #
+        # if BA_graph:
+        # if BA_graph:
+        #     return network
+        # else:
+        #     return False
+
+    # while nx.is_connected(network)==False:
+
+def construct_BA_network(number_of_nodes, parameter):
+
+    # Initial status
+    # Print some information about the graph
+    print(f"Initial status from the input .....")
+    print(f"Number of nodes in the network: {number_of_nodes}")
+    print(f"Average neighbor (degree): {parameter}")
+
+    # Construct Barabási – Albert(BA) model topology
+    # Create a BA model graph
+    print(f"Creating BARABASI ALBERT (BA) network model .....")
+    network = nx.barabasi_albert_graph(number_of_nodes, parameter)
+    network.name = 'Barabási – Albert(BA)'
+    print(f"Graph: {network}")
+
+    # Make sure BA network model degree connection average is as input
+    # Check current and target average degree connection
+    current_avg_degree = sum(dict(network.degree()).values()) / number_of_nodes
+    print(f"Current average degree: {current_avg_degree}")
+    target_avg_degree = parameter
+    print(f"Target average degree: {target_avg_degree}")
 
     connected = False
     while not connected:
@@ -247,13 +427,30 @@ def iterate_and_print_graph(graph):
     #         print(f"    {key}: {value}")
 
 def calculate_average_weight(graph):
-    # Get all edge weights
-    edge_weights = [data['weight'] for u, v, data in graph.edges(data=True)]
 
-    # Calculate the average
-    average_weight = sum(edge_weights) / len(edge_weights)
+    """Calculates the average weight of edges in a graph.
 
-    return average_weight
+      Args:
+        graph_edges_data: The output of `graph.edges(data=True)`, which is a list of
+                           tuples with edge information (source, target, attributes).
+
+      Returns:
+        The average weight of the edges in the graph.
+      """
+
+    total_weight = 0
+    num_edges = 0
+
+    for u, v, data in graph.edges(data=True):
+        if 'weight' in data:
+            total_weight += data['weight']
+            num_edges += 1
+
+    if num_edges > 0:
+        average_weight = total_weight / num_edges
+        return average_weight
+    else:
+        return 0  # Or handle the case where there are no edges with weights
 
 def display_graph(graph, title="Network Graph"):
   """
@@ -321,8 +518,8 @@ if __name__ == '__main__':
     parser.add_argument('--others', required=True, help="Total number of probability (ER) or parameter (BA)")
     parser.add_argument('--model', required=True, help="Total number of nodes for the topology")
     # Add the optional argument with a default value of False
-    parser.add_argument('--minlat', default=1 , help="Total number of nodes for the topology")
-    parser.add_argument('--maxlat', default=100, help="Total number of nodes for the topology")
+    parser.add_argument('--minlat', default=1 , help="Min latency of nodes for the topology")
+    parser.add_argument('--maxlat', default=100, help="Max latency of nodes for the topology")
     parser.add_argument('--display', action='store_true', help="Display new topology (default: False)")
     parser.add_argument('--save', action='store_true', help="Save new topology to json(default: False)")
     args = parser.parse_args()
@@ -337,6 +534,7 @@ if __name__ == '__main__':
         number_of_nodes = int(args.nodes)
         parameter = int(args.others)
         graph = construct_BA_network(number_of_nodes, parameter)
+        # graph = construct_BA_network2(number_of_nodes, parameter)
 
     else:
 
@@ -379,59 +577,5 @@ if __name__ == '__main__':
 
     # Iterate and print the graph content
     # iterate_and_print_graph(graph)
-
-
-
-# def construct_BA_network(number_of_nodes, parameter):
-#
-#     connected=False
-#     # make sure all nodes are connected.
-#     # if not connected, we will recreate the BA graph model
-#     while connected==False:
-#         # Construct Barabási – Albert(BA) model topology
-#         network = nx.barabasi_albert_graph(number_of_nodes, parameter)
-#         network.name = 'Barabási – Albert(BA)'
-#
-#         # Rename nodes
-#         # mapping = {i: f"gossip-statefulset-{i + 1}" for i in range(number_of_nodes)}
-#         mapping = {i: f"gossip-statefulset-{i}" for i in range(number_of_nodes)}
-#         network = nx.relabel_nodes(network, mapping)
-#
-#         # Registered network graph with its neighbor
-#         # and its weight (latency)
-#         for u, v in combinations(network, 2):
-#             if network.has_edge(u, v) and 'weight' not in network.edges[u, v]:
-#                 network.edges[u, v]['weight'] = random.randint(1, 100)
-#
-#         # check if all nodes connected or not
-#         if nx.is_connected(network):
-#             connected=True
-#
-#     return network
-#
-# def construct_ER_network(number_of_nodes, probability_of_edges):
-#
-#     connected = False
-#     # make sure all nodes are connected.
-#     # if not connected, we will recreate the BA graph model
-#     while connected == False:
-#         network = nx.Graph()
-#         network.name = 'Erdös – Rényi(ER)'
-#
-#         # Creating nodes
-#         for i in range(number_of_nodes):
-#             network.add_node(f"gossip-statefulset-{i}")
-#
-#         # Add node edges
-#         for u, v in combinations(network, 2):
-#             if random.random() < probability_of_edges:
-#                 if u != v:
-#                     network.add_edge(u, v, weight=random.randint(1, 100))
-#
-#         # check if all nodes connected or not
-#         if nx.is_connected(network):
-#             connected = True
-#
-#     return network
 
 
