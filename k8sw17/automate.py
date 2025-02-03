@@ -142,7 +142,7 @@ class Test:
             traceback.print_exc()
             sys.exit(1)
 
-    def wait_for_pods_to_be_ready(self, namespace='default', expected_pods=0, timeout=600):
+    def wait_for_pods_to_be_ready(self, namespace='default', expected_pods=0, timeout=1000):
         """
                 Waits for all pods in the specified namespace to be down
                 by checking every second until they are terminated or timeout is reached.
@@ -174,7 +174,7 @@ class Test:
         print(f"Timeout waiting for pods to terminate in namespace {namespace}.", flush=True)
         return False  # Timeout reached
 
-    def wait_for_pods_to_be_down(self, namespace='default', timeout=600):
+    def wait_for_pods_to_be_down(self, namespace='default', timeout=1000):
         """
         Waits for all pods in the specified namespace to be down
         by checking every second until they are terminated or timeout is reached.
@@ -215,7 +215,7 @@ class Test:
             session.stdin.write(f'python3 start.py --message {message}\n')
             session.stdin.flush()
             # end_time = time.time() + 300
-            end_time = time.time() + 600
+            end_time = time.time() + 1000
             while time.time() < end_time:
                 reads = [session.stdout.fileno()]
                 ready = select.select(reads, [], [], 5)[0]
@@ -293,7 +293,7 @@ if __name__ == '__main__':
                 print(f"node={node}", flush=True)
 
                 # if node == 10: We don't need to specify because nodes have been filtered
-                if test.wait_for_pods_to_be_down(namespace='default', timeout=600):
+                if test.wait_for_pods_to_be_down(namespace='default', timeout=1000):
 
                     # Apply helm
                     # helm install gossip-statefulset chartw/ --values chartw/values.yaml --debug --set image.tag=v5 --set cluster=0
@@ -304,7 +304,7 @@ if __name__ == '__main__':
 
                     print(f"Helm {statefulsetname}: {file} started...", flush=True)
 
-                    if test.wait_for_pods_to_be_ready(namespace='default', expected_pods=node, timeout=600):
+                    if test.wait_for_pods_to_be_ready(namespace='default', expected_pods=node, timeout=1000):
 
                         # Create unique uuid for this test
                         unique_id = str(uuid.uuid4())[:4]  # Generate a UUID and take the first 4 characters
@@ -329,7 +329,7 @@ if __name__ == '__main__':
                     # Remove helm
                     result = test.run_command(['helm', 'uninstall', statefulsetname])
                     print(f"Helm {statefulsetname} will be uninstalled...", flush=True)
-                    if test.wait_for_pods_to_be_down(namespace='default', timeout=600):
+                    if test.wait_for_pods_to_be_down(namespace='default', timeout=1000):
                         print(f"Helm {statefulsetname}: {file} uninstalled is completed...", flush=True)
         else:
             print(f"No file was found for args={args}")
