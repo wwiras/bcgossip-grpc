@@ -426,8 +426,9 @@ if __name__ == '__main__':
     # filename = "nodes1500_Jan152025091055_BA20.json"
 
 
-    filename = "nodes100_Feb022025105931_BA2.json"
+    # filename = "nodes100_Feb022025105931_BA2.json"
     # filename = "nodes100_Feb022025105830_ER0.02.json"
+    filename = "nodes1000_Feb032025212115_BA10.json"
 
 
     # Get the current working directory

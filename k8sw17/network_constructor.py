@@ -168,6 +168,84 @@ def fix_nodes_edge2(graph, target_avg_degree):
         print(f"Average degree after fixed: {avg_degree}, from original: {target_avg_degree}")
     return graph
 
+def construct_BA_network3(number_of_nodes, parameter, adjustment=0):
+# Manually creating BA model network
+    # Initial status
+    # Print some information about the graph
+    print(f"Initial status from the input .....")
+    print(f"Number of nodes in the network: {number_of_nodes}")
+    print(f"Average neighbor (degree): {parameter}")
+
+    # Construct Barabási – Albert(BA) model topology
+    # Create a BA model graph
+    print(f"Creating BARABASI ALBERT (BA) network model .....")
+
+    connected = False
+    while not connected:
+
+        # Create an empty graph
+        network = nx.Graph()
+
+        # Add all nodes first
+        network.add_nodes_from(range(number_of_nodes))
+
+        # network = nx.barabasi_albert_graph(number_of_nodes, parameter)
+        network.name = 'Barabási – Albert(BA)'
+        # print(f"Graph before adding edges: {network}")
+
+        # Get all nodes
+        # nodes = list(range(number_of_nodes))
+
+        # Get mininum and maximum degree edges
+        max_degree = parameter + parameter
+        # adjustment = 1
+        min_degree = 1
+
+        if ((parameter + parameter) - adjustment) >= parameter:
+            max_degree = (parameter + parameter) - adjustment
+        else:
+            # print(f"{((parameter + parameter) - adjustment)} is less parameter: {parameter}")
+            break
+
+
+        # Add remaining nodes one by one
+        for node in range(number_of_nodes):
+
+            # get degree
+            degree = random.randint(min_degree, max_degree)
+            print(f"current degree: {degree}")
+
+            # get edges for current node (i)
+            for conn in range(degree):
+                potential_neighbor_node = random.randint(0, number_of_nodes-1)
+                if potential_neighbor_node != node:
+                    network.add_edge(node, potential_neighbor_node)
+                    # print(f" Add neighbor node: {potential_neighbor_node} to node: {node}")
+
+        # After all edges updated
+        # print(f"Graph: {network}")
+
+        # Make sure BA network model degree connection average is as input
+        # Check current and target average degree connection
+        current_avg_degree = sum(dict(network.degree()).values()) / number_of_nodes
+        # print(f"Current average degree: {current_avg_degree}")
+        target_avg_degree = parameter
+        # print(f"Target average degree: {target_avg_degree}")
+        # print(f"nx.is_connected(network): {nx.is_connected(network)}")
+
+        if target_avg_degree <= current_avg_degree and nx.is_connected(network):
+            print(f"Current average degree: {current_avg_degree} is higher than or the same as Target average degree:{target_avg_degree}  ")
+            connected = True
+        else:
+            print(f"Current average degree: {current_avg_degree} is smaller than Target average degree:{target_avg_degree}")
+            print(f"Or connected is {nx.is_connected(network)} ...")
+            break
+
+    if connected:
+        return network
+    else:
+        return connected
+
 def construct_BA_network2(number_of_nodes, parameter):
 
     # Initial status
@@ -520,6 +598,7 @@ if __name__ == '__main__':
     # Add the optional argument with a default value of False
     parser.add_argument('--minlat', default=1 , help="Min latency of nodes for the topology")
     parser.add_argument('--maxlat', default=100, help="Max latency of nodes for the topology")
+    parser.add_argument('--adjust', default=0, help="Max latency of nodes for the topology")
     parser.add_argument('--display', action='store_true', help="Display new topology (default: False)")
     parser.add_argument('--save', action='store_true', help="Save new topology to json(default: False)")
     args = parser.parse_args()
@@ -527,14 +606,16 @@ if __name__ == '__main__':
     # Getting minimum and maximum lateny
     minlat = int(args.minlat)
     maxlat = int(args.maxlat)
+    adjust = int(args.adjust)
 
     if args.model== "BA":
 
         # Using BA Model
         number_of_nodes = int(args.nodes)
         parameter = int(args.others)
-        graph = construct_BA_network(number_of_nodes, parameter)
+        # graph = construct_BA_network(number_of_nodes, parameter)
         # graph = construct_BA_network2(number_of_nodes, parameter)
+        graph = construct_BA_network3(number_of_nodes, parameter,adjust)
 
     else:
 
