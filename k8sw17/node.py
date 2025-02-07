@@ -148,6 +148,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             if neighbor_pod_name != sender_id:
                 neighbor_ip = self.get_pod_ip(neighbor_pod_name)
                 target = f"{neighbor_ip}:5050"
+                print(f"target : {target }")
 
                 # Record the send timestamp
                 send_timestamp = time.time_ns()
