@@ -115,8 +115,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             self._log_event(message, sender_id, received_timestamp, None,
                             received_latency, 'initiate', log_message)
             self.gossip_initiated = False  # For multiple tests, need to reset gossip initialization
-            # return gossip_pb2.Acknowledgment(details=f"{self.pod_name}({self.host}) processed message: '{message}'")
-        #
+
         # Check for duplicate messages
         elif message in self.received_messages:
             log_message = (f"{self.pod_name}({self.host}) ignoring duplicate message: '{message}' "
@@ -214,7 +213,6 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         }
 
         # Log the JSON data using the logging module (for potential future use)
-        # should remove this
         logging.info(json.dumps(event_data))
 
         # Print both the log message and the JSON data to the console
