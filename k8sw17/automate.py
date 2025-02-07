@@ -247,8 +247,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_test', required=True, type=int, help="Total number of tests to do")
     parser.add_argument('--cluster', required=True, help="Cluster or Non-cluster")
     parser.add_argument('--model', default='', help="Network model (BA or ER)")  # Add model argument
-    parser.add_argument('--target_filename', default='',
-        help="Specific filename to be tested. If False it means test all nodes (or files). Default=False")
+    parser.add_argument('--target_filename', default='',help="Specific filename to be tested. If False it means test all nodes (or files). Default=False")
 
     args = parser.parse_args()
 
