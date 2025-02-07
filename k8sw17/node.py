@@ -122,7 +122,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             log_message = (f"{self.pod_name}({self.host}) ignoring duplicate message: '{message}' "
                            f"from {sender_id} with latency={received_latency}ms")
             self._log_event(message, sender_id, received_timestamp, None,received_latency, 'duplicate', log_message)
-            # return gossip_pb2.Acknowledgment(details=f"Duplicate message ignored by {self.pod_name}({self.host})")
+            return gossip_pb2.Acknowledgment(details=f"Duplicate message ignored by {self.pod_name}({self.host})")
 
         # Send to message neighbor (that is  not receiving the message yet)
         else:
