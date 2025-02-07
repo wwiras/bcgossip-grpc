@@ -214,6 +214,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         }
 
         # Log the JSON data using the logging module (for potential future use)
+        # should remove this
         logging.info(json.dumps(event_data))
 
         # Print both the log message and the JSON data to the console
