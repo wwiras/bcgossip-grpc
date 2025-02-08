@@ -217,7 +217,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         # Print both the log message and the JSON data to the console
         # print(log_message, flush=True)
-        print(json.dumps(event_data), flush=True)
+        # print(json.dumps(event_data), flush=True)
 
     def start_server(self):
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
