@@ -132,7 +132,6 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             self._log_event(message, sender_id, received_timestamp, propagation_time,received_latency, 'received', log_message)
 
         # Gossip to neighbors (only if the message is new)
-        print(f"mesej : hantar mesej baru ")
         self.gossip_message(message, sender_id)
         return gossip_pb2.Acknowledgment(details=f"{self.pod_name}({self.host}) processed message: '{message}'")
 
@@ -149,7 +148,6 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             if neighbor_pod_name != sender_id:
                 neighbor_ip = self.get_pod_ip(neighbor_pod_name)
                 target = f"{neighbor_ip}:5050"
-                print(f"target : {target }")
 
                 # Record the send timestamp
                 send_timestamp = time.time_ns()
@@ -219,11 +217,10 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         # Print both the log message and the JSON data to the console
         # print(log_message, flush=True)
-        # print(json.dumps(event_data), flush=True)
+        print(json.dumps(event_data), flush=True)
 
     def start_server(self):
-        # server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-        server = grpc.server(futures.ThreadPoolExecutor(max_workers=20))
+        server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         gossip_pb2_grpc.add_GossipServiceServicer_to_server(self, server)
         server.add_insecure_port(f'[::]:{self.port}')
         print(f"{self.pod_name}({self.host}) listening on port {self.port}", flush=True)
