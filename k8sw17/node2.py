@@ -7,11 +7,11 @@ import gossip_pb2
 import gossip_pb2_grpc
 import json
 import time
-import logging
-import subprocess
+# import logging
+# import subprocess
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 class Node(gossip_pb2_grpc.GossipServiceServicer):
@@ -164,10 +164,9 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                             timestamp=send_timestamp,
                             latency_ms=neighbor_latency  # neighbor latency in miliseconds
                         ))
-                        print(
-                            f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip}) "
-                            f"with latency {neighbor_latency} ms",
-                            flush=True)
+                        # print(f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip}) "
+                        #     f"with latency {neighbor_latency} ms",
+                        #     flush=True)
                     except grpc.RpcError as e:
                         print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
 
@@ -213,15 +212,16 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         }
 
         # Log the JSON data using the logging module (for potential future use)
-        logging.info(json.dumps(event_data))
+        # logging.info(json.dumps(event_data))
 
         # Print both the log message and the JSON data to the console
         # print(log_message, flush=True)
+        print(event_data, flush=True)
         # print(json.dumps(event_data), flush=True)
 
     def start_server(self):
-        server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-        # server = grpc.server(futures.ThreadPoolExecutor(max_workers=20))
+        # server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+        server = grpc.server(futures.ThreadPoolExecutor(max_workers=20))
         gossip_pb2_grpc.add_GossipServiceServicer_to_server(self, server)
         server.add_insecure_port(f'[::]:{self.port}')
         print(f"{self.pod_name}({self.host}) listening on port {self.port}", flush=True)
