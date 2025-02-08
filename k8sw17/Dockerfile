@@ -18,8 +18,8 @@ COPY . /app
 EXPOSE 5050
 
 # Command to run the application
-CMD ["python3", "node.py"]
-#CMD ["python3", "node2.py"]
+#CMD ["python3", "node.py"]
+CMD ["python3", "node2.py"]
 
 
 
