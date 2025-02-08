@@ -12,6 +12,7 @@ import time
 
 # Configure logging
 # logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# last check for image tag 2
 
 
 class Node(gossip_pb2_grpc.GossipServiceServicer):
