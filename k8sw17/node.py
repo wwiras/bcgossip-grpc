@@ -220,7 +220,8 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # print(json.dumps(event_data), flush=True)
 
     def start_server(self):
-        server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+        # server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+        server = grpc.server(futures.ThreadPoolExecutor(max_workers=20))
         gossip_pb2_grpc.add_GossipServiceServicer_to_server(self, server)
         server.add_insecure_port(f'[::]:{self.port}')
         print(f"{self.pod_name}({self.host}) listening on port {self.port}", flush=True)
