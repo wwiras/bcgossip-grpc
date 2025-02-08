@@ -300,7 +300,7 @@ if __name__ == '__main__':
                     result = test.run_command(['helm', 'install', statefulsetname, 'chartw/', '--values',
                                                'chartw/values.yaml', '--debug', '--set', 'cluster=' + str(test.cluster),
                                                '--set','totalNodes=' + str(node), '--set', 'model=' + str(test.model),
-                                               '--set', 'image.tag=', str(args.tag)])
+                                               '--set', 'image.tag=' + str(args.tag)])
 
                     print(f"Helm {statefulsetname}: {file} started...", flush=True)
 
