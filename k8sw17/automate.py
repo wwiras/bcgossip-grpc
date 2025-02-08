@@ -247,6 +247,7 @@ if __name__ == '__main__':
     parser.add_argument('--num_test', required=True, type=int, help="Total number of tests to do")
     parser.add_argument('--cluster', required=True, help="Cluster or Non-cluster")
     parser.add_argument('--model', default='', help="Network model (BA or ER)")  # Add model argument
+    parser.add_argument('--tag', default='v1', help="Container image tag v1 / v2 / or ....")  # Add model argument
     parser.add_argument('--target_filename', default='',help="Specific filename to be tested. If False it means test all nodes (or files). Default=False")
 
     args = parser.parse_args()
@@ -298,8 +299,8 @@ if __name__ == '__main__':
                     # helm install gossip-statefulset chartw/ --values chartw/values.yaml --debug --set image.tag=v5 --set cluster=0
                     result = test.run_command(['helm', 'install', statefulsetname, 'chartw/', '--values',
                                                'chartw/values.yaml', '--debug', '--set', 'cluster=' + str(test.cluster),
-                                               '--set',
-                                               'totalNodes=' + str(node), '--set', 'model=' + str(test.model)])
+                                               '--set','totalNodes=' + str(node), '--set', 'model=' + str(test.model),
+                                               '--set', 'image.tag=', str(args.tag)])
 
                     print(f"Helm {statefulsetname}: {file} started...", flush=True)
 
