@@ -344,6 +344,8 @@ def save_new_topology(gnewgraph, filename, k, end_time, clusters):
         'directed': False,
         'multigraph': False,
         'total_clusters': k,
+        'total_nodes': len(nodes),
+        'total_edges': len(edges),
         # Add clustering time as a comment (disabled by default)
         'total_clustering_time_ms': end_time,
         'graph': {},
@@ -428,7 +430,12 @@ if __name__ == '__main__':
 
     # filename = "nodes100_Feb022025105931_BA2.json"
     # filename = "nodes100_Feb022025105830_ER0.02.json"
-    filename = "nodes1000_Feb032025212115_BA10.json"
+    # filename = "nodes1000_Feb032025212115_BA10.json"
+
+
+    # ICCMS2025
+    # filename = "nodes10_Feb072025182408_ER0.5.json"
+    filename = "nodes10_Feb072025182500_BA3.json"
 
 
     # Get the current working directory
