@@ -12,7 +12,7 @@ import logging
 
 # Configure logging
 # logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-logging.basicConfig(level=logging.INFO, format='%(message)s')
+# logging.basicConfig(level=logging.INFO, format='%(message)s')
 
 
 class Node(gossip_pb2_grpc.GossipServiceServicer):
@@ -214,11 +214,11 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         }
 
         # Log the JSON data using the logging module (for potential future use)
-        logging.info(json.dumps(event_data))
+        # logging.info(json.dumps(event_data))
 
         # Print both the log message and the JSON data to the console
         # print(log_message, flush=True)
-        # print(json.dumps(event_data), flush=True)
+        print(json.dumps(event_data), flush=True)
 
     def start_server(self):
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
