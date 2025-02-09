@@ -435,7 +435,18 @@ if __name__ == '__main__':
 
     # ICCMS2025
     # filename = "nodes10_Feb072025182408_ER0.5.json"
-    filename = "nodes10_Feb072025182500_BA3.json"
+    # filename = "nodes10_Feb072025182500_BA3.json"
+    # filename = "nodes50_Feb062025151733_BA2.json"
+    # filename = "nodes50_Feb062025152856_ER0.07.json"
+    # filename = "nodes150_Feb072025182958_ER0.02.json"
+    # filename = "nodes150_Feb072025183130_BA2.json"
+    # filename = "nodes100_Feb092025135238_BA2.json"
+    # filename = "nodes100_Feb092025135330_ER0.02.json"
+    # filename = "nodes300_Feb062025152130_BA2.json"
+    # filename = "nodes300_Feb072025183339_ER0.015.json"
+    # filename = "nodes300_Feb092025140244_ER0.02.json"
+    filename = "nodes300_Feb092025140642_BA2.json"
+
 
 
     # Get the current working directory
