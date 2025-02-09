@@ -12,6 +12,7 @@ import logging
 
 # Configure logging
 # logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(message)s')
 
 
 class Node(gossip_pb2_grpc.GossipServiceServicer):
@@ -164,10 +165,10 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                             timestamp=send_timestamp,
                             latency_ms=neighbor_latency  # neighbor latency in miliseconds
                         ))
-                        print(
-                            f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip}) "
-                            f"with latency {neighbor_latency} ms",
-                            flush=True)
+                        # print(
+                        #     f"{self.pod_name}({self.host}) forwarded message: '{message}' to {neighbor_pod_name} ({neighbor_ip}) "
+                        #     f"with latency {neighbor_latency} ms",
+                        #     flush=True)
                     except grpc.RpcError as e:
                         print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
 
