@@ -4,6 +4,7 @@
     "total_clusters": 3,
     "total_nodes": 50,
     "total_edges": 74,
+    "weight_average": 17.135135135135137,
     "total_clustering_time_ms": "26.39174",
     "graph": {},
     "nodes": [

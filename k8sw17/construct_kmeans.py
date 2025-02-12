@@ -339,6 +339,20 @@ def save_new_topology(gnewgraph, filename, k, end_time, clusters):
     edges = [{'source': source, 'target': target, 'weight': data['weight']}
              for source, target, data in gnewgraph.edges(data=True)]
 
+    # Calculate the weighted average
+    total_weight = sum(edge['weight'] for edge in edges)  # Sum of all weights
+    # weighted_sum = sum(edge['weight'] * 1 for edge in edges)  # Here, we assume the "value" is 1 for simplicity
+
+    # If you have a specific value associated with each edge, replace `1` with that value
+    # Example: weighted_sum = sum(edge['weight'] * edge['value'] for edge in edges)
+
+    # Calculate the weighted average
+    if total_weight > 0:
+        weighted_average = total_weight / len(edges)
+    else:
+        weighted_average = 0  # Handle the case where total_weight is zero
+
+
     # Include 'directed', 'multigraph', and 'graph'
     graph_data = {
         'directed': False,
@@ -346,6 +360,7 @@ def save_new_topology(gnewgraph, filename, k, end_time, clusters):
         'total_clusters': k,
         'total_nodes': len(nodes),
         'total_edges': len(edges),
+        'weight_average': weighted_average,
         # Add clustering time as a comment (disabled by default)
         'total_clustering_time_ms': end_time,
         'graph': {},
@@ -361,6 +376,31 @@ def save_new_topology(gnewgraph, filename, k, end_time, clusters):
     except Exception as e:
         return False
 
+def calculate_average_weight(graph):
+
+    """Calculates the average weight of edges in a graph.
+
+      Args:
+        graph_edges_data: The output of `graph.edges(data=True)`, which is a list of
+                           tuples with edge information (source, target, attributes).
+
+      Returns:
+        The average weight of the edges in the graph.
+      """
+
+    total_weight = 0
+    num_edges = 0
+
+    for u, v, data in graph.edges(data=True):
+        if 'weight' in data:
+            total_weight += data['weight']
+            num_edges += 1
+
+    if num_edges > 0:
+        average_weight = total_weight / num_edges
+        return average_weight
+    else:
+        return 0  # Or handle the case where there are no edges with weights
 
 # Main code
 if __name__ == '__main__':
@@ -436,7 +476,7 @@ if __name__ == '__main__':
     # ICCMS2025
     # filename = "nodes10_Feb072025182408_ER0.5.json"
     # filename = "nodes10_Feb072025182500_BA3.json"
-    # filename = "nodes50_Feb062025151733_BA2.json"
+    filename = "nodes50_Feb062025151733_BA2.json"
     # filename = "nodes50_Feb062025152856_ER0.07.json"
     # filename = "nodes150_Feb072025182958_ER0.02.json"
     # filename = "nodes150_Feb072025183130_BA2.json"
@@ -450,7 +490,7 @@ if __name__ == '__main__':
     # filename = "nodes300_Feb092025185345_ER0.015.json"
     # filename = "nodes50_Feb092025192653_ER0.07.json"
     # filename = "nodes150_Feb092025194826_ER0.02.json"
-    filename = "nodes300_Feb092025212956_ER0.015.json"
+    # filename = "nodes300_Feb092025212956_ER0.015.json"
 
 
 
@@ -570,6 +610,8 @@ if __name__ == '__main__':
             # print(f'Total clustering time (ms) with timer : {(end_timer - start_timer)}')
             print(f'newG: {newG}')
             print(f'Is newG is connected (nx.is_connected(newG)): {nx.is_connected(newG)}')
+            # new_average_weight = calculate_average_weight(newG)
+            # print(f'newG: {}')
             if fileout:
                 print(f'Successfully creating kMeans topology : {fileout}')
             else:
