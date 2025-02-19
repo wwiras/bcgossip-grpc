@@ -47,7 +47,8 @@ class SingleSwitchTopo(Topo):
         # Python's range(N) generates 0..N-1
         for h in range(n):
             # host = self.addHost('h%s' % (h + 1))
-            host = self.addHost('h%s' % (h))
+            # host = self.addHost('h%s' % (h)) #starts with 0
+            host = self.addHost('gossip-statefulset-%s' % (h))
             self.addLink(host, switch)
 
 
