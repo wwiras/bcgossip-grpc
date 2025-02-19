@@ -127,12 +127,15 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         # Get the current directory
         current_directory = os.getcwd()
+        print(f"Current directory: {current_directory}")
 
         # Move up one level
         parent_directory = os.path.dirname(current_directory)
+        print(f"Parent directory: {parent_directory}")
 
         # Join the parent directory with the topology_folder
         topology_dir = os.path.join(parent_directory, topology_folder)
+        print(f"Topology directory: {topology_dir}")
 
         # Construct the search string based on the cluster and model
         search_str = f'nodes{self.total_nodes}_' if self.cluster == '0' else f'kmeans_nodes{self.total_nodes}_'
