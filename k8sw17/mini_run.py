@@ -25,7 +25,7 @@ def create_mininet_network(topology):
         hosts[host_name] = net.addHost(host_name)
 
     # Add links with bandwidth and latency based on the topology
-    for link in topology['links']:
+    for link in topology['edges']:
         source = hosts[link['source']]
         target = hosts[link['target']]
         # bandwidth = link.get('bandwidth', 10)  # Default bandwidth if not specified
