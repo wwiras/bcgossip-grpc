@@ -10,10 +10,6 @@ import os
 # Configure logging
 logging.basicConfig(filename='gossip_simulation.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Load the topology from the JSON file
-with open('network_topology.json', 'r') as f:
-    topology = json.load(f)
-
 def create_mininet_network(topology):
     """
     Creates a Mininet network based on the provided topology.
