@@ -122,8 +122,17 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         """
         Retrieves the topology file from the specified folder based on the number of nodes and model.
         """
+        # current_directory = os.getcwd()
+        # topology_dir = os.path.join(current_directory, topology_folder)
+
+        # Get the current directory
         current_directory = os.getcwd()
-        topology_dir = os.path.join(current_directory, topology_folder)
+
+        # Move up one level
+        parent_directory = os.path.dirname(current_directory)
+
+        # Join the parent directory with the topology_folder
+        topology_dir = os.path.join(parent_directory, topology_folder)
 
         # Construct the search string based on the cluster and model
         search_str = f'nodes{self.total_nodes}_' if self.cluster == '0' else f'kmeans_nodes{self.total_nodes}_'
