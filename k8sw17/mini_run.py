@@ -27,12 +27,15 @@ def create_mininet_network(topology):
     # Add links with bandwidth and latency based on the topology
     for link in topology['edges']:
         source = hosts[link['source']]
+        print(f"Source: {source}")
         target = hosts[link['target']]
+        print(f"Target: {target}")
         # bandwidth = link.get('bandwidth', 10)  # Default bandwidth if not specified
         # latency = link.get('latency', '10ms')   # Default latency if not specified
         # net.addLink(source, target, cls=TCLink, bw=bandwidth, delay=latency)
         latency = link['weight'] # in this case the weight is latency
-        net.addLink(source, target, cls=TCLink,delay=latency)
+        print(f"Latency: {latency}")
+        # net.addLink(source, target, cls=TCLink,delay=latency)
 
     net.start()
     return net
