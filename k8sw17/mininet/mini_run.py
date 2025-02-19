@@ -62,10 +62,12 @@ def run_gossip_simulation(net, topology):
     """
     Runs a basic gossip simulation on the Mininet network.
     """
-    hosts = {node['id']: net.get(node['id']) for node in topology['nodes']}  # Get host objects
+    hosts = {shorten_node_name(node['id']): net.get(shorten_node_name(node['id'])) for node in topology['nodes']}  # Get host objects
+    print(f"hosts :{hosts}")
 
     # Choose an initial sender (you can modify this)
-    initial_sender = 'gossip-statefulset-0'  # Replace with the actual name of your initial sender
+    initial_sender_long = 'gossip-statefulset-0'  # Replace with the actual name of your initial sender
+    initial_sender = shorten_node_name(initial_sender_long)
 
     # Send the initial message
     message = "Hello from Mininet!"
@@ -130,7 +132,7 @@ if __name__ == '__main__':
 
     # Get topology file based on input
     topology = get_topology(args.nodes, args.cluster, args.model, topology_folder)
-    print(f"Topology: {topology}", flush=True)
+    # print(f"Topology: {topology}", flush=True)
 
     # Create and start the Mininet network
     net = create_mininet_network(topology)
