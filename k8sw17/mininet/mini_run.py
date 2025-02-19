@@ -27,15 +27,9 @@ def create_mininet_network(topology):
     # Add links with bandwidth and latency based on the topology
     for link in topology['edges']:
         source = hosts[link['source']]
-        # print(f"Source: {source}")
         target = hosts[link['target']]
-        # print(f"Target: {target}")
-        # bandwidth = link.get('bandwidth', 10)  # Default bandwidth if not specified
-        # latency = link.get('latency', '10ms')   # Default latency if not specified
-        # net.addLink(source, target, cls=TCLink, bw=bandwidth, delay=latency)
-        latency = link['weight'] # in this case the weight is latency
-        # print(f"Latency: {latency}")
-        # net.addLink(source, target, cls=TCLink,delay=latency)
+        latency = link['weight']  # Use 'weight' as latency
+        net.addLink(source, target, cls=TCLink, delay=f"{latency}ms")  # Add link with latency
 
     net.start()
     return net
@@ -60,37 +54,14 @@ def run_gossip_simulation(net, topology):
     # Collect propagation times (implementation depends on your gossip logic)
     # For this example, we'll just print the time when each host received the message
     for host_name, host in hosts.items():
-        if host_name!= initial_sender:
+        if host_name != initial_sender:
             output = host.cmd('cat /tmp/received_message.txt')  # Assuming you're writing the received message to a file
             if output:
                 received_time = float(output.splitlines()[-1].split()[-1])  # Extract the timestamp from the output
                 propagation_time = (received_time - start_time) / 1e6  # in milliseconds
                 logging.info(f"Propagation time to {host_name}: {propagation_time:.2f} ms")  # Log the propagation time
 
-    def get_topology(self,topology_folder):
-        """
-        Retrieves the topology file from the specified folder based on the number of nodes and model.
-        """
-        current_directory = os.getcwd()
-        topology_dir = os.path.join(current_directory, topology_folder)
-
-        # Construct the search string based on the cluster and model
-        search_str = f'nodes{self.total_nodes}_' if self.cluster == '0' else f'kmeans_nodes{self.total_nodes}_'
-
-        # Find the corresponding topology file
-        topology_file = None
-        for topology_filename in os.listdir(topology_dir):
-            if topology_filename.startswith(search_str) and self.model in topology_filename:
-                topology_file = topology_filename
-                break
-
-        if topology_file:
-            with open(os.path.join(topology_dir, topology_file), 'r') as f:
-                return json.load(f)
-        else:
-            raise FileNotFoundError(f"No topology file found for {self.total_nodes} nodes and model {self.model}.")
-
-def get_topology(nodes,cluster,model,topology_folder):
+def get_topology(nodes, cluster, model, topology_folder):
     """
     Retrieves the topology file from the specified folder based on the number of nodes and model.
     """
@@ -123,10 +94,9 @@ def get_topology(nodes,cluster,model,topology_folder):
         raise FileNotFoundError(f"No topology file found for {nodes} nodes and model {model}.")
 
 if __name__ == '__main__':
-
-    # get all args: cluster type, model, and totalnodes
-    parser = argparse.ArgumentParser(description="Run a gossip on mininet.")
-    parser.add_argument('--cluster', required=True, choices=['0', '1'],help="Cluster type: 0 for non-clustered, 1 for k-means clustered")
+    # Get all args: cluster type, model, and total nodes
+    parser = argparse.ArgumentParser(description="Run a gossip on Mininet.")
+    parser.add_argument('--cluster', required=True, choices=['0', '1'], help="Cluster type: 0 for non-clustered, 1 for k-means clustered")
     parser.add_argument('--model', required=True, choices=['BA', 'ER'], help="Topology model: BA or ER")
     parser.add_argument('--nodes', required=True, type=int, help="Total number of nodes in the topology")
     args = parser.parse_args()
@@ -134,10 +104,15 @@ if __name__ == '__main__':
     # Determine the topology folder based on cluster type
     topology_folder = "topology" if args.cluster == '0' else "topology_kmeans"
 
-    # get topology file based on input
-    topology = get_topology(args.nodes,args.cluster,args.model,topology_folder)
-    print(f"topology={topology}",flush=True)
+    # Get topology file based on input
+    topology = get_topology(args.nodes, args.cluster, args.model, topology_folder)
+    print(f"Topology: {topology}", flush=True)
 
-    net = create_mininet_network(topology)  # Create the Mininet network
-    # run_gossip_simulation(net, topology)   # Run the gossip simulation
-    # net.stop()                            # Stop the network
+    # Create and start the Mininet network
+    net = create_mininet_network(topology)
+
+    # Run the gossip simulation
+    # run_gossip_simulation(net, topology)
+
+    # Stop the network
+    net.stop()
