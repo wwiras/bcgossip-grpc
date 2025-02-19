@@ -11,6 +11,19 @@ import argparse
 # Configure logging
 logging.basicConfig(filename='gossip_simulation.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+def shorten_node_name(node_name):
+  """Shortens a Kubernetes-style node name (e.g., "gossip-statefulset-0")
+  to a more concise format (e.g., "gs0").
+
+  Args:
+      node_name: The original node name.
+
+  Returns:
+      The shortened node name.
+  """
+  parts = node_name.split('-')
+  return f"{parts}{parts}{parts}"
+
 def create_mininet_network(topology):
     """
     Creates a Mininet network based on the provided topology.
@@ -21,17 +34,25 @@ def create_mininet_network(topology):
     # Add hosts (nodes) based on the topology
     hosts = {}
     for node in topology['nodes']:
-        host_name = node['id']  # Assuming 'id' is the host name in your JSON
+        host_name_long = node['id']  # Assuming 'id' is the host name in your JSON
+        host_name = shorten_node_name(host_name_long)
         hosts[host_name] = net.addHost(host_name)
 
     # Add links with bandwidth and latency based on the topology
     for link in topology['edges']:
-        source = hosts[link['source']]
-        target = hosts[link['target']]
+        source_long = link['source']
+        print(f"source long: {source_long}")
+        source = shorten_node_name(source_long)
+        print(f"source:  {source}")
+        target_long = link['target']
+        print(f"target long: {target_long}")
+        target = shorten_node_name(target_long)
+        print(f"target: {target}")
         latency = link['weight']  # Use 'weight' as latency
-        net.addLink(source, target, cls=TCLink, delay=f"{latency}ms")  # Add link with latency
+        print(f"latency: {latency}")
+        # net.addLink(source, target, cls=TCLink, delay=f"{latency}ms")  # Add link with latency
 
-    net.start()
+    # net.start()
     return net
 
 def run_gossip_simulation(net, topology):
