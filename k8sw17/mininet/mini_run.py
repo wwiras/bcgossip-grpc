@@ -22,9 +22,10 @@ def shorten_node_name(node_name):
       The shortened node name.
   """
   parts = node_name.split('-')
-  print(f"parts:{parts}")
-  print(f"parts[0][0]:{parts[0][0]} parts[1][0]:{parts[1][0]} parts[2]:{parts[2]}")
-  return f"{parts[0][0]}{parts[0][0]}{parts}"
+  # print(f"parts:{parts}")
+  # print(f"parts[0][0]:{parts[0][0]} parts[1][0]:{parts[1][0]} parts[2]:{parts[2]}")
+  return f"parts[0][0]:{parts[0][0]}parts[1][0]:{parts[1][0]}parts[2]:{parts[2]}"
+  # return f"{parts[0][0]}{parts[0][0]}{parts}"
 
 def create_mininet_network(topology):
     """
