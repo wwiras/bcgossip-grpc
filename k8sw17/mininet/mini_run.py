@@ -138,7 +138,7 @@ if __name__ == '__main__':
     net = create_mininet_network(topology)
 
     # Run the gossip simulation
-    # run_gossip_simulation(net, topology)
+    run_gossip_simulation(net, topology)
 
     # Stop the network
     net.stop()
