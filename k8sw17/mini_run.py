@@ -119,7 +119,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Determine the topology folder based on cluster type
-    topology_folder = "topology" if self.cluster == '0' else "topology_kmeans"
+    topology_folder = "topology" if args.cluster == '0' else "topology_kmeans"
 
     # get topology file based on input
     topology = get_topology(args.nodes,args.cluster,args.model,topology_folder)
