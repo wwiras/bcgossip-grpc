@@ -48,7 +48,8 @@ class SingleSwitchTopo(Topo):
         for h in range(n):
             # host = self.addHost('h%s' % (h + 1))
             # host = self.addHost('h%s' % (h)) #starts with 0
-            host = self.addHost('gossip-statefulset-%s' % (h))
+            # host = self.addHost('gossip-statefulset-%s' % (h)) # Error: argument "gossip-statefulset-0-eth0" is wrong: "name" not a valid ifname
+            host = self.addHost('gs%s' % (h))
             self.addLink(host, switch)
 
 
