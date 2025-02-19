@@ -5,6 +5,7 @@ from mininet.cli import CLI
 import time
 import json
 import logging
+import os
 
 # Configure logging
 logging.basicConfig(filename='gossip_simulation.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -65,7 +66,68 @@ def run_gossip_simulation(net, topology):
                 propagation_time = (received_time - start_time) / 1e6  # in milliseconds
                 logging.info(f"Propagation time to {host_name}: {propagation_time:.2f} ms")  # Log the propagation time
 
+    def get_topology(self,topology_folder):
+        """
+        Retrieves the topology file from the specified folder based on the number of nodes and model.
+        """
+        current_directory = os.getcwd()
+        topology_dir = os.path.join(current_directory, topology_folder)
+
+        # Construct the search string based on the cluster and model
+        search_str = f'nodes{self.total_nodes}_' if self.cluster == '0' else f'kmeans_nodes{self.total_nodes}_'
+
+        # Find the corresponding topology file
+        topology_file = None
+        for topology_filename in os.listdir(topology_dir):
+            if topology_filename.startswith(search_str) and self.model in topology_filename:
+                topology_file = topology_filename
+                break
+
+        if topology_file:
+            with open(os.path.join(topology_dir, topology_file), 'r') as f:
+                return json.load(f)
+        else:
+            raise FileNotFoundError(f"No topology file found for {self.total_nodes} nodes and model {self.model}.")
+
+def get_topology(nodes,cluster,model,topology_folder):
+    """
+    Retrieves the topology file from the specified folder based on the number of nodes and model.
+    """
+    current_directory = os.getcwd()
+    topology_dir = os.path.join(current_directory, topology_folder)
+
+    # Construct the search string based on the cluster and model
+    search_str = f'nodes{nodes}_' if cluster == '0' else f'kmeans_nodes{nodes}_'
+
+    # Find the corresponding topology file
+    topology_file = None
+    for topology_filename in os.listdir(topology_dir):
+        if topology_filename.startswith(search_str) and model in topology_filename:
+            topology_file = topology_filename
+            break
+
+    if topology_file:
+        with open(os.path.join(topology_dir, topology_file), 'r') as f:
+            return json.load(f)
+    else:
+        raise FileNotFoundError(f"No topology file found for {nodes} nodes and model {model}.")
+
 if __name__ == '__main__':
-    net = create_mininet_network(topology)  # Create the Mininet network
+
+    # get all args: cluster type, model, and totalnodes
+    parser = argparse.ArgumentParser(description="Run a gossip on mininet.")
+    parser.add_argument('--cluster', required=True, choices=['0', '1'],help="Cluster type: 0 for non-clustered, 1 for k-means clustered")
+    parser.add_argument('--model', required=True, choices=['BA', 'ER'], help="Topology model: BA or ER")
+    parser.add_argument('--nodes', required=True, type=int, help="Total number of nodes in the topology")
+    args = parser.parse_args()
+
+    # Determine the topology folder based on cluster type
+    topology_folder = "topology" if self.cluster == '0' else "topology_kmeans"
+
+    # get topology file based on input
+    topology = get_topology(args.nodes,args.cluster,args.model,topology_folder)
+    print(f"topology={topology}",flush=True)
+
+    # net = create_mininet_network(topology)  # Create the Mininet network
     # run_gossip_simulation(net, topology)   # Run the gossip simulation
-    net.stop()                            # Stop the network
+    # net.stop()                            # Stop the network
