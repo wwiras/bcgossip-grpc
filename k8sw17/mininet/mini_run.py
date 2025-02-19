@@ -94,8 +94,17 @@ def get_topology(nodes,cluster,model,topology_folder):
     """
     Retrieves the topology file from the specified folder based on the number of nodes and model.
     """
+    # Get the current directory
     current_directory = os.getcwd()
-    topology_dir = os.path.join(current_directory, topology_folder)
+    print(f"Current directory: {current_directory}")
+
+    # Move up one level
+    parent_directory = os.path.dirname(current_directory)
+    print(f"Parent directory: {parent_directory}")
+
+    # Join the parent directory with the topology_folder
+    topology_dir = os.path.join(parent_directory, topology_folder)
+    print(f"Topology directory: {topology_dir}")
 
     # Construct the search string based on the cluster and model
     search_str = f'nodes{nodes}_' if cluster == '0' else f'kmeans_nodes{nodes}_'
