@@ -29,8 +29,9 @@ def create_mininet_network(topology):
         source = hosts[link['source']]
         target = hosts[link['target']]
         # bandwidth = link.get('bandwidth', 10)  # Default bandwidth if not specified
-        latency = link.get('latency', '10ms')   # Default latency if not specified
+        # latency = link.get('latency', '10ms')   # Default latency if not specified
         # net.addLink(source, target, cls=TCLink, bw=bandwidth, delay=latency)
+        latency = link['weight'] # in this case the weight is latency
         net.addLink(source, target, cls=TCLink,delay=latency)
 
     net.start()
@@ -125,6 +126,6 @@ if __name__ == '__main__':
     topology = get_topology(args.nodes,args.cluster,args.model,topology_folder)
     print(f"topology={topology}",flush=True)
 
-    # net = create_mininet_network(topology)  # Create the Mininet network
+    net = create_mininet_network(topology)  # Create the Mininet network
     # run_gossip_simulation(net, topology)   # Run the gossip simulation
-    # net.stop()                            # Stop the network
+    net.stop()                            # Stop the network
