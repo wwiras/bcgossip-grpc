@@ -35,7 +35,7 @@ def create_mininet_network(topology):
         # net.addLink(source, target, cls=TCLink, bw=bandwidth, delay=latency)
         latency = link['weight'] # in this case the weight is latency
         # print(f"Latency: {latency}")
-        net.addLink(source, target, cls=TCLink,delay=latency)
+        # net.addLink(source, target, cls=TCLink,delay=latency)
 
     net.start()
     return net
@@ -131,4 +131,4 @@ if __name__ == '__main__':
 
     net = create_mininet_network(topology)  # Create the Mininet network
     # run_gossip_simulation(net, topology)   # Run the gossip simulation
-    net.stop()                            # Stop the network
+    # net.stop()                            # Stop the network
