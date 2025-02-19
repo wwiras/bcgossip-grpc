@@ -44,18 +44,18 @@ def create_mininet_network(topology):
     # Add links with bandwidth and latency based on the topology
     for link in topology['edges']:
         source_long = link['source']
-        print(f"source long: {source_long}")
+        # print(f"source long: {source_long}")
         source = shorten_node_name(source_long)
-        print(f"source:  {source}")
+        # print(f"source:  {source}")
         target_long = link['target']
-        print(f"target long: {target_long}")
+        # print(f"target long: {target_long}")
         target = shorten_node_name(target_long)
-        print(f"target: {target}")
+        # print(f"target: {target}")
         latency = link['weight']  # Use 'weight' as latency
-        print(f"latency: {latency}")
-        # net.addLink(source, target, cls=TCLink, delay=f"{latency}ms")  # Add link with latency
+        # print(f"latency: {latency}")
+        net.addLink(source, target, cls=TCLink, delay=f"{latency}ms")  # Add link with latency
 
-    # net.start()
+    net.start()
     return net
 
 def run_gossip_simulation(net, topology):
