@@ -76,7 +76,7 @@ def run_gossip_simulation(net, topology):
     Runs a basic gossip simulation on the Mininet network using sockets.
     """
     hosts = {shorten_node_name(node['id']): net.get(shorten_node_name(node['id'])) for node in topology['nodes']}
-    print(f"hosts: {hosts}")
+    # print(f"hosts: {hosts}")
 
     # Start socket servers on all hosts
     for host_name, host in hosts.items():
