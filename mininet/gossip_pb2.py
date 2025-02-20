@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0cgossip.proto\x12\x06gossip\"Z\n\rGossipMessage\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x11\n\tsender_id\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x03\x12\x12\n\nlatency_ms\x18\x04 \x01(\x02\"!\n\x0e\x41\x63knowledgment\x12\x0f\n\x07\x64\x65tails\x18\x01 \x01(\t2M\n\rGossipService\x12<\n\x0bSendMessage\x12\x15.gossip.GossipMessage\x1a\x16.gossip.Acknowledgmentb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0cgossip.proto\x12\x06gossip\"Z\n\rGossipMessage\x12\x0f\n\x07message\x18\x01 \x01(\t\x12\x11\n\tsender_id\x18\x02 \x01(\t\x12\x11\n\ttimestamp\x18\x03 \x01(\x03\x12\x12\n\nlatency_ms\x18\x04 \x01(\x01\"!\n\x0e\x41\x63knowledgment\x12\x0f\n\x07\x64\x65tails\x18\x01 \x01(\t2M\n\rGossipService\x12<\n\x0bSendMessage\x12\x15.gossip.GossipMessage\x1a\x16.gossip.Acknowledgmentb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)

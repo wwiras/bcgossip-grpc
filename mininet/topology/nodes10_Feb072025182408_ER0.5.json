@@ -1,0 +1,147 @@
+{
+    "directed": false,
+    "multigraph": false,
+    "graph": {},
+    "nodes": [
+        {
+            "id": "gossip-statefulset-0"
+        },
+        {
+            "id": "gossip-statefulset-1"
+        },
+        {
+            "id": "gossip-statefulset-2"
+        },
+        {
+            "id": "gossip-statefulset-3"
+        },
+        {
+            "id": "gossip-statefulset-4"
+        },
+        {
+            "id": "gossip-statefulset-5"
+        },
+        {
+            "id": "gossip-statefulset-6"
+        },
+        {
+            "id": "gossip-statefulset-7"
+        },
+        {
+            "id": "gossip-statefulset-8"
+        },
+        {
+            "id": "gossip-statefulset-9"
+        }
+    ],
+    "edges": [
+        {
+            "weight": 28,
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-2"
+        },
+        {
+            "weight": 25,
+            "source": "gossip-statefulset-0",
+            "target": "gossip-statefulset-6"
+        },
+        {
+            "weight": 28,
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-4"
+        },
+        {
+            "weight": 27,
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-7"
+        },
+        {
+            "weight": 23,
+            "source": "gossip-statefulset-1",
+            "target": "gossip-statefulset-9"
+        },
+        {
+            "weight": 30,
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-4"
+        },
+        {
+            "weight": 27,
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-6"
+        },
+        {
+            "weight": 27,
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-7"
+        },
+        {
+            "weight": 23,
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-8"
+        },
+        {
+            "weight": 20,
+            "source": "gossip-statefulset-2",
+            "target": "gossip-statefulset-9"
+        },
+        {
+            "weight": 15,
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-4"
+        },
+        {
+            "weight": 21,
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-5"
+        },
+        {
+            "weight": 18,
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-6"
+        },
+        {
+            "weight": 15,
+            "source": "gossip-statefulset-3",
+            "target": "gossip-statefulset-9"
+        },
+        {
+            "weight": 24,
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-5"
+        },
+        {
+            "weight": 13,
+            "source": "gossip-statefulset-4",
+            "target": "gossip-statefulset-6"
+        },
+        {
+            "weight": 24,
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-6"
+        },
+        {
+            "weight": 23,
+            "source": "gossip-statefulset-5",
+            "target": "gossip-statefulset-9"
+        },
+        {
+            "weight": 30,
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-7"
+        },
+        {
+            "weight": 27,
+            "source": "gossip-statefulset-6",
+            "target": "gossip-statefulset-9"
+        },
+        {
+            "weight": 23,
+            "source": "gossip-statefulset-7",
+            "target": "gossip-statefulset-8"
+        }
+    ],
+    "weight_average": 23.38095238095238,
+    "total_edges": 21,
+    "total_nodes": 10
+}
