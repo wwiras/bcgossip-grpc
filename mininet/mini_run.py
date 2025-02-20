@@ -11,6 +11,10 @@ import grpc
 import gossip_pb2
 import gossip_pb2_grpc
 
+# Create the logs directory if it doesn't exist
+if not os.path.exists('logs'):
+    os.makedirs('logs')
+
 # Configure logging
 logging.basicConfig(filename='logs/gossip_simulation.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
