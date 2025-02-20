@@ -17,7 +17,7 @@ class GossipServiceStub(object):
         self.SendMessage = channel.unary_unary(
                 '/gossip.GossipService/SendMessage',
                 request_serializer=gossip__pb2.GossipMessage.SerializeToString,
-                response_deserializer=gossip__pb2.Acknowledgment.FromString,
+                response_deserializer=gossip__pb2.MessageResponse.FromString,
                 )
 
 
@@ -36,7 +36,7 @@ def add_GossipServiceServicer_to_server(servicer, server):
             'SendMessage': grpc.unary_unary_rpc_method_handler(
                     servicer.SendMessage,
                     request_deserializer=gossip__pb2.GossipMessage.FromString,
-                    response_serializer=gossip__pb2.Acknowledgment.SerializeToString,
+                    response_serializer=gossip__pb2.MessageResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -61,6 +61,6 @@ class GossipService(object):
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/gossip.GossipService/SendMessage',
             gossip__pb2.GossipMessage.SerializeToString,
-            gossip__pb2.Acknowledgment.FromString,
+            gossip__pb2.MessageResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

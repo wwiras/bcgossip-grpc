@@ -3,7 +3,7 @@ syntax = "proto3";
 package gossip;
 
 service GossipService {
-  rpc SendMessage(GossipMessage) returns (Acknowledgment);
+  rpc SendMessage(GossipMessage) returns (MessageResponse);
 }
 
 message GossipMessage {
@@ -13,6 +13,7 @@ message GossipMessage {
   double latency_ms = 4;
 }
 
-message Acknowledgment {
-  string details = 1;
+message MessageResponse {
+  string message = 1;
+  bool received = 2;
 }

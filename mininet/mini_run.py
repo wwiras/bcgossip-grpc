@@ -8,12 +8,8 @@ import logging
 import os
 import argparse
 import grpc
-import gossip_pb2
-import gossip_pb2_grpc
-
-# Create the logs directory if it doesn't exist
-if not os.path.exists('logs'):
-    os.makedirs('logs')
+import gossip_pb2_grpc as pb2_grpc
+import gossip_pb2 as pb2
 
 # Configure logging
 logging.basicConfig(filename='logs/gossip_simulation.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -24,7 +20,9 @@ def shorten_node_name(node_name):
     return f"{parts[0][0]}{parts[1][0]}{parts[2]}"
 
 def create_mininet_network(topology):
-    """Creates a Mininet network based on the provided topology."""
+    """
+    Creates a Mininet network based on the provided topology.
+    """
     net = Mininet(controller=Controller)
     net.addController('c0')
 
@@ -48,21 +46,25 @@ def create_mininet_network(topology):
     return net
 
 def send_grpc_message(target_ip, message, sender_id):
-    """Sends a message to a target node using gRPC."""
+    """
+    Sends a message to a target node using gRPC.
+    """
     target = f"{target_ip}:5050"
     with grpc.insecure_channel(target) as channel:
-        stub = gossip_pb2_grpc.GossipServiceStub(channel)
+        stub = pb2_grpc.GossipServiceStub(channel)
         print(f"Sending message to {target_ip}: '{message}'", flush=True)
-        response = stub.SendMessage(gossip_pb2.GossipMessage(
+        response = stub.SendMessage(pb2.GossipMessage(
             message=message,
             sender_id=sender_id,
             timestamp=time.time_ns(),
             latency_ms=0.00
         ))
-        print(f"Received acknowledgment: {response.details}", flush=True)
+        print(f"Received acknowledgment: {response.message}", flush=True)
 
 def run_gossip_simulation(net, topology):
-    """Runs a basic gossip simulation on the Mininet network using gRPC."""
+    """
+    Runs a basic gossip simulation on the Mininet network using gRPC.
+    """
     hosts = {shorten_node_name(node['id']): net.get(shorten_node_name(node['id'])) for node in topology['nodes']}
     print(f"hosts: {hosts}")
 
@@ -88,11 +90,12 @@ def run_gossip_simulation(net, topology):
                 logging.info(f"Propagation time to {host_name}: {propagation_time:.2f} ms")
 
 def get_topology(nodes, cluster, model, topology_folder):
-    """Retrieves the topology file from the specified folder based on the number of nodes and model."""
+    """
+    Retrieves the topology file from the specified folder based on the number of nodes and model.
+    """
     current_directory = os.getcwd()
-    # parent_directory = os.path.dirname(current_directory)
-    # topology_dir = os.path.join(parent_directory, topology_folder)
-    topology_dir = os.path.join(current_directory, topology_folder)
+    parent_directory = os.path.dirname(current_directory)
+    topology_dir = os.path.join(parent_directory, topology_folder)
 
     # Construct the search string based on the cluster and model
     search_str = f'nodes{nodes}_' if cluster == '0' else f'kmeans_nodes{nodes}_'
