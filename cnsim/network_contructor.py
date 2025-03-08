@@ -2,10 +2,7 @@
 This script is used to create network topology using ER model
 """
 import networkx as nx
-import matplotlib.pyplot as plt
 import json
-from itertools import combinations
-import random
 import os
 from datetime import datetime
 import argparse
