@@ -32,7 +32,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.gossip_initiated = False
         self.initial_gossip_timestamp = None
 
-    def get_topology(self, total_replicas, topology_folder, model="ER"):
+    def get_topology(self, total_replicas, topology_folder, model="Full"):
         """
         Retrieves the number of replicas for the specified StatefulSet using kubectl
         and finds the corresponding topology file in the 'topology' subfolder
@@ -71,7 +71,6 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         """
         Retrieves pod ip addr based on the given pod_name
         """
-
         config.load_incluster_config()
         v1 = client.CoreV1Api()
         pod = v1.read_namespaced_pod(name=pod_name, namespace=namespace)
@@ -83,7 +82,6 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         Receiving message from other nodes
         and distribute it to others
         """
-
         message = request.message
         sender_id = request.sender_id
         received_timestamp = time.time_ns()
