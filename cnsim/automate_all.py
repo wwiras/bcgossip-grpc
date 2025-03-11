@@ -31,6 +31,7 @@ class Test:
         self.filename = ''
         self.filepath = self.getTopologyFile()
         print(f"self.filepath = {self.filepath}", flush=True)
+        print(f"self.filename = {self.filename}", flush=True)
 
     # def getTopologyFile(self):
     #     """
