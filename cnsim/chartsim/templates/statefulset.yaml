@@ -26,7 +26,7 @@ spec:
             - containerPort: 5050
           env:
             - name: NODES
-              value: {{ .Values.totalNodes }}
+              value: "{{ .Values.totalNodes }}"
           {{- if eq .Values.testType "memory" }}
           resources:
             requests:
