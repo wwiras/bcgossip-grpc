@@ -31,22 +31,43 @@ class Test:
         self.filename = self.getTopologyFile()
         print(f"self.filename = {self.filename}", flush=True)
 
+    # def getTopologyFile(self):
+    #     """
+    #     Returns single json file for a given directory,
+    #     filtering by the number of nodes.
+    #     """
+    #     topology_file = ''
+    #     search_str = f'nodes{str(self.num_nodes)}'
+    #     try:
+    #         # Find the corresponding topology file
+    #         for topology_filename in os.listdir(self.topology_folder):
+    #             if topology_filename.startswith(search_str):
+    #                 topology_file = topology_filename
+    #                 break
+    #
+    #     except FileNotFoundError:
+    #         print(f"File not found for {self.num_tests} nodes topology", flush=True)
+    #
+    #     return topology_file
+
     def getTopologyFile(self):
         """
-        Returns single json file for a given directory,
-        filtering by the number of nodes.
+        Returns a single JSON file for a given directory,
+        filtering by the exact number of nodes.
         """
         topology_file = ''
-        search_str = f'nodes{str(self.num_nodes)}'
+        # Create a regex pattern to match the exact number of nodes
+        search_pattern = re.compile(rf'^nodes{self.num_nodes}_.*\.json$')
+
         try:
             # Find the corresponding topology file
             for topology_filename in os.listdir(self.topology_folder):
-                if topology_filename.startswith(search_str):
-                    topology_file = topology_filename
+                if search_pattern.match(topology_filename):
+                    topology_file = os.path.join(self.topology_folder, topology_filename)
                     break
 
         except FileNotFoundError:
-            print(f"File not found for {self.num_tests} nodes topology", flush=True)
+            print(f"File not found for {self.num_nodes} nodes topology", flush=True)
 
         return topology_file
 
