@@ -28,8 +28,9 @@ class Test:
         print(f"self.topology_folder = {self.topology_folder}", flush=True)
 
         # list of files to test (from json filename)
-        self.filename = self.getTopologyFile()
-        print(f"self.filename = {self.filename}", flush=True)
+        self.filename = ''
+        self.filepath = self.getTopologyFile()
+        print(f"self.filepath = {self.filepath}", flush=True)
 
     # def getTopologyFile(self):
     #     """
@@ -63,6 +64,7 @@ class Test:
             # Find the corresponding topology file
             for topology_filename in os.listdir(self.topology_folder):
                 if search_pattern.match(topology_filename):
+                    self.filename = topology_filename
                     topology_file = os.path.join(self.topology_folder, topology_filename)
                     break
 
