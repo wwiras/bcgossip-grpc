@@ -5,7 +5,7 @@ metadata:
   name: gossip-statefulset
 spec:
   serviceName: "bcgossip-svc"
-  replicas: {{ .Values.replicas }}
+  replicas: {{ .Values.totalNodes }}
   selector:
     matchLabels:
       app: bcgossip
