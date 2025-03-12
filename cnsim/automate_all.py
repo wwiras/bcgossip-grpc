@@ -167,7 +167,7 @@ class Test:
 
     def access_pod_and_initiate_gossip(self, pod_name, filename, unique_id, iteration):
         try:
-            session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--', 'sh'], stdin=subprocess.PIPE,
+            session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--request-timeout=600','--', 'sh'], stdin=subprocess.PIPE,
                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             message = f'{filename[:-5]}-{unique_id}-{iteration}'
             session.stdin.write(f'python3 start.py --message {message}\n')
@@ -183,8 +183,10 @@ class Test:
                     if 'Received acknowledgment:' in output:
                         print("Gossip propagation complete.", flush=True)
                         break
+                # Check if the session has ended
                 if session.poll() is not None:
-                    print("Session ended before completion.", flush=True)
+                    exit_code = session.poll()
+                    print(f"Session ended (before completion) with exit code: {exit_code}", flush=True)
                     break
             else:
                 print("Timeout waiting for gossip to complete.", flush=True)
