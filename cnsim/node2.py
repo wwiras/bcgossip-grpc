@@ -122,13 +122,19 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         """
         This function objective is to send message to all neighbor nodes.
         """
+
+        print(f"self.neighbor_ip_update: {self.neighbor_ip_update}",flush=True)
         # if neighbor ip address not updated, update it
         if not self.neighbor_ip_update:
             self.neighbor_pods = self.update_neighbors(self.pod_name)
+        print(f"self.neighbor_ip_update: {self.neighbor_ip_update}", flush=True)
 
         # Get the neighbor and its latency
         # for neighbor_pod_name in self.neighbor_pods:
+        print(f"self.neighbor_pods: {self.neighbor_pods}", flush=True)
         for neighbor_pod_name, neighbor_ip in self.neighbor_pods:
+
+            print(f"neighbor_pod_name, neighbor_ip : {neighbor_pod_name,neighbor_ip}", flush=True)
             if neighbor_pod_name != sender_id:
                 target = f"{neighbor_ip}:5050"
 
@@ -154,9 +160,9 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         neighbors = []
         for edge in self.topology['edges']:
             if edge['source'] == node_id:
-                neighbors.append((edge['target'], ''))  # Add neighbor as a tuple (from topology)
+                neighbors.append((edge['target']))  # Add neighbor as a tuple (from topology)
             elif edge['target'] == node_id:
-                neighbors.append((edge['source'], ''))  # Add neighbor as a tuple (from topology)
+                neighbors.append((edge['source']))  # Add neighbor as a tuple (from topology)
 
         return neighbors
 
