@@ -120,25 +120,14 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         """
         This function objective is to send message to all neighbor nodes.
         """
-
-        print(f"self.neighbor_ip_update: {self.neighbor_ip_update}", flush=True)
-        # if neighbor ip address not updated, update it
+        # update neighbor ip address (if it is not updated)
         if not self.neighbor_ip_update:
+            self.neighbor_pods = self.update_neighbors()
 
-            new_neighbor = self.update_neighbors()
-            # print(f"new_neighbor: {new_neighbor}", flush=True)
-
-            for n in new_neighbor:
-                print(f"n[0],n[1]: {n[0],n[1]}", flush=True)
-
-        print(f"self.neighbor_ip_update: {self.neighbor_ip_update}", flush=True)
-
-        # Get the neighbor and its latency
-        # for neighbor_pod_name in self.neighbor_pods:
-        for neighbor_pod_name in self.neighbor_pods:
-            if neighbor_pod_name != sender_id:
-                neighbor_ip = self.get_pod_ip(neighbor_pod_name)
-                target = f"{neighbor_ip}:5050"
+        # Get the neighbor and its ip address
+        for neighbor in self.neighbor_pods:
+            if neighbor[0] != sender_id: # neighbor name
+                target = f"{neighbor[1]}:5050" # neighbor ip address
 
                 # Record the send timestamp
                 send_timestamp = time.time_ns()
@@ -152,7 +141,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                             timestamp=send_timestamp,
                         ))
                     except grpc.RpcError as e:
-                        print(f"Failed to send message: '{message}' to {neighbor_pod_name}: {e}", flush=True)
+                        print(f"Failed to send message: '{message}' to {neighbor[0]}: {e}", flush=True)
 
     def _find_neighbors(self, node_id):
         """
