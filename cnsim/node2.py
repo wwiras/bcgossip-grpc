@@ -124,11 +124,17 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         print(f"self.neighbor_ip_update: {self.neighbor_ip_update}", flush=True)
         # if neighbor ip address not updated, update it
         if not self.neighbor_ip_update:
-            # self.neighbor_pods = self.update_neighbors(self.pod_name)
-            print(f"self.update_neighbors(): {self.update_neighbors()}", flush=True)
+
+            new_neighbor = self.update_neighbors()
+            # print(f"new_neighbor: {new_neighbor}", flush=True)
+
+            for n in new_neighbor:
+                print(f"n[0],n[1]: {n[0],n[1]}", flush=True)
+
         print(f"self.neighbor_ip_update: {self.neighbor_ip_update}", flush=True)
 
         # Get the neighbor and its latency
+        # for neighbor_pod_name in self.neighbor_pods:
         for neighbor_pod_name in self.neighbor_pods:
             if neighbor_pod_name != sender_id:
                 neighbor_ip = self.get_pod_ip(neighbor_pod_name)
