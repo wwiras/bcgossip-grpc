@@ -31,6 +31,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         self.gossip_initiated = False
         self.initial_gossip_timestamp = None
+        self.neighbor_ip_update = False # no ip addrs for pod neighbors yet
 
     def get_topology(self, total_replicas, topology_folder, model="Full"):
         """
@@ -120,6 +121,13 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         This function objective is to send message to all neighbor nodes.
         """
 
+        print(f"self.neighbor_ip_update: {self.neighbor_ip_update}", flush=True)
+        # if neighbor ip address not updated, update it
+        if not self.neighbor_ip_update:
+            # self.neighbor_pods = self.update_neighbors(self.pod_name)
+            print(f"self.update_neighbors(): {self.update_neighbors()}", flush=True)
+        print(f"self.neighbor_ip_update: {self.neighbor_ip_update}", flush=True)
+
         # Get the neighbor and its latency
         for neighbor_pod_name in self.neighbor_pods:
             if neighbor_pod_name != sender_id:
@@ -153,6 +161,17 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 neighbors.append((edge['source']))  # Add neighbor as a tuple (from topology)
 
         return neighbors
+
+    def update_neighbors(self, namespace="default"):
+        """
+        Returns a list of neighbors for the given node_id along with their IP addresses.
+        """
+        neighbors_with_ip = []
+        for neighbor in self.neighbor_pods:
+            ip = self.get_pod_ip(neighbor, namespace)
+            neighbors_with_ip.append((neighbor, ip))  # Append (node_id, ip) as a tuple
+        self.neighbor_ip_update = True
+        return neighbors_with_ip
 
     def _log_event(self, message, sender_id, received_timestamp, propagation_time, event_type, log_message):
         """Logs the gossip event as structured JSON data."""
