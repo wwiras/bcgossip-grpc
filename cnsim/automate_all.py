@@ -241,13 +241,24 @@ if __name__ == '__main__':
                     # Choosing gossip-statefulset-0 as initiator
                     # Can change this to random later
                     pod_name = "gossip-statefulset-0"
-                    print(f"Selected pod for test {nt}: {pod_name}", flush=True)
 
-                    # Start accessing the pods and initiate gossip
-                    if test.access_pod_and_initiate_gossip(pod_name, test.filename, unique_id, nt):
-                        print(f"Test {nt} complete for {test.filename}.", flush=True)
+                    # Pods preparation phase, not counted as test
+                    # first iteration (nt=0), for pods preparation
+                    # next iteration (nt>0), for gossip test
+                    if nt > 0:
+
+                        print(f"Selected pod for test {nt}: {pod_name}", flush=True)
+                        # Start accessing the pods and initiate gossip
+                        if test.access_pod_and_initiate_gossip(pod_name, test.filename, unique_id, nt):
+                            print(f"Test {nt} complete for {test.filename}.", flush=True)
+                        else:
+                            print(f"Test {nt} failed for {test.filename}.", flush=True)
                     else:
-                        print(f"Test {nt} failed for {test.filename}.", flush=True)
+                        print(f"Pod preparation starting..", flush=True)
+                        if test.access_pod_and_initiate_gossip(pod_name, test.filename, unique_id, nt):
+                            print(f"Pod preparation complete for {test.filename}.", flush=True)
+                        else:
+                            print(f"Pod preparation failed for {test.filename}.", flush=True)
             else:
                 print(f"Failed to prepare pods for {test.filename}.", flush=True)
 
