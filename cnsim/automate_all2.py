@@ -165,53 +165,13 @@ class Test:
         print(f"Timeout waiting for pods to terminate in namespace {namespace}.", flush=True)
         return False  # Timeout reached
 
-    # def access_pod_and_initiate_gossip(self, pod_name, filename, unique_id, iteration):
-    #     try:
-    #         session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--request-timeout=600','--', 'sh'], stdin=subprocess.PIPE,
-    #                                    stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    #         message = f'{filename[:-5]}-{unique_id}-{iteration}'
-    #         session.stdin.write(f'python3 start.py --message {message}\n')
-    #         session.stdin.flush()
-    #         # end_time = time.time() + 300
-    #         end_time = time.time() + 1000
-    #         while time.time() < end_time:
-    #             reads = [session.stdout.fileno()]
-    #             ready = select.select(reads, [], [], 5)[0]
-    #             if ready:
-    #                 output = session.stdout.readline()
-    #                 print(output, flush=True)
-    #                 if 'Received acknowledgment:' in output:
-    #                     print("Gossip propagation complete.", flush=True)
-    #                     break
-    #             # Check if the session has ended
-    #             if session.poll() is not None:
-    #                 exit_code = session.poll()
-    #                 print(f"Session ended (before completion) with exit code: {exit_code}", flush=True)
-    #                 break
-    #         else:
-    #             print("Timeout waiting for gossip to complete.", flush=True)
-    #             return False
-    #         session.stdin.write('exit\n')
-    #         session.stdin.flush()
-    #         return True
-    #     except Exception as e:
-    #         print(f"Error accessing pod {pod_name}: {e}", flush=True)
-    #         traceback.print_exc()
-    #         return False
-
     def access_pod_and_initiate_gossip(self, pod_name, filename, unique_id, iteration):
         try:
-            session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--request-timeout=600', '--', 'sh'],
-                                       stdin=subprocess.PIPE,
+            session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--request-timeout=600','--', 'sh'], stdin=subprocess.PIPE,
                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             message = f'{filename[:-5]}-{unique_id}-{iteration}'
-
-            # Record the start time
-            start_time = time.time()
-
             session.stdin.write(f'python3 start.py --message {message}\n')
             session.stdin.flush()
-
             # end_time = time.time() + 300
             end_time = time.time() + 1000
             while time.time() < end_time:
@@ -221,10 +181,7 @@ class Test:
                     output = session.stdout.readline()
                     print(output, flush=True)
                     if 'Received acknowledgment:' in output:
-                        # Record the end time when gossip propagation is complete
-                        end_time = time.time()
-                        gossip_time_taken = (end_time - start_time) * 1000  # Convert to milliseconds
-                        print(f"Gossip propagation complete. Time taken: {gossip_time_taken:.2f} ms", flush=True)
+                        print("Gossip propagation complete.", flush=True)
                         break
                 # Check if the session has ended
                 if session.poll() is not None:
