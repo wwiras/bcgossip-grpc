@@ -184,7 +184,8 @@ class Test:
                     output = session.stdout.readline()
                     print(output, flush=True)
                     if 'Received acknowledgment:' in output:
-                        print("Gossip propagation complete.", flush=True)
+                        if iteration > 0:
+                            print("Gossip propagation complete.", flush=True)
                         break
                 # Check if the session has ended
                 if session.poll() is not None:
