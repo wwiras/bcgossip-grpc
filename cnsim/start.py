@@ -6,7 +6,6 @@ import gossip_pb2
 import gossip_pb2_grpc
 from kubernetes import client, config
 
-
 def get_pod_ip(pod_name, namespace="default"):
     """Fetches the IP address of a pod in the specified namespace."""
     config.load_incluster_config()
@@ -36,21 +35,18 @@ def send_message_to_self(message):
 def send_message_to_prepare(message):
     """Sends a message to the current pod (itself) for pods preparing."""
     pod_name = socket.gethostname()
-    print(f"pod_name={pod_name}", flush=True)
     pod_ip = get_pod_ip(pod_name)
-    print(f"pod_ip={pod_ip}", flush=True)
     target = f"{pod_ip}:5050"
-    print(f"target={target}", flush=True)
 
     with grpc.insecure_channel(target) as channel:
         stub = gossip_pb2_grpc.GossipServiceStub(channel)
-        print(f"Sending message (pods preparation) to self ({pod_name}, {pod_ip}): '{message}'", flush=True)
+        print(f"Starting pods preparation..", flush=True)
         response = stub.SendMessage(gossip_pb2.GossipMessage(
             message=message,
             sender_id=pod_name,
             timestamp=time.time_ns()
         ))
-        print(f"Received acknowledgment: {response.details}", flush=True)
+        print(f"Pods preparation complete: {response.details}.json ", flush=True)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Send a message to self (the current pod).")

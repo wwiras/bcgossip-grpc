@@ -119,7 +119,7 @@ class Test:
                 running_pods = int(result.stdout.strip())
                 if running_pods >= expected_pods:
                     # print(f"All {expected_pods} pods are up and running in namespace {namespace}.", flush=True)
-                    print(f"All {expected_pods} pods are up in namespace:{namespace}. Now preparing pods..", flush=True)
+                    print(f"All {expected_pods} pods are up in namespace:{namespace}.", flush=True)
                     return True  # Pods are down
                 else:
                     print(f" {running_pods} pods are up for now in namespace {namespace}. Waiting...", flush=True)
@@ -250,9 +250,9 @@ if __name__ == '__main__':
                     if nt == 0:
                         # Start accessing the pods and initiate gossip
                         if test.access_pod_and_initiate_gossip(pod_name, test.filename, unique_id, nt):
-                            print(f"Pods preparing completed for {test.filename}.", flush=True)
+                            print(f"{test.num_nodes} pods preparing completed for {test.filename}.", flush=True)
                         else:
-                            print(f"Pods preparing failed for {test.filename}.", flush=True)
+                            print(f"{test.num_nodes} pods preparing failed for {test.filename}.", flush=True)
                     # Initiating test
                     else:
                         print(f"Selected pod for test {nt}: {pod_name}", flush=True)
