@@ -118,8 +118,7 @@ class Test:
                 # print(f"result {result}",flush=True)
                 running_pods = int(result.stdout.strip())
                 if running_pods >= expected_pods:
-                    # print(f"All {expected_pods} pods are up and running in namespace {namespace}.", flush=True)
-                    print(f"All {expected_pods} pods are up in namespace:{namespace}.", flush=True)
+                    print(f"All {expected_pods} pods are up and running in namespace {namespace}.", flush=True)
                     return True  # Pods are down
                 else:
                     print(f" {running_pods} pods are up for now in namespace {namespace}. Waiting...", flush=True)
@@ -170,7 +169,10 @@ class Test:
         try:
             session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--request-timeout=600','--', 'sh'], stdin=subprocess.PIPE,
                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            message = f'{filename[:-5]}-{unique_id}-{iteration}'
+            if iteration == 0:
+                message = f'{unique_id}-prepare'
+            else:
+                message = f'{filename[:-5]}-{unique_id}-{iteration}'
             session.stdin.write(f'python3 start.py --message {message}\n')
             session.stdin.flush()
             # end_time = time.time() + 300
@@ -182,10 +184,7 @@ class Test:
                     output = session.stdout.readline()
                     print(output, flush=True)
                     if 'Received acknowledgment:' in output:
-                        if iteration > 0:
-                            print("Gossip propagation complete.", flush=True)
-                        else:
-                            print("Pods preparation complete.", flush=True)
+                        print("Gossip propagation complete.", flush=True)
                         break
                 # Check if the session has ended
                 if session.poll() is not None:
@@ -193,10 +192,7 @@ class Test:
                     print(f"Session ended (before completion) with exit code: {exit_code}", flush=True)
                     break
             else:
-                if iteration > 0:
-                    print("Timeout waiting for gossip to complete.", flush=True)
-                else:
-                    print("Timeout waiting for pods preparation to complete.", flush=True)
+                print("Timeout waiting for gossip to complete.", flush=True)
                 return False
             session.stdin.write('exit\n')
             session.stdin.flush()
@@ -240,28 +236,18 @@ if __name__ == '__main__':
 
                 # Test iteration starts here
                 # for nt in range(1, test.num_tests + 1):
-                for nt in range(test.num_tests+1):
+                for nt in range(test.num_tests + 1):
 
                     # Choosing gossip-statefulset-0 as initiator
                     # Can change this to random later
                     pod_name = "gossip-statefulset-0"
+                    print(f"Selected pod for test {nt}: {pod_name}", flush=True)
 
-                    # Preparing pods
-                    if nt == 0:
-                        # Start accessing the pods and initiate gossip
-                        if test.access_pod_and_initiate_gossip(pod_name, test.filename, unique_id, nt):
-                            print(f"{test.num_nodes} pods preparing completed for {test.filename}.", flush=True)
-                        else:
-                            print(f"{test.num_nodes} pods preparing failed for {test.filename}.", flush=True)
-                    # Initiating test
+                    # Start accessing the pods and initiate gossip
+                    if test.access_pod_and_initiate_gossip(pod_name, test.filename, unique_id, nt):
+                        print(f"Test {nt} complete for {test.filename}.", flush=True)
                     else:
-                        print(f"Selected pod for test {nt}: {pod_name}", flush=True)
-
-                        # Start accessing the pods and initiate gossip
-                        if test.access_pod_and_initiate_gossip(pod_name, test.filename, unique_id, nt):
-                            print(f"Test {nt} complete for {test.filename}.", flush=True)
-                        else:
-                            print(f"Test {nt} failed for {test.filename}.", flush=True)
+                        print(f"Test {nt} failed for {test.filename}.", flush=True)
             else:
                 print(f"Failed to prepare pods for {test.filename}.", flush=True)
 

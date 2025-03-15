@@ -87,12 +87,8 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         sender_id = request.sender_id
         received_timestamp = time.time_ns()
 
-        # Check to prepare pods
-        if not self.neighbor_ip_update: # update neighbor ip address (if it is not updated)
-            self.neighbor_pods = self.update_neighbors()
-
         # Check for message initiation and set the initial timestamp
-        elif sender_id == self.pod_name and not self.gossip_initiated:
+        if sender_id == self.pod_name and not self.gossip_initiated:
             self.gossip_initiated = True
             self.initial_gossip_timestamp = received_timestamp
             log_message = (f"Gossip initiated by {self.pod_name}({self.host}) at "
@@ -120,9 +116,14 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         return gossip_pb2.Acknowledgment(details=f"{self.pod_name}({self.host}) processed message: '{message}'")
 
     def gossip_message(self, message, sender_id):
+
         """
         This function objective is to send message to all neighbor nodes.
         """
+        # update neighbor ip address (if it is not updated)
+        if not self.neighbor_ip_update:
+            self.neighbor_pods = self.update_neighbors()
+
         # Get the neighbor and its ip address
         for neighbor in self.neighbor_pods:
             if neighbor[0] != sender_id: # neighbor name
