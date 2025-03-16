@@ -188,18 +188,6 @@ class Test:
             raise Exception("No running pods found.")
         return random.choice(pod_list)
 
-    def run_command(command, shell=False):
-        """
-        Run a shell command and return the output.
-        """
-        try:
-            result = subprocess.run(command, check=True, text=True, capture_output=True, shell=shell)
-            return result.stdout.strip()
-        except subprocess.CalledProcessError as e:
-            print(f"An error occurred: {e.stderr}", flush=True)
-            traceback.print_exc()
-            sys.exit(1)
-
     def access_pod_and_initiate_gossip(self,pod_name, replicas, unique_id, iteration):
         """
         Access the pod's shell, initiate gossip, and handle the response.
