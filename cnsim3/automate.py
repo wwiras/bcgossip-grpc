@@ -266,24 +266,18 @@ if __name__ == '__main__':
 
                 print(f"Selected pod: {pod_name}", flush=True)
                 if test.access_pod_and_initiate_gossip(pod_name, test.num_nodes, unique_id, nt):
-                    print(f"Test {i} complete.", flush=True)
+                    print(f"Test {nt} complete.", flush=True)
                 else:
-                    print(f"Test {i} failed.", flush=True)
+                    print(f"Test {nt} failed.", flush=True)
 
-                    # print(f"Selected pod for test {nt}: {pod_name}", flush=True)
-                    # # Start accessing the pods and initiate gossip
-                    # if test.access_pod_and_initiate_gossip(pod_name, test.filename, unique_id, nt):
-                    #     print(f"Test {nt} complete for {test.filename}.", flush=True)
-                    # else:
-                    #     print(f"Test {nt} failed for {test.filename}.", flush=True)
         else:
-            print(f"Failed to prepare pods for {test.filename}.", flush=True)
+            print(f"Failed to prepare pods for {helmname}.", flush=True)
 
         # Remove helm
-        result = test.run_command(['helm', 'uninstall', statefulsetname])
-        print(f"Helm {statefulsetname} will be uninstalled...", flush=True)
+        result = test.run_command(['helm', 'uninstall', helmname])
+        print(f"Helm {helmname} will be uninstalled...", flush=True)
         if test.wait_for_pods_to_be_down(namespace='default', timeout=1000):
-            print(f"Helm {statefulsetname}: {test.filename} uninstalled is completed...", flush=True)
+            print(f"Helm {helmname} uninstallation is complete...", flush=True)
 
     else:
         print(f"No file was found for args={args}")
