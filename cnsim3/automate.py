@@ -48,7 +48,11 @@ class Test:
             A tuple (None, stderr) if the command fails.
         """
         try:
-            result = subprocess.run(command, check=True, text=True, capture_output=True)
+            # result = subprocess.run(command, check=True, text=True, capture_output=True)
+            if isinstance(command, str):
+                result = subprocess.run(command, check=True, text=True, capture_output=True, shell=True)
+            else:
+                result = subprocess.run(command, check=True, text=True, capture_output=True)
 
             # If full_path is provided (likely for 'apply' commands), provide more informative output
             if full_path:
