@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bcgossip{{ .Values.totalNodes }}nodes
+spec:
+  serviceName: "bcgossip-svc"
+  selector:
+    matchLabels:
+      run: bcgossip
+  replicas: {{ .Values.totalNodes }}
+  template:
+    metadata:
+      labels:
+        run: bcgossip
+    spec:
+      containers:
+      - name: bcgossip-cont
+        image: {{ .Values.image.name }}:{{ .Values.image.tag }}  # Replace with your actual Docker image
+        ports:
+        - containerPort: 5050
