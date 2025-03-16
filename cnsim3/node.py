@@ -39,7 +39,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # For initiating acknowledgment only
         if sender_ip == self.host and not self.gossip_initiated:
             self.gossip_initiated = True
-            print(f"Message initiated by {self.host}...", flush=True)
+            print(f"Message: {message} initiated by {self.host}...", flush=True)
             self.gossip_initiated = False  # For multiple tests, need to reset gossip initialization
 
         # Check whether the message is already received ot not
