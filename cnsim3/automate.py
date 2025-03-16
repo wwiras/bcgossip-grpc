@@ -183,7 +183,7 @@ class Test:
         Select a random pod from the list of running pods.
         """
         command = "kubectl get pods --no-headers | grep Running | awk '{print $1}'"
-        pod_list = self.run_command(command, shell=True).split()
+        pod_list = self.run_command(command).split()
         if not pod_list:
             raise Exception("No running pods found.")
         return random.choice(pod_list)
