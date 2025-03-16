@@ -9,6 +9,6 @@
 
 image:
   name: wwiras/cnsim3
-  tag: v1
+  tag: v3
 
 totalNodes: 10       # Default value, can be overridden
