@@ -187,10 +187,11 @@ class Test:
         Select a random pod from the list of running pods.
         """
         command = "kubectl get pods --no-headers | grep Running | awk '{print $1}'"
-        pod_list = self.run_command(command).split()
+        stdout, stderr = self.run_command(command)  # Extract stdout and stderr from the tuple
+        pod_list = stdout.split()  # Split the stdout into a list of pod names
         if not pod_list:
             raise Exception("No running pods found.")
-        return random.choice(pod_list)
+        return random.choice(pod_list)  # Return a random pod name
 
     def access_pod_and_initiate_gossip(self,pod_name, replicas, unique_id, iteration):
         """
