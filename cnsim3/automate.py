@@ -211,7 +211,7 @@ class Test:
                 if ready:
                     output = session.stdout.readline()
                     print(output, flush=True)
-                    if 'Done propagate!' in output:
+                    if 'Received acknowledgment:' in output:
                         print("Gossip propagation complete.", flush=True)
                         break
                 if session.poll() is not None:
