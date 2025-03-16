@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   name: bcgossip{{ .Values.totalNodes }}nodes
 spec:
-  serviceName: "bcgossip-svc"
   selector:
     matchLabels:
       run: bcgossip
