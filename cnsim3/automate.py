@@ -265,7 +265,7 @@ if __name__ == '__main__':
                 pod_name = test.select_random_pod()
 
                 print(f"Selected pod: {pod_name}", flush=True)
-                if test.access_pod_and_initiate_gossip(pod_name, replicas, unique_id, nt):
+                if test.access_pod_and_initiate_gossip(pod_name, test.num_nodes, unique_id, nt):
                     print(f"Test {i} complete.", flush=True)
                 else:
                     print(f"Test {i} failed.", flush=True)
