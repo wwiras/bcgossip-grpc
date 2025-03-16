@@ -178,7 +178,7 @@ class Test:
     #         traceback.print_exc()
     #         return False
 
-    def select_random_pod():
+    def select_random_pod(self):
         """
         Select a random pod from the list of running pods.
         """
@@ -257,10 +257,10 @@ if __name__ == '__main__':
 
                 # Choosing gossip-statefulset-0 as initiator
                 # Can change this to random later
-                pod_name = select_random_pod()
+                pod_name = test.select_random_pod()
 
                 print(f"Selected pod: {pod_name}", flush=True)
-                if access_pod_and_initiate_gossip(pod_name, replicas, unique_id, nt):
+                if test.access_pod_and_initiate_gossip(pod_name, replicas, unique_id, nt):
                     print(f"Test {i} complete.", flush=True)
                 else:
                     print(f"Test {i} failed.", flush=True)
