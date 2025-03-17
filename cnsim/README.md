@@ -2,14 +2,11 @@
 This code is for PLOS One article entitled *Cloud-Native Simulation Framework for Gossip Protocol: Modeling
 and Analyzing Network Dynamics*.
 
-## Notes on DONS simulator - k8sw17
+## Notes on Simulator
 
 ### Introduction
-This purpose of k8sw17 folder is to create a simulator that will
-imitate the simulation of "An Efficient Blockchain Neighbor Selection 
-Framework Based on Agglomerative Clustering" paper. Basically, the based
-of the network is based on DONS simulator 
-(https://www.sciencedirect.com/science/article/pii/S0167739X2100491X)
+This purpose of this simulator is to mimic gossip protocol in a distributed network environment such as IoT, Blockchain, VANET and MANET.
+
 
 #### Online KMeans Clustering
 Consider this as "live" version. This is where the kMeans clustering is 
