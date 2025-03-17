@@ -5,8 +5,14 @@ and Analyzing Network Dynamics*.
 ## Notes on Simulator
 
 ### Introduction
-This purpose of this simulator is to mimic gossip protocol in a distributed network environment such as IoT, Blockchain, VANET and MANET.
-
+Distributed networks, such as those used in IoT, blockchain, VANETs, and MANETs, are complex systems where 
+efficient and reliable communication is critical. Gossip protocols, which allow nodes to share information 
+in a decentralized and fault-tolerant way, are widely used in these environments but require careful research 
+to improve scalability and durability. To address this, we have developed a cloud-native simulator that mimics 
+gossip protocols in distributed networks. This simulator provides a flexible platform to study and optimize 
+communication strategies, helping researchers tackle challenges like dynamic topologies, node mobility, 
+and resource constraints. By enabling large-scale simulations, our tool aims to advance the development 
+of robust and scalable distributed systems.
 
 #### Online KMeans Clustering
 Consider this as "live" version. This is where the kMeans clustering is 
