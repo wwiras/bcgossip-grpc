@@ -60,9 +60,9 @@ python start.py --message "Hello, Gossip!"
 #### Step 4: Docker Image Creation and Deployment
 A Docker image (wwiras/cnsim:v1) is built by running the docker build command at *cnsim* root 
 folder and pushing it to Docker Hub. This will ease deployment on GKE.
-```
-docker build -t wwiras/cnsim:v1 .
-docker push wwiras/cnsim:v1
+```shell
+$ docker build -t wwiras/cnsim:v1 .
+$ docker push wwiras/cnsim:v1
 ```
 #### Step 5: GKE Deployment and Gossip Test
 The *automate_all.py* script automates the deployment (using *helm install* command) of 
