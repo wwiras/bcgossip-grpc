@@ -33,22 +33,38 @@ All topology files are saved in topology folder.
 python network_constructor.py --nodes 10 --save 
 ```
 
-#### Step 2 - Develop gossip script (Direct Mail Gossip)
+#### Step 2 - Develop grpc communication protocol (using python3)
+This simulator uses grpc for communication between pods. *gossip.proto* file 
+is created and compile to produce *gossip_pb2.py* and *gossip_pb2_grpc.py*.
+
+#### Step 3 - Develop gossip script (Direct Mail Gossip) 
 Two files are created using Python3.
 - start.py : to initiate gossip by sending a message from the pod's itself
 - node.py : build a grpc server to receive and propagate message (to it's neighbor - from Step 1)
 
 ```shell
 # initiate gossip by sending message to himself (self triggered)
-python start.py --message <any_message>
+python start.py --message any_message
 ```
-#### Step 3 - Build docker image and upload to  cluster options
 
-Build docker images based on the k8sw16 script. 
+#### Step 4 - Build docker image and upload to docker hub
+Build docker images based on cnsim script (from the root folder) and push it to docker hub. 
 ```
-docker build -t wwiras/k8sw17:v1 .
-docker push wwiras/k8sw17:v1
+docker build -t wwiras/cnsim:v1 .
+docker push wwiras/cnsim:v1
 ```
+
+#### Step 4 - Build docker image and upload to  cluster options
+Build docker images based on cnsim script (from the root folder). 
+```
+docker build -t wwiras/cnsim:v1 .
+docker push wwiras/cnsim:v1
+```
+
+
+
+
+
 
 But this time statefulset.yaml template will add with **CLUSTER** environment variable. The logic is:-
 - *os.environ['CLUSTER'] == 0*, choose "topology" folder
