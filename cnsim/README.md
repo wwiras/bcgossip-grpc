@@ -1,4 +1,4 @@
-# cnsim
+# Cloud-Native Simulation Framework for Gossip Protocol: Modeling and Analyzing Network Dynamics
 This code is for PLOS One article entitled *Cloud-Native Simulation Framework for Gossip Protocol: Modeling
 and Analyzing Network Dynamics*.
 
@@ -14,9 +14,11 @@ communication strategies, helping researchers tackle challenges like dynamic top
 and resource constraints. By enabling large-scale simulations, our tool aims to advance the development 
 of robust and scalable distributed systems.
 
+In this note, the platform of this simulator, prequisite and the steps to implement it will be listed below. 
+
 ### Simulator Platform 
 This simulator platform is consists of:-
-- Google Kubernetes Engine (in Google Cloud Platform) - gossip activity
+- Google Kubernetes Engine (in Google Cloud Platform) - Gossip activity
 - Google BigQuery - Data Collection and Extraction
 - Google Colab - Data Analisys and virtualization 
 
