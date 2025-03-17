@@ -29,26 +29,19 @@ Topology is created (using network_constructor.py) with Full connected network m
 All topology files are saved in topology folder. 
 
 ```shell
-# For BA model
+# Full connected network
 python network_constructor.py --nodes 10 --save 
 ```
 
-#### Step 2 - Build cluster topology (input; k=total_cluster, json_file=from step 1)
-This is an offline solution for a distribution system. Based on the output from step 1, we will create
-anew topology (or graph network) with k cluster (from the argument of the command). To get track
-on the files generated, we will save the cluster file based on the topology file (from step 1).
-If the input filename is "nodes10_Dec2820240043.json", the output is "kmeans_nodes10_Dec2820240043.json"
-in topology_kmeans folder.
+#### Step 2 - Develop Gossip Script (Direct Mail Gossip Protocol)
+Two files are created using Python3.
+- start.py : to initiate gossip (from a selected pod) from the pod's itself by sending a message
+- node.py : build a grpc server to receive and propagate message
 
 ```shell
-# To run the code and display or save new topology (display=True) and (save=True):
-python construct_kmeans.py --filename nodes10_Dec2820240043.json --num_cluster 2 --display --save
-# the output file will kmeans_k2_nodes10_Dec2820240043.json
-    
-#To run the code and ignore display and save new topology (display=False)and (save=False):
-python construct_kmeans.py --filename nodes10_Dec2820240043.json --num_cluster 2
+# initiate gossip by sending message to himself (self triggered)
+python start.py --message <any_message>
 ```
-
 #### Step 3 - Buidl docker image (k8sw17) and run cluster options
 
 Build docker images based on the k8sw16 script. 
