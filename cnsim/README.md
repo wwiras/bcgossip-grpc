@@ -15,7 +15,7 @@ gossip activity. GKE allows for easy scaling and management of the simulation en
 serverless architecture allows for fast and cost-effective analysis of large datasets.
 * **Google Colab:** For data visualization and in-depth analysis of simulation results. Colab provides a 
 free and accessible environment for Python-based data analysis.
-* **python3:** *python* language is used for gossip scripting and data analysis  
+* **python3:** *python* language is used for gossip scripting, data analysis and data virtualization.  
 
 ### Implementation Steps
 
