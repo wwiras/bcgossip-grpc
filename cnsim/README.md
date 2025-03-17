@@ -14,8 +14,6 @@ communication strategies, helping researchers tackle challenges like dynamic top
 and resource constraints. By enabling large-scale simulations, our tool aims to advance the development 
 of robust and scalable distributed systems.
 
-In this note, the platform of this simulator, prequisite and the steps to implement it will be listed as below. 
-
 ### Simulator Platform 
 This simulator platform is consists of:-
 - Google Kubernetes Engine (in Google Cloud Platform) - Gossip activity simulation
@@ -38,7 +36,7 @@ This simulator uses grpc for communication between pods. *gossip.proto* file
 is created and compile to produce *gossip_pb2.py* and *gossip_pb2_grpc.py*.
 
 #### Step 3 - Develop gossip script (Direct Mail Gossip) 
-Two files are created using Python3.
+Two files are created using python3.
 - start.py : to initiate gossip by sending a message from the pod's itself
 - node.py : build a grpc server to receive and propagate message (to it's neighbor - from Step 1)
 
@@ -54,53 +52,28 @@ docker build -t wwiras/cnsim:v1 .
 docker push wwiras/cnsim:v1
 ```
 
-#### Step 4 - Build docker image and upload to  cluster options
-Build docker images based on cnsim script (from the root folder). 
-```
-docker build -t wwiras/cnsim:v1 .
-docker push wwiras/cnsim:v1
-```
+#### Step 5 - Deployment and gossip test
+Below are the steps to deploy and initialize gossip (together with helm uninstall). 
 
+a. Helm chart is used to deploy our *Statefulset*.
 
+b. Once *Statefulset* is ready, access any pod to execute gossip initialization by sending 
+a message to himself (command in Step 3). After this, a message is send from the
+initialize pod to its neighbors. From there, its neighbor, will send the received message
+to their neighbors. This process will continue until all pods receive this message including
+new and duplicated message. All this activities will be recorded and stored to google
+cloud logging.
 
+c. Once propagation (gossip) is completed, helm uninstall command will be executed 
+to remove *Statefulset* deployment.  
 
-
-
-But this time statefulset.yaml template will add with **CLUSTER** environment variable. The logic is:-
-- *os.environ['CLUSTER'] == 0*, choose "topology" folder
-- *os.environ['CLUSTER'] == 1*, choose "topology_kmeans" folder
-```
-# no cluster - random gossip
-helm install gossip-statefulset chartw/ --values chartw/values.yaml --debug --set cluster=0
-```
-```
-# kmeans cluster
-helm install gossip-statefulset chartw/ --values chartw/values.yaml --debug --set cluster=1
-```
-
-### Running Latency Test
-
-- Basically, we will create topology (random or kmeans cluster) on Step 1 and 2. (10,30, 50, 70, 100 or any amount).
-- All of these topologies will be stored in the container images.
-- Let say we want to run latency test for 30 nodes of random gossip. the command is as below 
+A python script has been developed (*automate_all.py*) to simplify this complex tasks. 
+Refer code for more details.
 ```shell
-helm install gossip-statefulset chartw/ --values chartw/values.yaml --debug --set cluster=0 --set totalNodes=30
-```
-- To start or initiate the test, just proceed with the command
-```shell
-# Make sure all pods are runnning using kubernetes command or tool
-# make sure all pods has running status
-$ kubectl get pod
-
-# access random pods
-$ kubectl exec -it gossip-statefulset-0 -- sh
-
-# run gossip initialization 
-$ python3 start.py --message "any message" 
+# gossip automation script
+python automate_all.py --num_nodes 10 --num_tests 10
 ```
 
-### Running Latency Automation Test
-We will write the commands here
+#### Step 6 - Data collection and extraction
 
-### Notes on working topology
-nodes50_Jan082025181429_ER0.1.json, works for k2 and k4
+#### Step 7 - Data analysis
