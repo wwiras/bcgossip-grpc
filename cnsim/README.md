@@ -53,9 +53,13 @@ docker push wwiras/cnsim:v1
 ```
 
 #### Step 5 - Deployment and gossip test
-Below are the steps to deploy and initialize gossip (together with helm uninstall). 
+Below are the steps to deploy and initialize gossip (together with helm uninstall) manually. 
 
-a. Helm chart is used to deploy our *Statefulset*.
+a. Helm chart is used to deploy our *Statefulset*. 
+```shell 
+helm install gossip-statefulset ./chartsim --set testType=default,totalNodes=10
+```
+<small> Note: Refer values.yaml in chartsim directory to see what values can be customized.</small>
 
 b. Once *Statefulset* is ready, access any pod to execute gossip initialization by sending 
 a message to himself (command in Step 3). After this, a message is send from the
@@ -63,11 +67,19 @@ initialize pod to its neighbors. From there, its neighbor, will send the receive
 to their neighbors. This process will continue until all pods receive this message including
 new and duplicated message. All this activities will be recorded and stored to google
 cloud logging.
+```shell
+# initiate gossip by sending message to himself (self triggered)
+python start.py --message any_message
+```
+
 
 c. Once propagation (gossip) is completed, helm uninstall command will be executed 
-to remove *Statefulset* deployment.  
+to remove *Statefulset* deployment.
+```shell 
+helm uninstall gossip-statefulset
+```
 
-A python script has been developed (*automate_all.py*) to simplify this complex tasks. 
+Fortunately, a python script has been developed (*automate_all.py*) to simplify this complex tasks. 
 Refer code for more details.
 ```shell
 # gossip automation script
