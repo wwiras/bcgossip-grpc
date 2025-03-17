@@ -62,24 +62,24 @@ helm install gossip-statefulset ./chartsim --set testType=default,totalNodes=10
 <small> Note: Refer values.yaml in chartsim directory to see what values can be customized.</small>
 
 b. Once *Statefulset* is ready, access any pod to execute gossip initialization by sending 
-a message to himself (command in Step 3). After this, a message is send from the
-initialize pod to its neighbors. From there, its neighbor, will send the received message
-to their neighbors. This process will continue until all pods receive this message including
-new and duplicated message. All this activities will be recorded and stored to google
-cloud logging.
+a message to himself (command in Step 3). 
 ```shell
-# initiate gossip by sending message to himself (self triggered)
-python start.py --message any_message
+# Access pod gossip-statefulset-0  
+kubectl exec -it gossip-statefulset-0 -- sh
 ```
 
+After this, a message is send from the initialize pod to its neighbors. From there, its neighbor, 
+will send the received message to their neighbors. This process will continue until all pods receive 
+this message including new and duplicated message. Through *fluentd* agent on each pod, all this 
+activities will be recorded and stored to google cloud logging.
 
-c. Once propagation (gossip) is completed, helm uninstall command will be executed 
-to remove *Statefulset* deployment.
+c. Once propagation (gossip) is completed, exit pod and run helm uninstall command to remove 
+*Statefulset* deployment.
 ```shell 
 helm uninstall gossip-statefulset
 ```
 
-Fortunately, a python script has been developed (*automate_all.py*) to simplify this complex tasks. 
+Fortunately, a python script has been developed (*automate_all.py*) to automate and simplify all this tasks. 
 Refer code for more details.
 ```shell
 # gossip automation script
