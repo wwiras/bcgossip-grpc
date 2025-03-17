@@ -9,12 +9,13 @@ dynamics in distributed networks.**
 This simulator leverages Google Cloud Platform services to provide a scalable and flexible environment for 
 modeling and analyzing gossip protocols. The architecture comprises:
 
-* **Google Kubernetes Engine (GKE):** For deploying and managing the distributed network nodes, simulating gossip activity. 
-* GKE allows for easy scaling and management of the simulation environment.
-* **Google BigQuery:** For storing and querying simulation data, enabling efficient data analysis. 
-* BigQuery's serverless architecture allows for fast and cost-effective analysis of large datasets.
-* **Google Colab:** For data visualization and in-depth analysis of simulation results. 
-* Colab provides a free and accessible environment for Python-based data analysis.
+* **Google Kubernetes Engine (GKE):** For deploying and managing the distributed network nodes, simulating 
+gossip activity. GKE allows for easy scaling and management of the simulation environment.
+* **Google BigQuery:** For storing and querying simulation data, enabling efficient data analysis. BigQuery's 
+serverless architecture allows for fast and cost-effective analysis of large datasets.
+* **Google Colab:** For data visualization and in-depth analysis of simulation results. Colab provides a 
+free and accessible environment for Python-based data analysis.
+* **python3:** *python* language is used for gossip scripting and data analysis  
 
 ### Implementation Steps
 
@@ -32,18 +33,23 @@ python network_constructor.py --nodes 10 --save
 gRPC is used for inter-node communication, providing efficient and reliable message passing. gRPC is a
 high-performance Remote Procedure Call (RPC) framework that allows nodes to communicate as if they 
 were calling local functions. The *gossip.proto* file defines the communication interface, specifying 
-the message structure and service definitions. This file is then compiled into Python classes 
-(*gossip_pb2.py*, *gossip_pb2_grpc.py*). These classes provide the necessary code for serializing 
-and deserializing messages, and for implementing the gRPC server and client.
+the message structure and service definitions. 
+
+This file is then compiled (with command below) and generate two *python* files (python classes) in the same directory:
+* *gossip_pb2.py*: Contains the *python* classes for your protocol buffer messages (GossipMessage, Acknowledgment).
+* *gossip_pb2_grpc.py*: Contains the *python* classes for your gRPC service (GossipServiceServicer, GossipServiceStub).
+```python
+python -m grpc_tools.protoc -I=. --python_out=. --grpc_python_out=. gossip.proto
+```
 
 #### Step 3: Gossip Script (Direct Mail Gossip)
 The simulator implements a "Direct Mail Gossip" protocol, where nodes directly send messages 
 to their neighbors. This is a basic form of gossip protocol, where each node maintains a list of 
 its neighbors and forwards messages to them.
 
-- *start.py* initiates the gossip process by sending a message to the node itself. This simulates a 
+- *start.py*: initiates the gossip process by sending a message to the node itself. This simulates a 
 node originating a message.
-- *node.py* acts as a gRPC server, receiving and propagating messages to neighboring nodes. It 
+- *node.py*: acts as a gRPC server, receiving and propagating messages to neighboring nodes. It 
 listens for incoming messages and, upon receipt, forwards them to the nodes listed in its 
 neighbor list.
 ```shell
@@ -88,9 +94,9 @@ AND jsonPayload.message like 'nodes70_Mar112025160431_Full1.0-5869-%'
 
 LIMIT 1000000
 ```
-From here, extracts result to a *.csv file and store it in a google drive for data analysis (in Step 7).
+From here, save the result to a *.csv file and store it in a google drive for data analysis (in Step 7).
 
 #### Step 7: Data Analysis
-Open new Google Colab and point it the google drive where all the *csv files have been saved (from Step 6). Execute
-data filtering and analysis here. All data analysis for this simulator is shown in this link.
+Open new Google Colab and point it to the google drive where all the *.csv files have been saved (from Step 6). Execute
+data cleaning, analysis and virtualization here. All steps for data analysis are shown in this link.
 
