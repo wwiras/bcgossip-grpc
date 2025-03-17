@@ -24,25 +24,25 @@ This simulator platform is consists of:-
 
 ### Steps to implement
 
-#### Step 1 - Build topology using model Fully Conneceted Network Model
+#### Step 1 - Build topology using fully conneceted network model
 Topology is created (using network_constructor.py) with Full connected network model. 
 All topology files are saved in topology folder. 
 
 ```shell
-# Full connected network
+# Full connected network (with total_node and save indicator inputs)
 python network_constructor.py --nodes 10 --save 
 ```
 
-#### Step 2 - Develop Gossip Script (Direct Mail Gossip Protocol)
+#### Step 2 - Develop gossip script (Direct Mail Gossip)
 Two files are created using Python3.
-- start.py : to initiate gossip (from a selected pod) from the pod's itself by sending a message
-- node.py : build a grpc server to receive and propagate message
+- start.py : to initiate gossip by sending a message from the pod's itself
+- node.py : build a grpc server to receive and propagate message (to it's neighbor - from Step 1)
 
 ```shell
 # initiate gossip by sending message to himself (self triggered)
 python start.py --message <any_message>
 ```
-#### Step 3 - Buidl docker image (k8sw17) and run cluster options
+#### Step 3 - Build docker image and upload to  cluster options
 
 Build docker images based on the k8sw16 script. 
 ```
