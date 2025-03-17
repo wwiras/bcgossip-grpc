@@ -14,36 +14,24 @@ communication strategies, helping researchers tackle challenges like dynamic top
 and resource constraints. By enabling large-scale simulations, our tool aims to advance the development 
 of robust and scalable distributed systems.
 
-In this note, the platform of this simulator, prequisite and the steps to implement it will be listed below. 
+In this note, the platform of this simulator, prequisite and the steps to implement it will be listed as below. 
 
 ### Simulator Platform 
 This simulator platform is consists of:-
-- Google Kubernetes Engine (in Google Cloud Platform) - Gossip activity
-- Google BigQuery - Data Collection and Extraction
-- Google Colab - Data Analisys and virtualization 
+- Google Kubernetes Engine (in Google Cloud Platform) - Gossip activity simulation
+- Google BigQuery - Data collection and extraction
+- Google Colab - Data analisys and virtualization 
 
 ### Steps to implement
 
-#### Step 1 - Build random topology (input: nodes,n) using BA or ER model
-BA = Barabási–Albert Network
-ER = Erdös – Rényi(ER) Network
-Before initializing gossip, we need to create a topology that will
-gossip with BA or ER model latency (range 1ms - 100ms). Make sure
-you provide save and display options (optional)
+#### Step 1 - Build topology using model Fully Conneceted Network Model
+Topology is created (using network_constructor.py) with Full connected network model. 
+All topology files are saved in topology folder. 
 
 ```shell
 # For BA model
-python network_constructor.py --nodes 7 --model BA --others 3 --save 
+python network_constructor.py --nodes 10 --save 
 ```
-
-```shell
-# For ER model
-python network_constructor.py --nodes 7 --model ER --others 0.5 --display
-```
-
-This script will create a topology file (in topology folder) or 
-display the topology based on the options provided.
-
 
 #### Step 2 - Build cluster topology (input; k=total_cluster, json_file=from step 1)
 This is an offline solution for a distribution system. Based on the output from step 1, we will create
