@@ -97,10 +97,8 @@ From here, save the result to a *.csv file and store it in a google drive for da
 
 #### Step 7: Data Analysis and Virtualization
 Open new Google Colab and point it to the google drive where all the *.csv files have been saved (from Step 6). Execute
-data cleaning, analysis and virtualization here. All steps for data analysis and virtualization are shown in this link.
+data cleaning, analysis and virtualization here. All steps for data analysis and virtualization are shown in
+ [colab](https://github.com/wwiras/bcgossip-grpc/tree/main/cnsim/colab).
 
-Note: 
-- All data generated from this simulator is stored [here](https://github.com/wwiras/bcgossip-grpc/tree/main/cnsim/results).
-- Some data has large size. Please use this
-[method](https://www.reddit.com/r/SideProject/comments/17s1v0x/the_easiest_way_to_download_parts_of_a_large/?rdt=54904)
-to download it.
+> **_NOTE:_**  All data generated from this simulator can be found inside each *.ipynb files 
+from [colab](https://github.com/wwiras/bcgossip-grpc/tree/main/cnsim/colab).
