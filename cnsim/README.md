@@ -33,9 +33,8 @@ python network_constructor.py --nodes 10 --save
 gRPC is used for inter-node communication, providing efficient and reliable message passing. gRPC is a
 high-performance Remote Procedure Call (RPC) framework that allows nodes to communicate as if they 
 were calling local functions. The *gossip.proto* file defines the communication interface, specifying 
-the message structure and service definitions. 
-
-This file is then compiled (with command below) and generate two *python* files (python classes) in the same directory:
+the message structure and service definitions. This file is then compiled (with command below) and 
+generates two *python* files (python classes) in the same directory:
 * *gossip_pb2.py*: Contains the *python* classes for your protocol buffer messages (GossipMessage, Acknowledgment).
 * *gossip_pb2_grpc.py*: Contains the *python* classes for your gRPC service (GossipServiceServicer, GossipServiceStub).
 ```python
@@ -96,7 +95,7 @@ LIMIT 1000000
 ```
 From here, save the result to a *.csv file and store it in a google drive for data analysis (in Step 7).
 
-#### Step 7: Data Analysis
+#### Step 7: Data Analysis and Virtualization
 Open new Google Colab and point it to the google drive where all the *.csv files have been saved (from Step 6). Execute
-data cleaning, analysis and virtualization here. All steps for data analysis are shown in this link.
+data cleaning, analysis and virtualization here. All steps for data analysis and virtualization are shown in this link.
 
