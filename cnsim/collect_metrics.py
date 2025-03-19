@@ -41,6 +41,7 @@ def fetch_metrics(project_name, interval, metric_type):
         interval=interval,
         view=monitoring_v3.ListTimeSeriesRequest.TimeSeriesView.FULL,
     )
+    print(f"results: {results}")
     return results
 
 # Process and print metrics
