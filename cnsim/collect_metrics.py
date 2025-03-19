@@ -14,7 +14,7 @@ def get_network_received_bytes(project_id, location, cluster_name, namespace_nam
 
     end_time_pb = Timestamp()
     end_time_pb.seconds = int(end_time.timestamp())
-    end_time_pb.nanos = int((start_time.timestamp() - int(start_time.timestamp())) * 10**9)
+    end_time_pb.nanos = int((end_time.timestamp() - int(end_time.timestamp())) * 10**9)
 
     interval = int((end_time - start_time).total_seconds())
 
@@ -35,7 +35,7 @@ def get_network_received_bytes(project_id, location, cluster_name, namespace_nam
         "time_range": {"start_time": start_time_pb, "end_time": end_time_pb},
     }
 
-    results = client.query_time_series(request)
+    results = client.query_time_series_data(request) #corrected method call
 
     for result in results:
         for point in result.points:
