@@ -1,17 +1,20 @@
+import time
+import json
 from google.cloud import monitoring_v3
 import datetime
+from google.protobuf.timestamp_pb2 import Timestamp  # Import Timestamp
 
 def get_network_received_bytes(project_id, location, cluster_name, namespace_name, nodes, start_time, end_time):
     client = monitoring_v3.MetricServiceClient()
     project_name = f"projects/{project_id}"
 
-    start_time_pb = monitoring_v3.Timestamp()
+    start_time_pb = Timestamp()
     start_time_pb.seconds = int(start_time.timestamp())
     start_time_pb.nanos = int((start_time.timestamp() - int(start_time.timestamp())) * 10**9)
 
-    end_time_pb = monitoring_v3.Timestamp()
+    end_time_pb = Timestamp()
     end_time_pb.seconds = int(end_time.timestamp())
-    end_time_pb.nanos = int((end_time.timestamp() - int(end_time.timestamp())) * 10**9)
+    end_time_pb.nanos = int((start_time.timestamp() - int(start_time.timestamp())) * 10**9)
 
     interval = int((end_time - start_time).total_seconds())
 
@@ -48,7 +51,7 @@ if __name__ == "__main__":
 
     test_runs = [
         {"nodes": "10", "start": datetime.datetime(2025, 3, 19, 11, 45), "end": datetime.datetime(2025, 3, 19, 11, 42)},
-        {"nodes": "30", "start": datetime.datetime(2025, 3, 19, 11, 49), "end": datetime.datetime(2025, 3, 19, 11, 45)},
+        {"nodes": "30", "start": datetime.datetime(2025, 3, 19, 11, 49), "end": datetime.datetime(2025, 3, 19, 11, 46)},
     ]
 
     print("Nodes, Network Received Bytes (rate)")
