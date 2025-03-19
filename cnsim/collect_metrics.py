@@ -35,7 +35,7 @@ def get_network_received_bytes(project_id, location, cluster_name, namespace_nam
         "time_range": {"start_time": start_time_pb, "end_time": end_time_pb},
     }
 
-    results = client.query_time_series_data(request) #corrected method call
+    results = client.query_time_series(request) #corrected method call for older versions
 
     for result in results:
         for point in result.points:
