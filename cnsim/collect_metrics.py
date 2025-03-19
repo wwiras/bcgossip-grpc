@@ -2,46 +2,53 @@ import time
 import json
 from google.cloud import monitoring_v3
 import datetime
-from google.protobuf.timestamp_pb2 import Timestamp  # Import Timestamp
+from google.protobuf.timestamp_pb2 import Timestamp
 
 def get_network_received_bytes(project_id, location, cluster_name, namespace_name, nodes, start_time, end_time):
+    """
+    Fetches the network received bytes for a specific pod in a Kubernetes cluster.
+    """
     client = monitoring_v3.MetricServiceClient()
     project_name = f"projects/{project_id}"
 
+    # Convert datetime to Timestamp
     start_time_pb = Timestamp()
-    start_time_pb.seconds = int(start_time.timestamp())
-    start_time_pb.nanos = int((start_time.timestamp() - int(start_time.timestamp())) * 10**9)
+    start_time_pb.FromDatetime(start_time)
 
     end_time_pb = Timestamp()
-    end_time_pb.seconds = int(end_time.timestamp())
-    end_time_pb.nanos = int((end_time.timestamp() - int(end_time.timestamp())) * 10**9)
+    end_time_pb.FromDatetime(end_time)
 
-    interval = int((end_time - start_time).total_seconds())
+    # Define the time interval
+    interval = monitoring_v3.TimeInterval()
+    interval.start_time = start_time_pb
+    interval.end_time = end_time_pb
 
-    query = f"""
-        sum(rate(kubernetes_io:pod_network_received_bytes_count{{
-            monitored_resource="k8s_pod",
-            project_id="{project_id}",
-            location="{location}",
-            cluster_name="{cluster_name}",
-            namespace_name="{namespace_name}",
-            nodes="{nodes}"
-        }}[{interval}s]))
-    """
+    # Define the metric filter
+    metric_type = "kubernetes.io/pod/network/received_bytes_count"
+    filter_str = (
+        f'metric.type="{metric_type}" '
+        f'AND resource.labels.project_id="{project_id}" '
+        f'AND resource.labels.location="{location}" '
+        f'AND resource.labels.cluster_name="{cluster_name}" '
+        f'AND resource.labels.namespace_name="{namespace_name}" '
+        f'AND resource.labels.pod_name=~"gossip-statefulset-.*"'
+    )
 
-    request = {
-        "name": project_name,
-        "query": query,
-        "time_range": {"start_time": start_time_pb, "end_time": end_time_pb},
-    }
+    # Query the metric
+    results = client.list_time_series(
+        name=project_name,
+        filter=filter_str,
+        interval=interval,
+        view=monitoring_v3.ListTimeSeriesRequest.TimeSeriesView.FULL,
+    )
 
-    results = client.query_time_series(request) #corrected method call for older versions
-
+    # Process the results
+    total_received_bytes = 0
     for result in results:
         for point in result.points:
-            return point.value.double_value
+            total_received_bytes += point.value.int64_value
 
-    return 0.0
+    return total_received_bytes
 
 if __name__ == "__main__":
     project_id = "bcgossip-proj"
@@ -49,12 +56,15 @@ if __name__ == "__main__":
     cluster_name = "bcgossip-cluster"
     namespace_name = "default"
 
+    # Define test runs with correct time ranges
     test_runs = [
-        {"nodes": "10", "start": datetime.datetime(2025, 3, 19, 11, 45), "end": datetime.datetime(2025, 3, 19, 11, 42)},
-        {"nodes": "30", "start": datetime.datetime(2025, 3, 19, 11, 49), "end": datetime.datetime(2025, 3, 19, 11, 46)},
+        {"nodes": "10", "start": datetime.datetime(2025, 3, 19, 11, 42), "end": datetime.datetime(2025, 3, 19, 11, 45)},
+        {"nodes": "30", "start": datetime.datetime(2025, 3, 19, 11, 46), "end": datetime.datetime(2025, 3, 19, 11, 49)},
     ]
 
-    print("Nodes, Network Received Bytes (rate)")
+    print("Nodes, Network Received Bytes")
     for test_run in test_runs:
-        network_bytes = get_network_received_bytes(project_id, location, cluster_name, namespace_name, test_run["nodes"], test_run["start"], test_run["end"])
+        network_bytes = get_network_received_bytes(
+            project_id, location, cluster_name, namespace_name, test_run["nodes"], test_run["start"], test_run["end"]
+        )
         print(f"{test_run['nodes']}, {network_bytes}")
