@@ -31,7 +31,7 @@ def get_network_received_bytes(project_id, location, cluster_name, namespace_nam
         f'AND resource.labels.location="{location}" '
         f'AND resource.labels.cluster_name="{cluster_name}" '
         f'AND resource.labels.namespace_name="{namespace_name}" '
-        f'AND resource.labels.pod_name=~"gossip-statefulset-.*"'
+        f'AND starts_with(resource.labels.pod_name, "gossip-statefulset-")' #corrected line
     )
 
     # Query the metric
