@@ -1,70 +1,81 @@
-import time
-import json
 from google.cloud import monitoring_v3
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import datetime
-from google.protobuf.timestamp_pb2 import Timestamp
+import time
 
-def get_network_received_bytes(project_id, location, cluster_name, namespace_name, nodes, start_time, end_time):
+def get_and_plot_metrics(project_id, metric_type, resource_labels, start_time, end_time, plot_title="Metrics Plot"):
     """
-    Fetches the network received bytes for a specific pod in a Kubernetes cluster.
+    Retrieves and plots metrics data from Google Cloud Monitoring.
+
+    Args:
+        project_id: GCP project ID.
+        metric_type: Metric type (e.g., "compute.googleapis.com/instance/cpu/usage_time").
+        resource_labels: Dictionary of resource labels for filtering.
+        start_time: datetime object for the start of the time interval.
+        end_time: datetime object for the end of the time interval.
+        plot_title: Title of the plot.
     """
     client = monitoring_v3.MetricServiceClient()
     project_name = f"projects/{project_id}"
 
-    # Convert datetime to Timestamp
-    start_time_pb = Timestamp()
-    start_time_pb.FromDatetime(start_time)
-
-    end_time_pb = Timestamp()
-    end_time_pb.FromDatetime(end_time)
-
-    # Define the time interval
     interval = monitoring_v3.TimeInterval()
-    interval.start_time = start_time_pb
-    interval.end_time = end_time_pb
+    interval.start_time = monitoring_v3.Timestamp(seconds=int(start_time.timestamp()))
+    interval.end_time = monitoring_v3.Timestamp(seconds=int(end_time.timestamp()))
 
-    # Define the metric filter
-    metric_type = "kubernetes.io/pod/network/received_bytes_count"
-    filter_str = (
-        f'metric.type="{metric_type}" '
-        f'AND resource.labels.project_id="{project_id}" '
-        f'AND resource.labels.location="{location}" '
-        f'AND resource.labels.cluster_name="{cluster_name}" '
-        f'AND resource.labels.namespace_name="{namespace_name}" '
-        f'AND starts_with(resource.labels.pod_name, "gossip-statefulset-")' #corrected line
-    )
+    filter_str = f'metric.type = "{metric_type}"'
+    for key, value in resource_labels.items():
+        filter_str += f' AND resource.labels.{key} = "{value}"'
 
-    # Query the metric
-    results = client.list_time_series(
-        name=project_name,
-        filter=filter_str,
-        interval=interval,
-        view=monitoring_v3.ListTimeSeriesRequest.TimeSeriesView.FULL,
-    )
+    try:
+        results = client.list_time_series(
+            request={
+                "name": project_name,
+                "filter": filter_str,
+                "interval": interval,
+                "view": monitoring_v3.ListTimeSeriesRequest.TimeSeriesView.FULL,
+            }
+        )
+    except Exception as e:
+        print(f"Error retrieving metrics: {e}")
+        return
 
-    # Process the results
-    total_received_bytes = 0
+    time_list_x_axis = []
+    utilization_list_y_axis = []
+
     for result in results:
         for point in result.points:
-            total_received_bytes += point.value.int64_value
+            time_list_x_axis.append(datetime.datetime.fromtimestamp(point.interval.start_time.seconds))
+            utilization_list_y_axis.append(point.value.double_value * 100)
 
-    return total_received_bytes
+    if not time_list_x_axis:
+        print("No data points found for the given time interval and filters.")
+        return
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(time_list_x_axis, utilization_list_y_axis, color='lightblue', linewidth=2)
+    fig.set_size_inches(20.5, 14.5)
+
+    xfmt = mdates.DateFormatter('%B/%d %H:%M:%S')
+    ax.xaxis.set_major_formatter(xfmt)
+    plt.title(plot_title)
+    plt.xlabel("Time")
+    plt.ylabel("Utilization (%)")
+    plt.show()
 
 if __name__ == "__main__":
-    project_id = "bcgossip-proj"
-    location = "us-central1-c"
-    cluster_name = "bcgossip-cluster"
-    namespace_name = "default"
+    # project_id = "bcgossip-proj"
+    # location = "us-central1-c"
+    # cluster_name = "bcgossip-cluster"
+    # namespace_name = "default"
 
-    # Define test runs with correct time ranges
-    test_runs = [
-        {"nodes": "10", "start": datetime.datetime(2025, 3, 19, 11, 42), "end": datetime.datetime(2025, 3, 19, 11, 45)},
-        {"nodes": "30", "start": datetime.datetime(2025, 3, 19, 11, 46), "end": datetime.datetime(2025, 3, 19, 11, 49)},
-    ]
+    project_id = "bcgossip-proj"  # Replace with yours
+    metric_type = "compute.googleapis.com/instance/cpu/usage_time"
+    resource_labels = {"cluster_name": "bcgossip-cluster"}  # Replace with your labels
+    # start_time = datetime.datetime(2021, 6, 1, 2, 10, 23)
+    # end_time = datetime.datetime(2021, 6, 1, 2, 15, 23)
+    start_time = datetime.datetime(2025, 3, 19, 11, 42)
+    end_time = datetime.datetime(2025, 3, 19, 11, 45)
+    get_and_plot_metrics(project_id, metric_type, resource_labels, start_time, end_time)
 
-    print("Nodes, Network Received Bytes")
-    for test_run in test_runs:
-        network_bytes = get_network_received_bytes(
-            project_id, location, cluster_name, namespace_name, test_run["nodes"], test_run["start"], test_run["end"]
-        )
-        print(f"{test_run['nodes']}, {network_bytes}")
