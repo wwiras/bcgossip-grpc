@@ -63,7 +63,7 @@ def process_metrics(results, metric_name):
 if __name__ == "__main__":
     # Define the time range
     start_time = datetime(2025, 3, 19, 11, 42)  # Replace with your start time
-    end_time = datetime(2025, 3, 19, 11, 45)    # Replace with your end time
+    end_time = datetime(2025, 3, 19, 15, 45)    # Replace with your end time
     interval = get_time_interval(start_time, end_time)
 
     # Fetch and print CPU usage
