@@ -56,6 +56,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             ret = v1.list_namespaced_pod(namespace=namespace, label_selector=label_selector)
 
             # Iterate through the Pods
+            print(f"ret.items: {ret.items}", flush=True)
             for pod in ret.items:
                 # Skip the Pod's own IP
                 if self.host == pod.status.pod_ip:
