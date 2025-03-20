@@ -79,7 +79,6 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         except client.ApiException as e:
             print(f"Failed to fetch Pods: {e}", flush=True)
-
     def SendMessage(self, request, context):
 
         """
