@@ -1,6 +1,5 @@
-import os
 import argparse
-import re
+import json
 import subprocess
 import sys
 import traceback
@@ -145,18 +144,33 @@ class Test:
             raise Exception("No running pods found.")
         return random.choice(pod_list)  # Return a random pod name
 
-    def access_pod_and_initiate_gossip(self,pod_name, replicas, unique_id, iteration):
+    def access_pod_and_initiate_gossip(self, pod_name, replicas, unique_id, iteration):
         """
         Access the pod's shell, initiate gossip, and handle the response.
         """
         try:
-            session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name,'--request-timeout=600',
+            # Log the start of gossip propagation
+            start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            message = f'{unique_id}-cubaan{replicas}-{iteration}'
+            start_log = {
+                'event': 'gossip_start',
+                'pod_name': pod_name,
+                'message': message,
+                'start_time': start_time,
+                'details': f"Gossip propagation started for message: {message}"
+            }
+            print(json.dumps(start_log), flush=True)  # Log the start event
+
+            # Start the session with the pod
+            session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--request-timeout=600',
                                         '--', 'sh'], stdin=subprocess.PIPE,
                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            message = f'{unique_id}-cubaan{replicas}-{iteration}'
-            print(f"Gossip propagation: start-{message} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", flush=True)
+
+            # Send the gossip message to the pod
             session.stdin.write(f'python3 start.py --message {message}\n')
             session.stdin.flush()
+
+            # Wait for the gossip to complete
             end_time = time.time() + 300
             while time.time() < end_time:
                 reads = [session.stdout.fileno()]
@@ -165,8 +179,16 @@ class Test:
                     output = session.stdout.readline()
                     print(output, flush=True)
                     if 'Received acknowledgment:' in output:
-                        print(f"Gossip propagation complete finish-{message} at "
-                              f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}.", flush=True)
+                        # Log the end of gossip propagation
+                        end_time_log = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                        end_log = {
+                            'event': 'gossip_end',
+                            'pod_name': pod_name,
+                            'message': message,
+                            'end_time': end_time_log,
+                            'details': f"Gossip propagation completed for message: {message}"
+                        }
+                        print(json.dumps(end_log), flush=True)  # Log the end event
                         break
                 if session.poll() is not None:
                     print("Session ended before completion.", flush=True)
@@ -174,11 +196,22 @@ class Test:
             else:
                 print("Timeout waiting for gossip to complete.", flush=True)
                 return False
+
+            # Close the session
             session.stdin.write('exit\n')
             session.stdin.flush()
             return True
+
         except Exception as e:
-            print(f"Error accessing pod {pod_name}: {e}", flush=True)
+            # Log any errors that occur during gossip propagation
+            error_log = {
+                'event': 'gossip_error',
+                'pod_name': pod_name,
+                'message': message,
+                'error': str(e),
+                'details': f"Error accessing pod {pod_name}: {e}"
+            }
+            print(json.dumps(error_log), flush=True)  # Log the error event
             traceback.print_exc()
             return False
 
