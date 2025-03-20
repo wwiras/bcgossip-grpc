@@ -47,23 +47,27 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # Create CoreV1Api instance
         v1 = client.CoreV1Api()
 
-        # Fetch all Pods in the cluster
-        ret = v1.list_pod_for_all_namespaces(watch=False)
+        # Define the namespace and label selector
+        namespace = "default"  # Replace with your namespace if different
+        label_selector = f"run={self.service_name}"  # Filter Pods by label
 
-        # Iterate through the Pods
-        for pod in ret.items:
-            # Check if the Pod has labels and the specific label matches self.service_name
-            if pod.metadata.labels and pod.metadata.labels.get('run') == self.service_name:
+        try:
+            # Fetch Pods in the specified namespace with the label selector
+            ret = v1.list_namespaced_pod(namespace=namespace, label_selector=label_selector)
+
+            # Iterate through the Pods
+            for pod in ret.items:
                 # Skip the Pod's own IP
                 if self.host == pod.status.pod_ip:
                     continue
-                # Add the Pod's IP to the list of susceptible nodes
-                self.susceptible_nodes.append(pod.status.pod_ip)
-                # Log the Pod name and IP
-                print(f"Pod Name: {pod.metadata.name}, Pod IP: {pod.status.pod_ip}", flush=True)
+                # Add the Pod's IP and name to the list of susceptible nodes
+                self.susceptible_nodes.append((pod.metadata.name, pod.status.pod_ip))
 
-        # Optional: Log the list of neighbors for debugging
-        # print(f"Susceptible nodes: {self.susceptible_nodes}", flush=True)
+            # Optional: Log the list of neighbors for debugging
+            print(f"Susceptible nodes: {self.susceptible_nodes}", flush=True)
+
+        except client.ApiException as e:
+            print(f"Failed to fetch Pods: {e}", flush=True)
 
     def SendMessage(self, request, context):
 
