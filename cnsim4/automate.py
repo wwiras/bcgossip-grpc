@@ -8,7 +8,7 @@ import time
 import uuid
 import select
 import random
-
+from datetime import datetime
 
 class Test:
     # def __init__(self,num_test,cluster):
@@ -154,6 +154,7 @@ class Test:
                                         '--', 'sh'], stdin=subprocess.PIPE,
                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             message = f'{unique_id}-cubaan{replicas}-{iteration}'
+            print(f"Gossip propagation: start-{message} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", flush=True)
             session.stdin.write(f'python initiate.py --message {message}\n')
             session.stdin.flush()
             end_time = time.time() + 300
@@ -164,7 +165,8 @@ class Test:
                     output = session.stdout.readline()
                     print(output, flush=True)
                     if 'Received acknowledgment:' in output:
-                        print("Gossip propagation complete.", flush=True)
+                        print(f"Gossip propagation complete finish-{message} at "
+                              f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}.", flush=True)
                         break
                 if session.poll() is not None:
                     print("Session ended before completion.", flush=True)
