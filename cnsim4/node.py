@@ -51,6 +51,9 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         namespace = "default"  # Replace with your namespace if different
         label_selector = f"app={self.service_name}"  # Use the correct label key and value
 
+        # Debugging: Print the namespace and label selector
+        print(f"Fetching Pods in namespace: {namespace}, with label selector: {label_selector}", flush=True)
+
         try:
             # Fetch Pods in the specified namespace with the label selector
             ret = v1.list_namespaced_pod(namespace=namespace, label_selector=label_selector)
@@ -66,6 +69,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
                 # Skip the Pod's own IP
                 if self.host == pod.status.pod_ip:
+                    print(f"Skipping own IP: {self.host}", flush=True)
                     continue
                 # Add the Pod's IP and name to the list of susceptible nodes
                 self.susceptible_nodes.append((pod.metadata.name, pod.status.pod_ip))
