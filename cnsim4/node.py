@@ -103,7 +103,9 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
     def gossip_message(self, message, sender_ip):
         # Refresh list of neighbors before gossiping to capture any changes
-        self.get_neighbours()
+        if len(self.get_neighbours()) == 0:
+            self.get_neighbours()
+
         # print(f"self.susceptible_nodes={self.susceptible_nodes}",flush=True)
         for peer_name, peer_ip in self.susceptible_nodes:
             # Exclude the sender from the list of nodes to forward the message to
