@@ -48,7 +48,7 @@ class Test:
                     print(f"{full_path} deleted successfully!", flush=True)
                 else:
                     print(f"Changes applied to {full_path}:", flush=True)
-                    # print(result.stdout, flush=True)
+                    print(result.stdout, flush=True)
 
             # print(f"result.stdout: {result.stdout}", flush=True)
             # print(f"result.stderr: {result.stderr}", flush=True)
