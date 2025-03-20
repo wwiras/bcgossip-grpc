@@ -3,6 +3,7 @@ import argparse
 import gossip_pb2
 import gossip_pb2_grpc
 import socket
+import time
 
 def send_message_to_self(message):
     """Sends a message to the current pod (itself)."""
