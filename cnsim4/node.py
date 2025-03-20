@@ -143,7 +143,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
         gossip_pb2_grpc.add_GossipServiceServicer_to_server(self, server)
         server.add_insecure_port(f'[::]:{self.port}')
-        print(f"({self.host}) listening on port {self.port}", flush=True)
+        print(f"{self.hostname}({self.host}) listening on port {self.port}", flush=True)
         server.start()
         server.wait_for_termination()
 
