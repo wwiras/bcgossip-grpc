@@ -50,7 +50,7 @@ class Test:
                     print(f"Changes applied to {full_path}:", flush=True)
                     print(result.stdout, flush=True)
 
-            # print(f"result.stdout: {result.stdout}", flush=True)
+            print(f"result.stdout: {result.stdout}", flush=True)
             # print(f"result.stderr: {result.stderr}", flush=True)
             return result.stdout, result.stderr
         except subprocess.CalledProcessError as e:
