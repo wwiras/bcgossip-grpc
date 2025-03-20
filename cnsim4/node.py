@@ -49,11 +49,12 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         # Fetch all Pods in the cluster
         ret = v1.list_pod_for_all_namespaces(watch=False)
-        print(f"ret: {ret}", flush=True)
+        # print(f"ret: {ret}", flush=True)
 
         # Iterate through the Pods
         for pod in ret.items:
             # Check if the Pod has labels and the specific label matches self.service_name
+            print(f"pod.metadata: {pod.metadata}", flush=True)
             if pod.metadata.labels and pod.metadata.labels.get('run') == self.service_name:
                 # Skip the Pod's own IP
                 if self.host == pod.status.pod_ip:
