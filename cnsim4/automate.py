@@ -155,7 +155,7 @@ class Test:
                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             message = f'{unique_id}-cubaan{replicas}-{iteration}'
             print(f"Gossip propagation: start-{message} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", flush=True)
-            session.stdin.write(f'python initiate.py --message {message}\n')
+            session.stdin.write(f'python start.py --message {message}\n')
             session.stdin.flush()
             end_time = time.time() + 300
             while time.time() < end_time:
