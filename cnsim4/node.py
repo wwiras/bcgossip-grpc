@@ -19,6 +19,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # Set to keep track of messages that have been received to prevent loops
         self.received_messages = set()
         self.received_messages_time = time.time_ns()
+        self.gossip_initiated = False
 
     def get_neighbours(self):
         # Clear the existing list to refresh it
@@ -46,7 +47,8 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         received_timestamp = time.time_ns()
 
         # Check for message initiation and set the initial timestamp
-        if sender_id == self.host and self.received_messages_time < received_timestamp:
+        if sender_id == self.pod_name and not self.gossip_initiated:
+            self.gossip_initiated = True
             self.received_messages.add(message)
             log_message = (f"Gossip initiated by {self.host} at "
                            f"{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(received_timestamp / 1e9))}")
