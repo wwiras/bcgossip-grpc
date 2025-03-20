@@ -7,6 +7,7 @@ import gossip_pb2
 import gossip_pb2_grpc
 import json
 import time
+from kubernetes import client, config
 
 class Node(gossip_pb2_grpc.GossipServiceServicer):
 
@@ -19,22 +20,48 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # Set to keep track of messages that have been received to prevent loops
         self.received_messages = set()
         self.received_messages_time = time.time_ns()
-        self.gossip_initiated = False
+        # self.gossip_initiated = False
+
+    # def get_neighbours(self):
+    #     # Clear the existing list to refresh it
+    #     self.susceptible_nodes = []
+    #     config.load_incluster_config()
+    #     v1 = client.CoreV1Api()
+    #     ret = v1.list_pod_for_all_namespaces(watch=False)
+    #     for i in ret.items:
+    #         if i.metadata.labels:
+    #             for k, v in i.metadata.labels.items():
+    #                 if k == 'run' and v == self.service_name:
+    #                     if self.host == i.status.pod_ip:
+    #                         continue  # Skip own IP
+    #                     else:
+    #                         self.susceptible_nodes.append(i.status.pod_ip)
 
     def get_neighbours(self):
         # Clear the existing list to refresh it
         self.susceptible_nodes = []
+
+        # Load in-cluster config (for running inside Kubernetes)
         config.load_incluster_config()
+
+        # Create CoreV1Api instance
         v1 = client.CoreV1Api()
+
+        # Fetch all Pods in the cluster
         ret = v1.list_pod_for_all_namespaces(watch=False)
-        for i in ret.items:
-            if i.metadata.labels:
-                for k, v in i.metadata.labels.items():
-                    if k == 'run' and v == self.service_name:
-                        if self.host == i.status.pod_ip:
-                            continue  # Skip own IP
-                        else:
-                            self.susceptible_nodes.append(i.status.pod_ip)
+
+        # Iterate through the Pods
+        for pod in ret.items:
+            # Check if the Pod has labels and the specific label matches self.service_name
+            if pod.metadata.labels and pod.metadata.labels.get('run') == self.service_name:
+                # Skip the Pod's own IP
+                if self.host == pod.status.pod_ip:
+                    continue
+                # Add the Pod's IP to the list of susceptible nodes
+                self.susceptible_nodes.append(pod.status.pod_ip)
+
+        # Optional: Log the list of neighbors for debugging
+        print(f"Susceptible nodes: {self.susceptible_nodes}",flush=True)
 
     def SendMessage(self, request, context):
 
@@ -47,8 +74,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         received_timestamp = time.time_ns()
 
         # Check for message initiation and set the initial timestamp
-        if sender_id == self.host and not self.gossip_initiated:
-            self.gossip_initiated = True
+        if sender_id == self.host:
             self.received_messages.add(message)
             log_message = (f"Gossip initiated by {self.host} at "
                            f"{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(received_timestamp / 1e9))}")
