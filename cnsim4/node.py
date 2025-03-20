@@ -47,7 +47,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         received_timestamp = time.time_ns()
 
         # Check for message initiation and set the initial timestamp
-        if sender_id == self.pod_name and not self.gossip_initiated:
+        if sender_id == self.host and not self.gossip_initiated:
             self.gossip_initiated = True
             self.received_messages.add(message)
             log_message = (f"Gossip initiated by {self.host} at "
@@ -76,6 +76,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
     def gossip_message(self, message, sender_ip):
         # Refresh list of neighbors before gossiping to capture any changes
         self.get_neighbours()
+        print(f"self.susceptible_nodes={self.susceptible_nodes}",flush=True)
         for peer_ip in self.susceptible_nodes:
             # Exclude the sender from the list of nodes to forward the message to
             if peer_ip != sender_ip:
