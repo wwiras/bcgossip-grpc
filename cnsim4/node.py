@@ -69,7 +69,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         # Gossip to neighbors (only if the message is new)
         self.gossip_message(message, sender_id)
-        return gossip_pb2.Acknowledgment(details=f"{self.pod_name}({self.host}) processed message: '{message}'")
+        return gossip_pb2.Acknowledgment(details=f"({self.host}) processed message: '{message}'")
 
     def gossip_message(self, message, sender_ip):
         # Refresh list of neighbors before gossiping to capture any changes
@@ -86,7 +86,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                         stub = gossip_pb2_grpc.GossipServiceStub(channel)
                         stub.SendMessage(gossip_pb2.GossipMessage(
                             message=message,
-                            sender_id=self.pod_name,
+                            sender_id=self.host,
                             timestamp=send_timestamp,
                         ))
                     except grpc.RpcError as e:
