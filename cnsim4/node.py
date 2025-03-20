@@ -49,6 +49,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         # Fetch all Pods in the cluster
         ret = v1.list_pod_for_all_namespaces(watch=False)
+        print(f"ret: {ret}", flush=True)
 
         # Iterate through the Pods
         for pod in ret.items:
@@ -61,7 +62,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
                 self.susceptible_nodes.append(pod.status.pod_ip)
 
         # Optional: Log the list of neighbors for debugging
-        print(f"Susceptible nodes: {self.susceptible_nodes}",flush=True)
+        # print(f"Susceptible nodes: {self.susceptible_nodes}",flush=True)
 
     def SendMessage(self, request, context):
 
