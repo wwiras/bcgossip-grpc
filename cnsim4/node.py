@@ -49,15 +49,21 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         # Define the namespace and label selector
         namespace = "default"  # Replace with your namespace if different
-        label_selector = f"run={self.service_name}"  # Filter Pods by label
+        label_selector = f"app={self.service_name}"  # Use the correct label key and value
 
         try:
             # Fetch Pods in the specified namespace with the label selector
             ret = v1.list_namespaced_pod(namespace=namespace, label_selector=label_selector)
 
+            # Debugging: Print the number of Pods returned
+            print(f"Number of Pods returned: {len(ret.items)}", flush=True)
+
             # Iterate through the Pods
-            print(f"ret.items: {ret.items}", flush=True)
             for pod in ret.items:
+                # Debugging: Print Pod details
+                print(f"Pod Name: {pod.metadata.name}, Pod IP: {pod.status.pod_ip}, Labels: {pod.metadata.labels}",
+                      flush=True)
+
                 # Skip the Pod's own IP
                 if self.host == pod.status.pod_ip:
                     continue
