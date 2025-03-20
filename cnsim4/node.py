@@ -9,6 +9,7 @@ import json
 import time
 from kubernetes import client, config
 
+# Inspired from k8sv2
 class Node(gossip_pb2_grpc.GossipServiceServicer):
 
     def __init__(self, service_name):
@@ -19,23 +20,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.susceptible_nodes = []
         # Set to keep track of messages that have been received to prevent loops
         self.received_messages = set()
-        self.received_messages_time = time.time_ns()
         # self.gossip_initiated = False
-
-    # def get_neighbours(self):
-    #     # Clear the existing list to refresh it
-    #     self.susceptible_nodes = []
-    #     config.load_incluster_config()
-    #     v1 = client.CoreV1Api()
-    #     ret = v1.list_pod_for_all_namespaces(watch=False)
-    #     for i in ret.items:
-    #         if i.metadata.labels:
-    #             for k, v in i.metadata.labels.items():
-    #                 if k == 'run' and v == self.service_name:
-    #                     if self.host == i.status.pod_ip:
-    #                         continue  # Skip own IP
-    #                     else:
-    #                         self.susceptible_nodes.append(i.status.pod_ip)
 
     def get_neighbours(self):
         # Clear the existing list to refresh it
@@ -52,30 +37,30 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         label_selector = f"app={self.service_name}"  # Use the correct label key and value
 
         # Debugging: Print the namespace and label selector
-        print(f"Fetching Pods in namespace: {namespace}, with label selector: {label_selector}", flush=True)
+        # print(f"Fetching Pods in namespace: {namespace}, with label selector: {label_selector}", flush=True)
 
         try:
             # Fetch Pods in the specified namespace with the label selector
             ret = v1.list_namespaced_pod(namespace=namespace, label_selector=label_selector)
 
             # Debugging: Print the number of Pods returned
-            print(f"Number of Pods returned: {len(ret.items)}", flush=True)
+            # print(f"Number of Pods returned: {len(ret.items)}", flush=True)
 
             # Iterate through the Pods
             for pod in ret.items:
                 # Debugging: Print Pod details
-                print(f"Pod Name: {pod.metadata.name}, Pod IP: {pod.status.pod_ip}, Labels: {pod.metadata.labels}",
-                      flush=True)
+                # print(f"Pod Name: {pod.metadata.name},
+                # Pod IP: {pod.status.pod_ip}, Labels: {pod.metadata.labels}",flush=True)
 
                 # Skip the Pod's own IP
                 if self.host == pod.status.pod_ip:
-                    print(f"Skipping own IP: {self.host}", flush=True)
+                    # print(f"Skipping own IP: {self.host}", flush=True)
                     continue
                 # Add the Pod's IP and name to the list of susceptible nodes
                 self.susceptible_nodes.append((pod.metadata.name, pod.status.pod_ip))
 
             # Optional: Log the list of neighbors for debugging
-            print(f"Susceptible nodes: {self.susceptible_nodes}", flush=True)
+            # print(f"Susceptible nodes: {self.susceptible_nodes}", flush=True)
 
         except client.ApiException as e:
             print(f"Failed to fetch Pods: {e}", flush=True)
@@ -119,7 +104,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # Refresh list of neighbors before gossiping to capture any changes
         self.get_neighbours()
         print(f"self.susceptible_nodes={self.susceptible_nodes}",flush=True)
-        for peer_ip in self.susceptible_nodes:
+        for peer_name, peer_ip in self.susceptible_nodes:
             # Exclude the sender from the list of nodes to forward the message to
             if peer_ip != sender_ip:
 
