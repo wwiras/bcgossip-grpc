@@ -167,7 +167,7 @@ class Test:
 
     def access_pod_and_initiate_gossip(self, pod_name, filename, unique_id, iteration):
         try:
-            session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--request-timeout=600','--', 'sh'], stdin=subprocess.PIPE,
+            session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--request-timeout=1200','--', 'sh'], stdin=subprocess.PIPE,
                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             if iteration == 0:
                 message = f'{unique_id}-prepare'
@@ -176,7 +176,7 @@ class Test:
             session.stdin.write(f'python3 start.py --message {message}\n')
             session.stdin.flush()
             # end_time = time.time() + 300
-            end_time = time.time() + 1000
+            end_time = time.time() + 1200
             while time.time() < end_time:
                 reads = [session.stdout.fileno()]
                 ready = select.select(reads, [], [], 5)[0]
