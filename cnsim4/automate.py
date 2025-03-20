@@ -193,7 +193,7 @@ if __name__ == '__main__':
     test = Test(args.num_tests, args.num_nodes)  # Pass the new arguments to Test
 
     # helm name is fixed
-    helmname = 'bcgossip'
+    helmname = 'cnsim'
 
     # if node == 10: We don't need to specify because nodes have been filtered
     if test.wait_for_pods_to_be_down(namespace='default', timeout=1000):
