@@ -8,7 +8,7 @@ memory:
   limits: "150Mi"    # Default memory limits
 
 image:
-  name: wwiras/cnsim
+  name: wwiras/cnsim4
   tag: v1
 
 totalNodes: 10       # Default value, can be overridden
