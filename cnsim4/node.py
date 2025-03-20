@@ -13,7 +13,8 @@ from kubernetes import client, config
 class Node(gossip_pb2_grpc.GossipServiceServicer):
 
     def __init__(self, service_name):
-        self.host = socket.gethostbyname(socket.gethostname())
+        self.hostname = socket.gethostname()
+        self.host = socket.gethostbyname(self.hostname)
         self.port = '5050'
         self.service_name = service_name
         # List to keep track of IPs of neighboring nodes
@@ -77,7 +78,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # Check for message initiation and set the initial timestamp
         if sender_id == self.host:
             self.received_messages.add(message)
-            log_message = (f"Gossip initiated by {self.host} at "
+            log_message = (f"Gossip initiated by {self.hostname} ({self.host}) at "
                            f"{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(received_timestamp / 1e9))}")
             self._log_event(message, sender_id, received_timestamp, None,
                             'initiate', log_message)
@@ -92,13 +93,13 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         else:
             self.received_messages.add(message)
             propagation_time = (received_timestamp - request.timestamp) / 1e6
-            log_message = (f"({self.host}) received: '{message}' from {sender_id}"
+            log_message = (f"({self.hostname}({self.host}) received: '{message}' from {sender_id}"
                            f" in {propagation_time:.2f} ms ")
             self._log_event(message, sender_id, received_timestamp, propagation_time, 'received', log_message)
 
         # Gossip to neighbors (only if the message is new)
         self.gossip_message(message, sender_id)
-        return gossip_pb2.Acknowledgment(details=f"({self.host}) processed message: '{message}'")
+        return gossip_pb2.Acknowledgment(details=f"{self.hostname}({self.host}) processed message: '{message}'")
 
     def gossip_message(self, message, sender_ip):
         # Refresh list of neighbors before gossiping to capture any changes
