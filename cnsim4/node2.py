@@ -65,6 +65,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         except client.ApiException as e:
             print(f"Failed to fetch Pods: {e}", flush=True)
+
     def SendMessage(self, request, context):
 
         """
@@ -110,7 +111,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
     def gossip_message(self, message, sender_ip):
 
-        # print(f"self.susceptible_nodes={self.susceptible_nodes}",flush=True)
+        print(f"self.susceptible_nodes={self.susceptible_nodes}",flush=True)
         for peer_name, peer_ip in self.susceptible_nodes:
             # Exclude the sender from the list of nodes to forward the message to
             if peer_ip != sender_ip:
