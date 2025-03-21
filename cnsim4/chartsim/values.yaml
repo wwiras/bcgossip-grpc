@@ -9,6 +9,6 @@ memory:
 
 image:
   name: wwiras/cnsim4
-  tag: v17
+  tag: v18
 
 totalNodes: 10       # Default value, can be overridden
