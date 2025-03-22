@@ -18,9 +18,19 @@ class Test:
         print(f"self.num_test = {self.num_tests}", flush=True)
         print(f'self.num_nodes = {self.num_nodes}', flush=True)
 
-    def run_command(self, command, full_path=None):
+    def run_command(self, command, full_path=None, suppress_output=False):
         """
         Runs a command and handles its output and errors.
+
+        Args:
+            command: A list representing the command and its arguments.
+            full_path: (Optional) The full path to a file being processed
+                       (used for informative messages in case of 'apply' commands).
+            suppress_output: (Optional) If True, suppresses printing the stdout of the command.
+
+        Returns:
+            A tuple (stdout, stderr) if the command succeeds.
+            A tuple (None, stderr) if the command fails.
         """
         try:
             if isinstance(command, str):
@@ -28,6 +38,7 @@ class Test:
             else:
                 result = subprocess.run(command, check=True, text=True, capture_output=True)
 
+            # If full_path is provided (likely for 'apply' commands), provide more informative output
             if full_path:
                 if 'unchanged' in result.stdout or 'created' in result.stdout:
                     print(f"{full_path} applied successfully!", flush=True)
@@ -37,7 +48,10 @@ class Test:
                     print(f"Changes applied to {full_path}:", flush=True)
                     print(result.stdout, flush=True)
 
-            print(f"result.stdout: {result.stdout}", flush=True)
+            # Print stdout only if suppress_output is False
+            if not suppress_output:
+                print(f"result.stdout: {result.stdout}", flush=True)
+
             return result.stdout, result.stderr
         except subprocess.CalledProcessError as e:
             if full_path:
@@ -54,6 +68,43 @@ class Test:
                 print(f"An unexpected error occurred while executing the command.", flush=True)
             traceback.print_exc()
             sys.exit(1)
+
+    # def run_command(self, command, full_path=None):
+    #     """
+    #     Runs a command and handles its output and errors.
+    #     """
+    #     try:
+    #         if isinstance(command, str):
+    #             result = subprocess.run(command, check=True, text=True, capture_output=True, shell=True)
+    #         else:
+    #             result = subprocess.run(command, check=True, text=True, capture_output=True)
+    #
+    #         if full_path:
+    #             if 'unchanged' in result.stdout or 'created' in result.stdout:
+    #                 print(f"{full_path} applied successfully!", flush=True)
+    #             elif 'deleted' in result.stdout:
+    #                 print(f"{full_path} deleted successfully!", flush=True)
+    #             else:
+    #                 print(f"Changes applied to {full_path}:", flush=True)
+    #                 print(result.stdout, flush=True)
+    #
+    #         print(f"result.stdout: {result.stdout}", flush=True)
+    #         return result.stdout, result.stderr
+    #     except subprocess.CalledProcessError as e:
+    #         if full_path:
+    #             print(f"An error occurred while applying {full_path}.", flush=True)
+    #         else:
+    #             print(f"An error occurred while executing the command.", flush=True)
+    #         print(f"Error message: {e.stderr}", flush=True)
+    #         traceback.print_exc()
+    #         sys.exit(1)
+    #     except Exception as e:
+    #         if full_path:
+    #             print(f"An unexpected error occurred while applying {full_path}.", flush=True)
+    #         else:
+    #             print(f"An unexpected error occurred while executing the command.", flush=True)
+    #         traceback.print_exc()
+    #         sys.exit(1)
 
     def wait_for_pods_to_be_ready(self, namespace='default', expected_pods=0, timeout=1000):
         """
@@ -103,17 +154,6 @@ class Test:
             time.sleep(1)
         print(f"Timeout waiting for pods to terminate in namespace {namespace}.", flush=True)
         return False
-
-    # def select_random_pod(self):
-    #     """
-    #     Select a random pod from the list of running pods.
-    #     """
-    #     command = "kubectl get pods --no-headers | grep Running | awk '{print $1}'"
-    #     stdout, stderr = self.run_command(command)
-    #     pod_list = stdout.split()
-    #     if not pod_list:
-    #         raise Exception("No running pods found.")
-    #     return random.choice(pod_list)
 
     def select_random_pod(self):
         """
