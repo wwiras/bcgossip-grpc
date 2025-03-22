@@ -166,9 +166,10 @@ class Test:
             raise Exception("No running pods found.")
         return random.choice(pod_list)  # Return a random pod name
 
+
     def _get_malaysian_time(self):
         """Helper function to get the current time in Malaysian timezone (UTC+8)."""
-        utc_time = datetime.utcnow()  # Get current UTC time
+        utc_time = datetime.now(timezone.utc)  # Get current UTC time
         malaysia_offset = timedelta(hours=8)  # Malaysia is UTC+8
         malaysia_time = utc_time + malaysia_offset
         return malaysia_time
