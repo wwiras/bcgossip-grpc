@@ -7,8 +7,8 @@ import time
 import uuid
 import select
 import random
-from datetime import datetime
-import pytz  # Import pytz for timezone handling
+from datetime import datetime, timedelta, timezone
+
 
 class Test:
     def __init__(self, num_tests, num_nodes):
@@ -127,9 +127,11 @@ class Test:
         return random.choice(pod_list)  # Return a random pod name
 
     def _get_malaysian_time(self):
-        """Helper function to get the current time in Malaysian timezone."""
-        malaysia_tz = pytz.timezone('Asia/Kuala_Lumpur')
-        return datetime.now(malaysia_tz)
+        """Helper function to get the current time in Malaysian timezone (UTC+8)."""
+        utc_time = datetime.utcnow()  # Get current UTC time
+        malaysia_offset = timedelta(hours=8)  # Malaysia is UTC+8
+        malaysia_time = utc_time + malaysia_offset
+        return malaysia_time
 
     def access_pod_and_initiate_gossip(self, pod_name, replicas, unique_id, iteration):
         """
