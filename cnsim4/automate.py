@@ -164,7 +164,8 @@ class Test:
             session.stdin.flush()
 
             # Wait for the gossip to complete
-            end_time = time.time() + 300
+            # end_time = time.time() + 300
+            end_time = time.time() + 1200
             while time.time() < end_time:
                 reads = [session.stdout.fileno()]
                 ready = select.select(reads, [], [], 5)[0]
