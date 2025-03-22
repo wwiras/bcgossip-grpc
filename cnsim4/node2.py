@@ -70,7 +70,9 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         """
         Receiving message from other nodes
-        and distribute it to others
+        and distribute it to others.
+        This is for single round direct mail gossip
+        Only one neighbor to distribute message is sent per gossip
         """
         message = request.message
         sender_id = request.sender_id

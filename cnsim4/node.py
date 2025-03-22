@@ -69,7 +69,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         """
         Receiving message from other nodes
-        and distribute it to others
+        and distribute it to others (multi rounds gossip)
         """
         message = request.message
         sender_id = request.sender_id
