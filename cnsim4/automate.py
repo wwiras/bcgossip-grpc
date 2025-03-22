@@ -8,11 +8,10 @@ import uuid
 import select
 import random
 from datetime import datetime
+import pytz  # Import pytz for timezone handling
 
 class Test:
-    # def __init__(self,num_test,cluster):
     def __init__(self, num_tests, num_nodes):
-
         # Getting test details
         self.num_tests = num_tests
         self.num_nodes = num_nodes
@@ -22,24 +21,13 @@ class Test:
     def run_command(self, command, full_path=None):
         """
         Runs a command and handles its output and errors.
-
-        Args:
-            command: A list representing the command and its arguments.
-            full_path: (Optional) The full path to a file being processed
-                       (used for informative messages in case of 'apply' commands).
-
-        Returns:
-            A tuple (stdout, stderr) if the command succeeds.
-            A tuple (None, stderr) if the command fails.
         """
         try:
-            # result = subprocess.run(command, check=True, text=True, capture_output=True)
             if isinstance(command, str):
                 result = subprocess.run(command, check=True, text=True, capture_output=True, shell=True)
             else:
                 result = subprocess.run(command, check=True, text=True, capture_output=True)
 
-            # If full_path is provided (likely for 'apply' commands), provide more informative output
             if full_path:
                 if 'unchanged' in result.stdout or 'created' in result.stdout:
                     print(f"{full_path} applied successfully!", flush=True)
@@ -50,7 +38,6 @@ class Test:
                     print(result.stdout, flush=True)
 
             print(f"result.stdout: {result.stdout}", flush=True)
-            # print(f"result.stderr: {result.stderr}", flush=True)
             return result.stdout, result.stderr
         except subprocess.CalledProcessError as e:
             if full_path:
@@ -70,8 +57,7 @@ class Test:
 
     def wait_for_pods_to_be_ready(self, namespace='default', expected_pods=0, timeout=1000):
         """
-                Waits for all pods in the specified namespace to be down
-                by checking every second until they are terminated or timeout is reached.
+        Waits for all pods in the specified namespace to be ready.
         """
         print(f"Checking for pods in namespace {namespace}...", flush=True)
         start_time = time.time()
@@ -80,77 +66,78 @@ class Test:
         while time.time() - start_time < timeout:
             try:
                 result = subprocess.run(get_pods_cmd, shell=True,
-                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
-                # Check for "No resources found" in the output
-                # print(f"result {result}",flush=True)
+                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                 running_pods = int(result.stdout.strip())
                 if running_pods >= expected_pods:
                     print(f"All {expected_pods} pods are up and running in namespace {namespace}.", flush=True)
-                    return True  # Pods are down
+                    return True
                 else:
                     print(f" {running_pods} pods are up for now in namespace {namespace}. Waiting...", flush=True)
-
             except subprocess.CalledProcessError as e:
                 print(f"Error checking for pods: {e.stderr}", flush=True)
-                return False  # An error occurred
-
-            time.sleep(1)  # Check every second
-
+                return False
+            time.sleep(1)
         print(f"Timeout waiting for pods to terminate in namespace {namespace}.", flush=True)
-        return False  # Timeout reached
+        return False
 
     def wait_for_pods_to_be_down(self, namespace='default', timeout=1000):
         """
-        Waits for all pods in the specified namespace to be down
-        by checking every second until they are terminated or timeout is reached.
+        Waits for all pods in the specified namespace to be down.
         """
         print(f"Checking for pods in namespace {namespace}...", flush=True)
         start_time = time.time()
-        # get_pods_cmd = f"kubectl get pods -n {namespace}"
         get_pods_cmd = f"kubectl get pods -n {namespace} --no-headers | grep Terminating | wc -l"
 
         while time.time() - start_time < timeout:
             try:
                 result = subprocess.run(get_pods_cmd, shell=True,
-                                        stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-
-                # Check for "No resources found" in the output
-                # terminating_pods = int(result.stdout.strip())
-                # print(f"result {result}",flush=True)
+                                         stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                 if "No resources found" in result.stderr:
                     print(f"No pods found in namespace {namespace}.", flush=True)
-                    return True  # Pods are down
+                    return True
                 else:
                     print(f"Pods still exist in namespace {namespace}. Waiting...", flush=True)
-
             except subprocess.CalledProcessError as e:
                 print(f"Error checking for pods: {e.stderr}", flush=True)
-                return False  # An error occurred
-
-            time.sleep(1)  # Check every second
-
+                return False
+            time.sleep(1)
         print(f"Timeout waiting for pods to terminate in namespace {namespace}.", flush=True)
-        return False  # Timeout reached
+        return False
+
+    # def select_random_pod(self):
+    #     """
+    #     Select a random pod from the list of running pods.
+    #     """
+    #     command = "kubectl get pods --no-headers | grep Running | awk '{print $1}'"
+    #     stdout, stderr = self.run_command(command)
+    #     pod_list = stdout.split()
+    #     if not pod_list:
+    #         raise Exception("No running pods found.")
+    #     return random.choice(pod_list)
 
     def select_random_pod(self):
         """
         Select a random pod from the list of running pods.
         """
         command = "kubectl get pods --no-headers | grep Running | awk '{print $1}'"
-        stdout, stderr = self.run_command(command)  # Extract stdout and stderr from the tuple
+        stdout, stderr = self.run_command(command, suppress_output=True)  # Suppress stdout for this command
         pod_list = stdout.split()  # Split the stdout into a list of pod names
         if not pod_list:
             raise Exception("No running pods found.")
         return random.choice(pod_list)  # Return a random pod name
+
+    def _get_malaysian_time(self):
+        """Helper function to get the current time in Malaysian timezone."""
+        malaysia_tz = pytz.timezone('Asia/Kuala_Lumpur')
+        return datetime.now(malaysia_tz)
 
     def access_pod_and_initiate_gossip(self, pod_name, replicas, unique_id, iteration):
         """
         Access the pod's shell, initiate gossip, and handle the response.
         """
         try:
-            # Log the start of gossip propagation
-            start_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            # Log the start of gossip propagation in Malaysian time
+            start_time = self._get_malaysian_time().strftime('%Y-%m-%d %H:%M:%S')
             message = f'{unique_id}-cubaan{replicas}-{iteration}'
             start_log = {
                 'event': 'gossip_start',
@@ -179,8 +166,8 @@ class Test:
                     output = session.stdout.readline()
                     print(output, flush=True)
                     if 'Received acknowledgment:' in output:
-                        # Log the end of gossip propagation
-                        end_time_log = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                        # Log the end of gossip propagation in Malaysian time
+                        end_time_log = self._get_malaysian_time().strftime('%Y-%m-%d %H:%M:%S')
                         end_log = {
                             'event': 'gossip_end',
                             'pod_name': pod_name,
@@ -216,7 +203,6 @@ class Test:
             return False
 
 if __name__ == '__main__':
-
     # Getting the input or setting
     parser = argparse.ArgumentParser(description="Usage: python automate.py --num_test <number_of_tests>")
     parser.add_argument('--num_tests', required=True, type=int, help="Total number of tests to do")
@@ -225,38 +211,29 @@ if __name__ == '__main__':
 
     test = Test(args.num_tests, args.num_nodes)  # Pass the new arguments to Test
 
-    # helm name is fixed
+    # Helm name is fixed
     helmname = 'cnsim'
 
-    # if node == 10: We don't need to specify because nodes have been filtered
     if test.wait_for_pods_to_be_down(namespace='default', timeout=1000):
-
         # Apply helm
         result = test.run_command(['helm', 'install', helmname, 'chartsim/', '--values',
                                    'chartsim/values.yaml', '--debug',
-                                   '--set','totalNodes=' + str(test.num_nodes)])
+                                   '--set', 'totalNodes=' + str(test.num_nodes)])
 
         print(f"Helm {helmname} started...", flush=True)
 
         if test.wait_for_pods_to_be_ready(namespace='default', expected_pods=test.num_nodes, timeout=1000):
-
             # Create unique uuid for this test
             unique_id = str(uuid.uuid4())[:4]  # Generate a UUID and take the first 4 characters
 
             # Test iteration starts here
-            # for nt in range(1, test.num_tests + 1):
-            for nt in range(1,test.num_tests+1):
-
-                # Choosing gossip-statefulset-0 as initiator
-                # Can change this to random later
+            for nt in range(1, test.num_tests + 1):
                 pod_name = test.select_random_pod()
-
                 print(f"Selected pod: {pod_name}", flush=True)
                 if test.access_pod_and_initiate_gossip(pod_name, test.num_nodes, unique_id, nt):
                     print(f"Test {nt} complete.", flush=True)
                 else:
                     print(f"Test {nt} failed.", flush=True)
-
         else:
             print(f"Failed to prepare pods for {helmname}.", flush=True)
 
@@ -265,7 +242,5 @@ if __name__ == '__main__':
         print(f"Helm {helmname} will be uninstalled...", flush=True)
         if test.wait_for_pods_to_be_down(namespace='default', timeout=1000):
             print(f"Helm {helmname} uninstallation is complete...", flush=True)
-
     else:
         print(f"No file was found for args={args}")
-
