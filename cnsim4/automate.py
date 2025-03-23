@@ -217,6 +217,19 @@ if __name__ == '__main__':
         key, value = s.split('=', 1)
         helm_args[key] = value
 
+    # Ensure totalNodes is provided or set a default value
+    if 'totalNodes' not in helm_args:
+        print("Warning: totalNodes not provided. Using default value: totalNodes=10", flush=True)
+        helm_args['totalNodes'] = '10'  # Set default value
+
+    # Confirm totalNodes value
+    total_nodes = helm_args.get('totalNodes')
+    if not total_nodes or not total_nodes.isdigit():
+        print("Error: totalNodes must be a valid integer.", flush=True)
+        sys.exit(1)
+
+    print(f"totalNodes confirmed: {total_nodes}", flush=True)
+
     test = Test(args.num_tests, helm_args)  # Pass the Helm arguments to Test
 
     # Helm name is fixed
@@ -232,20 +245,15 @@ if __name__ == '__main__':
         result = test.run_command(helm_command)
         print(f"Helm {helmname} started...", flush=True)
 
-        # Dynamically determine num_nodes
-        num_nodes = test.get_num_nodes(namespace='default')
-        if num_nodes <= 0:
-            raise ValueError("No running pods found. Cannot determine num_nodes.")
-
         # Wait for pods to be ready
-        if test.wait_for_pods_to_be_ready(namespace='default', expected_pods=num_nodes, timeout=1000):
+        if test.wait_for_pods_to_be_ready(namespace='default', expected_pods=int(total_nodes), timeout=1000):
             unique_id = str(uuid.uuid4())[:4]
 
             # Test iteration starts here
             for nt in range(0, test.num_tests + 1):
                 pod_name = test.select_random_pod()
                 print(f"Selected pod: {pod_name}", flush=True)
-                if test.access_pod_and_initiate_gossip(pod_name, num_nodes, unique_id, nt):
+                if test.access_pod_and_initiate_gossip(pod_name, int(total_nodes), unique_id, nt):
                     print(f"Test {nt} complete.", flush=True)
                 else:
                     print(f"Test {nt} failed.", flush=True)
