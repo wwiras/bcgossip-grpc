@@ -15,6 +15,7 @@ class Test:
         # Getting test details
         self.num_tests = num_tests
         self.helm_args = helm_args  # Store Helm arguments as a dictionary
+        self.gossip_delay = float(helm_args.get('gossipDelay', 5.0))  # Default 2s
         print(f"self.num_tests = {self.num_tests}", flush=True)
         print(f'self.helm_args = {self.helm_args}', flush=True)
 
@@ -143,6 +144,9 @@ class Test:
         """
         Access the pod's shell, initiate gossip, and handle the response.
         """
+
+        time.sleep(self.gossip_delay)  # Use configurable delay
+
         try:
             start_time = self._get_malaysian_time().strftime('%Y-%m-%d %H:%M:%S')
             message = f'{unique_id}-cubaan{replicas}-{iteration}'
