@@ -20,7 +20,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         # List to keep track of IPs of neighboring nodes
         self.susceptible_nodes = []
         # Set to keep track of messages that have been received to prevent loops
-        self.received_messages = set()
+        self.received_message = ""
         # self.gossip_initiated = False
 
     def get_neighbours(self):
@@ -110,23 +110,18 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
     #     except client.ApiException as e:
     #         print(f"Failed to fetch Pods: {e}", flush=True)
     def SendMessage(self, request, context):
-
-        """
-        Receiving message from other nodes
-        and distribute it to others (multi rounds gossip)
-        """
         message = request.message
         sender_id = request.sender_id
         received_timestamp = time.time_ns()
 
         # For initiating acknowledgment only
-        if sender_ip == self.host:
-            self.received_messages.add(message)
+        if sender_id == self.host:
+            self.received_message = message
             log_message = (f"Gossip initiated by {self.hostname} ({self.host}) at "
                            f"{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(received_timestamp / 1e9))}")
             self._log_event(message, sender_id, received_timestamp, None,
                             'initiate', log_message)
-            self.gossip_message(message, sender_ip)
+            self.gossip_message(message, sender_id)
             return gossip_pb2.Acknowledgment(details=f"Done propagate! {self.host} received: '{message}'")
 
         # Check whether the message is already received ot not
@@ -136,7 +131,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
             self._log_event(message, sender_id, received_timestamp, None, 'duplicate', log_message)
             return gossip_pb2.Acknowledgment(details=f"Duplicate message ignored by ({self.host})")
         else:
-            self.received_messages.add(message)
+            self.received_message = message
             propagation_time = (received_timestamp - request.timestamp) / 1e6
             log_message = (f"({self.hostname}({self.host}) received: '{message}' from {sender_id}"
                            f" in {propagation_time:.2f} ms ")
