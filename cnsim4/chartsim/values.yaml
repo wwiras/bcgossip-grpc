@@ -9,6 +9,6 @@ memory:
 
 image:
   name: wwiras/cnsim4
-  tag: v25 # (direct mail from k8sv2)
+  tag: v26 # (direct mail from k8sv2)
 
 totalNodes: 10       # Default value, can be overridden

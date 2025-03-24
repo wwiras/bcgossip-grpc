@@ -24,93 +24,98 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.received_message = ""
         # self.gossip_initiated = False
 
-    # def get_neighbours(self):
-    #     """Finds neighbor pods using DNS reverse lookup for minimal latency"""
-    #     self.susceptible_nodes = []
-    #
-    #     try:
-    #         # Get all pods in the service (using DNS bulk lookup)
-    #         _, _, pod_ips = socket.gethostbyaddr(f"{self.service_name}.default.svc.cluster.local")
-    #
-    #         for ip in pod_ips:
-    #             # Skip own IP
-    #             if ip == self.host:
-    #                 continue
-    #
-    #             try:
-    #                 # Reverse DNS lookup for pod name (format: pod-name.namespace.pod.cluster.local)
-    #                 hostname = socket.gethostbyaddr(ip)[0].split('.')[0]
-    #                 self.susceptible_nodes.append((hostname, ip))
-    #
-    #             except socket.herror:
-    #                 # Fallback to Kubernetes API if DNS fails
-    #                 config.load_incluster_config()
-    #                 v1 = client.CoreV1Api()
-    #                 pod = v1.read_namespaced_pod(
-    #                     field_selector=f"status.podIP={ip}",
-    #                     namespace="default"
-    #                 )
-    #                 self.susceptible_nodes.append((pod.metadata.name, ip))
-    #
-    #     except (socket.gaierror, socket.herror):
-    #         # Fallback to pure Kubernetes API if DNS completely fails
-    #         config.load_incluster_config()
-    #         v1 = client.CoreV1Api()
-    #         pods = v1.list_namespaced_pod(
-    #             namespace="default",
-    #             label_selector=f"app={self.service_name}"
-    #         )
-    #         self.susceptible_nodes = [
-    #             (pod.metadata.name, pod.status.pod_ip)
-    #             for pod in pods.items
-    #             if pod.status.pod_ip != self.host
-    #         ]
-    #
-    #     return self.susceptible_nodes
-
     def get_neighbours(self):
-        # Clear the existing list to refresh it
+        """Finds neighbor pods using DNS reverse lookup for minimal latency"""
         self.susceptible_nodes = []
 
-        # Load in-cluster config (for running inside Kubernetes)
-        config.load_incluster_config()
-
-        # Create CoreV1Api instance
-        v1 = client.CoreV1Api()
-
-        # Define the namespace and label selector
-        namespace = "default"  # Replace with your namespace if different
-        label_selector = f"app={self.app_name}"  # Use the correct label key and value
-
-        # Debugging: Print the namespace and label selector
-        # print(f"Fetching Pods in namespace: {namespace}, with label selector: {label_selector}", flush=True)
-
         try:
-            # Fetch Pods in the specified namespace with the label selector
-            ret = v1.list_namespaced_pod(namespace=namespace, label_selector=label_selector)
+            # Get all pods in the service (using DNS bulk lookup)
+            _, _, pod_ips = socket.gethostbyaddr(f"{self.service_name}.default.svc.cluster.local")
 
-            # Debugging: Print the number of Pods returned
-            # print(f"Number of Pods returned: {len(ret.items)}", flush=True)
-
-            # Iterate through the Pods
-            for pod in ret.items:
-                # Debugging: Print Pod details
-                # print(f"Pod Name: {pod.metadata.name},
-                # Pod IP: {pod.status.pod_ip}, Labels: {pod.metadata.labels}",flush=True)
-
-                # Skip the Pod's own IP
-                if self.host == pod.status.pod_ip:
-                    # print(f"Skipping own IP: {self.host}", flush=True)
+            for ip in pod_ips:
+                # Skip own IP
+                if ip == self.host:
                     continue
-                # Add the Pod's IP and name to the list of susceptible nodes
-                self.susceptible_nodes.append((pod.metadata.name, pod.status.pod_ip))
 
-            # Optional: Log the list of neighbors for debugging
-            # print(f"Susceptible nodes: {self.susceptible_nodes}", flush=True)
+                try:
+                    # Reverse DNS lookup for pod name (format: pod-name.namespace.pod.cluster.local)
+                    hostname = socket.gethostbyaddr(ip)[0].split('.')[0]
+                    self.susceptible_nodes.append((hostname, ip))
 
-        except client.ApiException as e:
-            print(f"Failed to fetch Pods: {e}", flush=True)
+                except socket.herror:
+                    # Fallback to Kubernetes API if DNS fails
+                    config.load_incluster_config()
+                    v1 = client.CoreV1Api()
+                    pod = v1.read_namespaced_pod(
+                        field_selector=f"status.podIP={ip}",
+                        namespace="default"
+                    )
+                    self.susceptible_nodes.append((pod.metadata.name, ip))
+
+        except (socket.gaierror, socket.herror):
+            # Fallback to pure Kubernetes API if DNS completely fails
+            config.load_incluster_config()
+            v1 = client.CoreV1Api()
+            pods = v1.list_namespaced_pod(
+                namespace="default",
+                label_selector=f"app={self.service_name}"
+            )
+            self.susceptible_nodes = [
+                (pod.metadata.name, pod.status.pod_ip)
+                for pod in pods.items
+                if pod.status.pod_ip != self.host
+            ]
+
+        return self.susceptible_nodes
+
+    # def get_neighbours(self):
+    #     # Clear the existing list to refresh it
+    #     self.susceptible_nodes = []
+    #
+    #     # Load in-cluster config (for running inside Kubernetes)
+    #     config.load_incluster_config()
+    #
+    #     # Create CoreV1Api instance
+    #     v1 = client.CoreV1Api()
+    #
+    #     # Define the namespace and label selector
+    #     namespace = "default"  # Replace with your namespace if different
+    #     label_selector = f"app={self.service_name}"  # Use the correct label key and value
+    #
+    #     # Debugging: Print the namespace and label selector
+    #     # print(f"Fetching Pods in namespace: {namespace}, with label selector: {label_selector}", flush=True)
+    #
+    #     try:
+    #         # Fetch Pods in the specified namespace with the label selector
+    #         ret = v1.list_namespaced_pod(namespace=namespace, label_selector=label_selector)
+    #
+    #         # Debugging: Print the number of Pods returned
+    #         # print(f"Number of Pods returned: {len(ret.items)}", flush=True)
+    #
+    #         # Iterate through the Pods
+    #         for pod in ret.items:
+    #             # Debugging: Print Pod details
+    #             # print(f"Pod Name: {pod.metadata.name},
+    #             # Pod IP: {pod.status.pod_ip}, Labels: {pod.metadata.labels}",flush=True)
+    #
+    #             # Skip the Pod's own IP
+    #             if self.host == pod.status.pod_ip:
+    #                 # print(f"Skipping own IP: {self.host}", flush=True)
+    #                 continue
+    #             # Add the Pod's IP and name to the list of susceptible nodes
+    #             self.susceptible_nodes.append((pod.metadata.name, pod.status.pod_ip))
+    #
+    #         # Optional: Log the list of neighbors for debugging
+    #         # print(f"Susceptible nodes: {self.susceptible_nodes}", flush=True)
+    #
+    #     except client.ApiException as e:
+    #         print(f"Failed to fetch Pods: {e}", flush=True)
     def SendMessage(self, request, context):
+
+        """
+        Receiving message from other nodes
+        and distribute it to others (multi rounds gossip)
+        """
         message = request.message
         sender_id = request.sender_id
         received_timestamp = time.time_ns()
