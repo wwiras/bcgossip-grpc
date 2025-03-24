@@ -17,6 +17,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
         self.host = socket.gethostbyname(self.hostname)
         self.port = '5050'
         self.service_name = service_name
+        self.app_name = 'bcgossip'
         # List to keep track of IPs of neighboring nodes
         self.susceptible_nodes = []
         # Set to keep track of messages that have been received to prevent loops
@@ -79,7 +80,7 @@ class Node(gossip_pb2_grpc.GossipServiceServicer):
 
         # Define the namespace and label selector
         namespace = "default"  # Replace with your namespace if different
-        label_selector = f"app={self.service_name}"  # Use the correct label key and value
+        label_selector = f"app={self.app_name}"  # Use the correct label key and value
 
         # Debugging: Print the namespace and label selector
         # print(f"Fetching Pods in namespace: {namespace}, with label selector: {label_selector}", flush=True)
