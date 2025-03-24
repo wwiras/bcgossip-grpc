@@ -162,7 +162,7 @@ class Test:
             session.stdin.write(f'python3 start.py --message {message}\n')
             session.stdin.flush()
 
-            end_time = time.time() + 2400
+            end_time = time.time() + 3000
             while time.time() < end_time:
                 reads = [session.stdout.fileno()]
                 ready = select.select(reads, [], [], 5)[0]
