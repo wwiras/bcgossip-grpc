@@ -155,7 +155,7 @@ class Test:
             }
             print(json.dumps(start_log), flush=True)
 
-            session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--request-timeout=600',
+            session = subprocess.Popen(['kubectl', 'exec', '-it', pod_name, '--request-timeout=3000',
                                        '--', 'sh'], stdin=subprocess.PIPE,
                                       stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
