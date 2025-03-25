@@ -148,7 +148,7 @@ class Test:
         time.sleep(self.gossip_delay)  # Use configurable delay
 
         try:
-            start_time = self._get_malaysian_time().strftime('%Y-%m-%d %H:%M:%S')
+            start_time = self._get_malaysian_time().strftime('%Y/%m/%d %H:%M:%S')
             message = f'{unique_id}-cubaan{replicas}-{iteration}'
             start_log = {
                 'event': 'gossip_start',
@@ -174,7 +174,7 @@ class Test:
                     output = session.stdout.readline()
                     print(output, flush=True)
                     if 'Received acknowledgment:' in output:
-                        end_time_log = self._get_malaysian_time().strftime('%Y-%m-%d %H:%M:%S')
+                        end_time_log = self._get_malaysian_time().strftime('%Y/%m/%d %H:%M:%S')
                         end_log = {
                             'event': 'gossip_end',
                             'pod_name': pod_name,
